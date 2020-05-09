@@ -1,4 +1,4 @@
-
+let anim = "nothing";
 
 class GameScene extends Phaser.Scene {
     constructor() {
@@ -10,6 +10,7 @@ class GameScene extends Phaser.Scene {
     preload(){
         this.load.image("tiles", "assets/tilesets/buch-outdoor.png");
         this.load.tilemapTiledJSON("map", "assets/tilemaps/testmap.json");
+        this.load.spritesheet('basecharacter', 'assets/basetoon.png', {frameWidth:64,frameHeight:64});
     }
 
 
@@ -30,7 +31,84 @@ class GameScene extends Phaser.Scene {
 
        // this.player = new Player(this, {x:40,y:40});
         this.controller = new Controller(this,client);
+        this.testAnimations();
+    }
+    testAnimations(){
+        this.anims.create({
+            key: 'castup',
+            frames: this.anims.generateFrameNumbers('basecharacter', { start: 0, end: 6 }),
+            frameRate: 2,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'castleft',
+            frames: this.anims.generateFrameNumbers('basecharacter', { start: 13, end: 19 }),
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'castdown',
+            frames: this.anims.generateFrameNumbers('basecharacter', { start: 26, end: 32 }),
+            frameRate: 2,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'castright',
+            frames: this.anims.generateFrameNumbers('basecharacter', { start: 39, end: 45 }),
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'thrustup',
+            frames: this.anims.generateFrameNumbers('basecharacter', { start: 52, end: 59 }),
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'thrustleft',
+            frames: this.anims.generateFrameNumbers('basecharacter', { start: 65, end: 72 }),
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'thrustdown',
+            frames: this.anims.generateFrameNumbers('basecharacter', { start: 78, end: 85 }),
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'thrustright',
+            frames: this.anims.generateFrameNumbers('basecharacter', { start: 91, end: 98 }),
+            frameRate: 10,
+            repeat: -1
+        });
+        //104 is standing
+        this.anims.create({
+            key: 'walkup',
+            frames: this.anims.generateFrameNumbers('basecharacter', { start: 104, end: 112 }),
+            frameRate: 10,
+            repeat: -1
+        });
 
+        this.anims.create({
+            key: 'walkleft',
+            frames: this.anims.generateFrameNumbers('basecharacter', { start: 117, end: 125 }),
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'walkdown',
+            frames: this.anims.generateFrameNumbers('basecharacter', { start: 130, end: 138 }),
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'walkright',
+            frames: this.anims.generateFrameNumbers('basecharacter', { start: 143, end: 151 }),
+            frameRate: 10,
+            repeat: -1
+        });
+        anim = "walkright"
     }
 
     newEntity(id, x, y){
@@ -62,7 +140,7 @@ class GameScene extends Phaser.Scene {
 class MovingSprite{
     constructor(scene, pos, imageID){
         this.pos = pos;
-        this.sprite = scene.add.image(pos.x, pos.y, imageID);
+        this.sprite = scene.add.sprite(pos.x, pos.y, imageID);
         this.newPosition = pos;
     }
 
@@ -84,7 +162,9 @@ class MovingSprite{
 
 class Player extends MovingSprite{
     constructor(scene, pos){
-        super(scene,pos, "player");
+        super(scene,pos, "walk");
+        this.sprite.anims.play(anim);
+
     }
 
     update(){
