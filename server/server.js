@@ -77,16 +77,16 @@ class MovingGameObject{
 
     addMovement(addedVelocity){
         let previouseVelocity = this.velocity;
-        let x = addedVelocity.x + previouseVelocity.x;
-        let y = addedVelocity.y + previouseVelocity.y;
-
+        let x = Math.sign(addedVelocity.x) + Math.sign(previouseVelocity.x);
+        let y = Math.sign(addedVelocity.y) + Math.sign(previouseVelocity.y);
+// maybe anim event here for direction
         if(Math.abs(x) > 0 && Math.abs(y) > 0){
             let xSign = Math.sign(x);
             let ySign = Math.sign(y);
             let mX = x;
             let mY = y;
-            x = Math.pow(0.5,(mX * mX) + (mY * mY)) * xSign;
-            y = Math.pow(0.5,(mX * mX) + (mY * mY)) * ySign;
+            x = Math.pow(0.8,(mX * mX) + (mY * mY)) * xSign;
+            y = Math.pow(0.8,(mX * mX) + (mY * mY)) * ySign;
         }
 
         this.velocity = {x: x * this.moveSpeed, y: y * this.moveSpeed};
