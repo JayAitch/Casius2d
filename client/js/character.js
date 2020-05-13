@@ -3,7 +3,7 @@
 class MovingSprite{
     constructor(scene, pos, animationLookup){
         this.pos = pos;
-        this.sprite = scene.add.sprite(pos.x, pos.y, animationLookup.key);
+        this.sprite = scene.add.sprite(pos.x, pos.y, animationLookup);
         this.newPosition = pos;
         this.lastAnim = "";
         this.animationLookup = animationLookup;
@@ -74,7 +74,7 @@ class MovingMultiSprite extends MovingSprite{
         super(scene,pos, base);
         this.spriteList = {};
         array.forEach((elem)=>{
-            let sprite = scene.add.sprite(pos.x, pos.y, elem);
+            let sprite = scene.add.sprite(pos.x, pos.y);
             this.spriteList[elem] = sprite
         })
     }
@@ -104,7 +104,7 @@ class MovingMultiSprite extends MovingSprite{
 
 class Player extends MovingMultiSprite{
     constructor(scene, pos){
-        super(scene,pos, "basecharacter", ["goldhelm","goldlegs","jacket", "spear","shield","leatherbelt"]);
+        super(scene,pos, "basecharacter", ["dspear","goldhelm", "goldlegs", "leatherbelt","jacket"]);
     }
 
     update(){

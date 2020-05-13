@@ -1,4 +1,4 @@
-
+let anim = "nothing";
 
 let slots = {"HEAD":"HEAD","BODY":"BODY","BELT":"BELT","LEGS":"LEGS", "1HWEAPON":"1HWEAPON", "2HWEAPON":"2HWEAPON", "OFFHAND":"OFFHAND"}
 class Item {
@@ -19,7 +19,7 @@ class EquiptableItem extends Item{
 }
 let item = new EquiptableItem()
 equiptableItems = [];
-equiptableItems[0] = new EquiptableItem("goldhelm", "", "", "goldhelm", slots.HEAD);
+equiptableItems[0] = new EquiptableItem("goldhelm", "", "");
 equiptableItems[1] = new EquiptableItem("goldlegs");
 equiptableItems[2] = new EquiptableItem("leatherbelt");
 equiptableItems[3] = new EquiptableItem("jacket");
@@ -41,7 +41,7 @@ class GameScene extends Phaser.Scene {
 
 
     create(){
-        const client = new GameClient(this, "192.168.1.8", "55000");
+        const client = new GameClient(this, "localhost", "55000");
         client.sender.connect();
         const map = this.make.tilemap({ key: "map" });
 
@@ -96,7 +96,8 @@ class Controller{
 
 
         spaceKey.on('down', (event)=> {
-            console.log(scene.mapEntities);
+           // console.log(scene.mapEntities);
+            scene.mapEntities[0].animation = "walkup"
         });
         this.client = client;
 

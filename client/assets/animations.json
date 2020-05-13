@@ -398,5 +398,62 @@
                                     "frameRate": 10,
                                     "repeat": -1
                             }
+                },
+                "dspear" : {
+                            "castup" : {
+                                    "frames": { "key": "dspear","start" : 32, "end" : 38},
+                                    "frameRate" : 10,
+                                    "repeat" : -1
+                            },
+                            "castleft": {
+                                    "frames": { "key": "dspear","start" : 32, "end" : 38},
+                                    "frameRate" : 10,
+                                    "repeat" : -1
+                            },
+                            "castdown": {
+                                    "frames": { "key": "dspear","start" : 32, "end" : 38},
+                                    "frameRate": 10
+                            },
+                            "castright": {
+                                    "frames": { "key": "dspear","start" : 32, "end" : 38},
+                                    "frameRate": 10
+                            },
+                            "thrustup": {
+                                    "frames": { "key": "dspear","start" : 0, "end" : 7},
+                                    "frameRate": 10
+                            },
+                            "thrustleft": {
+                                    "frames": { "key": "dspear","start" : 8, "end" : 15},
+                                    "frameRate": 10
+                            },
+                            "thrustdown": {
+                                    "frames": { "key": "dspear","start" : 16, "end" : 23},
+                                    "frameRate": 10
+                            },
+                            "thrustright": {
+                                    "frames": { "key": "dspear","start" : 24, "end" : 31},
+                                    "frameRate": 10
+                            },
+                            "walkup": {
+                                    "frames": { "key": "dspear","start" : 32, "end" : 38},
+                                    "frameRate": 10,
+                                    "repeat": -1
+                            },
+                            "walkleft": {
+                                    "frames": { "key": "dspear","start" : 32, "end" : 38},
+                                    "frameRate": 10,
+                                    "repeat": -1
+                            },
+                            "walkdown": {
+                                    "frames": { "key": "dspear","start" : 32, "end" : 38},
+                                    "frameRate": 10,
+                                    "repeat": -1
+                            },
+                            "walkright": {
+                                    "frames": { "key": "dspear","start" : 32, "end" : 38},
+                                    "frameRate": 10,
+                                    "repeat": -1
+                            }
+
                 }
     }
