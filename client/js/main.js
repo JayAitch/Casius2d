@@ -12,9 +12,9 @@ const config = {
     dom: {
         createContainer: true
     },
-    scene: [GameScene],
+    scene: [BootScene, PreloadScene, GameScene],
 };
-
+let game;
 window.addEventListener('load', (event) => {
     game = new Phaser.Game(config);
 });

@@ -40,8 +40,8 @@ class Receiver{
 
             for(let i = 0; data.length > i; i++){
                 let dataRow = data[i];
-                console.log(dataRow);
-                console.log(dataRow.id);
+          //       console.log(dataRow);
+              //  console.log(dataRow.id);
                 if(dataRow.pos != undefined)
                 this.gameScene.newEntity(i, dataRow.pos.x, dataRow.pos.y);
             }

@@ -1,0 +1,402 @@
+   {
+        "basecharacter" : {
+                    "castup" : {
+                            "frames" : {"key": "basecharacter","start" : 0, "end" : 6},
+                            "frameRate" : 10,
+                            "repeat" : -1
+                    },
+                    "castleft": {
+                            "frames" : { "key": "basecharacter","start" : 13, "end" : 19 },
+                            "frameRate" : 10,
+                            "repeat" : -1
+                    },
+                    "castdown": {
+                            "frames": { "key": "basecharacter","start" : 26, "end" : 32},
+                            "frameRate": 10
+                    },
+                    "castright": {
+                            "frames": { "key": "basecharacter","start" : 39, "end" : 45},
+                            "frameRate": 10
+                    },
+
+                    "thrustup": {
+                            "frames": { "key": "basecharacter","start" : 52, "end" : 59},
+                            "frameRate": 10
+                    },
+                    "thrustleft": {
+                            "frames": { "key": "basecharacter","start" : 65, "end" : 72},
+                            "frameRate": 10
+                    },
+                    "thrustdown": {
+                            "frames": { "key": "basecharacter","start" : 78, "end" : 85},
+                            "frameRate": 10
+                    },
+                    "thrustright": {
+                            "frames": { "key": "basecharacter","start" : 91, "end" : 98},
+                            "frameRate": 10
+                    },
+                    "walkup": {
+                            "frames": { "key": "basecharacter","start" : 104, "end" : 112},
+                            "frameRate": 10,
+                            "repeat": -1
+                    },
+                    "walkleft": {
+                            "frames": { "key": "basecharacter","start" : 117, "end" : 125},
+                            "frameRate": 10,
+                            "repeat": -1
+                    },
+                    "walkdown": {
+                            "frames": { "key": "basecharacter","start" : 130, "end" : 138},
+                            "frameRate": 10,
+                            "repeat": -1
+                    },
+                    "walkright": {
+                            "frames": { "key": "basecharacter","start" : 143, "end" : 151},
+                            "frameRate": 10,
+                            "repeat": -1
+                    }
+        },
+        "goldhelm" : {
+                    "castup" : {
+                            "frames" : {"key": "goldhelm","start" : 0, "end" : 6},
+                            "frameRate" : 10,
+                            "repeat" : -1
+                    },
+                    "castleft": {
+                            "frames" : { "key": "goldhelm","start" : 13, "end" : 19 },
+                            "frameRate" : 10,
+                            "repeat" : -1
+                    },
+                    "castdown": {
+                            "frames": { "key": "goldhelm","start" : 26, "end" : 32},
+                            "frameRate": 10
+                    },
+                    "castright": {
+                            "frames": { "key": "goldhelm","start" : 39, "end" : 45},
+                            "frameRate": 10
+                    },
+
+                    "thrustup": {
+                            "frames": { "key": "goldhelm","start" : 52, "end" : 59},
+                            "frameRate": 10
+                    },
+                    "thrustleft": {
+                            "frames": { "key": "goldhelm","start" : 65, "end" : 72},
+                            "frameRate": 10
+                    },
+                    "thrustdown": {
+                            "frames": { "key": "goldhelm","start" : 78, "end" : 85},
+                            "frameRate": 10
+                    },
+                    "thrustright": {
+                            "frames": { "key": "goldhelm","start" : 91, "end" : 98},
+                            "frameRate": 10
+                    },
+                    "walkup": {
+                            "frames": { "key": "goldhelm","start" : 104, "end" : 112},
+                            "frameRate": 10,
+                            "repeat": -1
+                    },
+                    "walkleft": {
+                            "frames": { "key": "goldhelm","start" : 117, "end" : 125},
+                            "frameRate": 10,
+                            "repeat": -1
+                    },
+                    "walkdown": {
+                            "frames": { "key": "goldhelm","start" : 130, "end" : 138},
+                            "frameRate": 10,
+                            "repeat": -1
+                    },
+                    "walkright": {
+                            "frames": { "key": "goldhelm","start" : 143, "end" : 151},
+                            "frameRate": 10,
+                            "repeat": -1
+                    }
+        },
+        "spear" : {
+                    "castup" : {
+                            "frames" : {"key": "spear","start" : 0, "end" : 6},
+                            "frameRate" : 10,
+                            "repeat" : -1
+                    },
+                    "castleft": {
+                            "frames" : { "key": "spear","start" : 13, "end" : 19 },
+                            "frameRate" : 10,
+                            "repeat" : -1
+                    },
+                    "castdown": {
+                            "frames": { "key": "spear","start" : 26, "end" : 32},
+                            "frameRate": 10
+                    },
+                    "castright": {
+                            "frames": { "key": "spear","start" : 39, "end" : 45},
+                            "frameRate": 10
+                    },
+
+                    "thrustup": {
+                            "frames": { "key": "spear","start" : 52, "end" : 59},
+                            "frameRate": 10
+                    },
+                    "thrustleft": {
+                            "frames": { "key": "spear","start" : 65, "end" : 72},
+                            "frameRate": 10
+                    },
+                    "thrustdown": {
+                            "frames": { "key": "spear","start" : 78, "end" : 85},
+                            "frameRate": 10
+                    },
+                    "thrustright": {
+                            "frames": { "key": "spear","start" : 91, "end" : 98},
+                            "frameRate": 10
+                    },
+                    "walkup": {
+                            "frames": { "key": "spear","start" : 104, "end" : 112},
+                            "frameRate": 10,
+                            "repeat": -1
+                    },
+                    "walkleft": {
+                            "frames": { "key": "spear","start" : 117, "end" : 125},
+                            "frameRate": 10,
+                            "repeat": -1
+                    },
+                    "walkdown": {
+                            "frames": { "key": "spear","start" : 130, "end" : 138},
+                            "frameRate": 10,
+                            "repeat": -1
+                    },
+                    "walkright": {
+                            "frames": { "key": "spear","start" : 143, "end" : 151},
+                            "frameRate": 10,
+                            "repeat": -1
+                    }
+        },
+        "goldlegs" : {
+                    "castup" : {
+                            "frames" : {"key": "goldlegs","start" : 0, "end" : 6},
+                            "frameRate" : 10,
+                            "repeat" : -1
+                    },
+                    "castleft": {
+                            "frames" : { "key": "goldlegs","start" : 13, "end" : 19 },
+                            "frameRate" : 10,
+                            "repeat" : -1
+                    },
+                    "castdown": {
+                            "frames": { "key": "goldlegs","start" : 26, "end" : 32},
+                            "frameRate": 10
+                    },
+                    "castright": {
+                            "frames": { "key": "goldlegs","start" : 39, "end" : 45},
+                            "frameRate": 10
+                    },
+
+                    "thrustup": {
+                            "frames": { "key": "goldlegs","start" : 52, "end" : 59},
+                            "frameRate": 10
+                    },
+                    "thrustleft": {
+                            "frames": { "key": "goldlegs","start" : 65, "end" : 72},
+                            "frameRate": 10
+                    },
+                    "thrustdown": {
+                            "frames": { "key": "goldlegs","start" : 78, "end" : 85},
+                            "frameRate": 10
+                    },
+                    "thrustright": {
+                            "frames": { "key": "goldlegs","start" : 91, "end" : 98},
+                            "frameRate": 10
+                    },
+                    "walkup": {
+                            "frames": { "key": "goldlegs","start" : 104, "end" : 112},
+                            "frameRate": 10,
+                            "repeat": -1
+                    },
+                    "walkleft": {
+                            "frames": { "key": "goldlegs","start" : 117, "end" : 125},
+                            "frameRate": 10,
+                            "repeat": -1
+                    },
+                    "walkdown": {
+                            "frames": { "key": "goldlegs","start" : 130, "end" : 138},
+                            "frameRate": 10,
+                            "repeat": -1
+                    },
+                    "walkright": {
+                            "frames": { "key": "goldlegs","start" : 143, "end" : 151},
+                            "frameRate": 10,
+                            "repeat": -1
+                    }
+        },
+        "leatherbelt" : {
+                            "castup" : {
+                                    "frames" : {"key": "leatherbelt","start" : 0, "end" : 6},
+                                    "frameRate" : 10,
+                                    "repeat" : -1
+                            },
+                            "castleft": {
+                                    "frames" : { "key": "leatherbelt","start" : 13, "end" : 19 },
+                                    "frameRate" : 10,
+                                    "repeat" : -1
+                            },
+                            "castdown": {
+                                    "frames": { "key": "leatherbelt","start" : 26, "end" : 32},
+                                    "frameRate": 10
+                            },
+                            "castright": {
+                                    "frames": { "key": "leatherbelt","start" : 39, "end" : 45},
+                                    "frameRate": 10
+                            },
+        
+                            "thrustup": {
+                                    "frames": { "key": "leatherbelt","start" : 52, "end" : 59},
+                                    "frameRate": 10
+                            },
+                            "thrustleft": {
+                                    "frames": { "key": "leatherbelt","start" : 65, "end" : 72},
+                                    "frameRate": 10
+                            },
+                            "thrustdown": {
+                                    "frames": { "key": "leatherbelt","start" : 78, "end" : 85},
+                                    "frameRate": 10
+                            },
+                            "thrustright": {
+                                    "frames": { "key": "leatherbelt","start" : 91, "end" : 98},
+                                    "frameRate": 10
+                            },
+                            "walkup": {
+                                    "frames": { "key": "leatherbelt","start" : 104, "end" : 112},
+                                    "frameRate": 10,
+                                    "repeat": -1
+                            },
+                            "walkleft": {
+                                    "frames": { "key": "leatherbelt","start" : 117, "end" : 125},
+                                    "frameRate": 10,
+                                    "repeat": -1
+                            },
+                            "walkdown": {
+                                    "frames": { "key": "leatherbelt","start" : 130, "end" : 138},
+                                    "frameRate": 10,
+                                    "repeat": -1
+                            },
+                            "walkright": {
+                                    "frames": { "key": "leatherbelt","start" : 143, "end" : 151},
+                                    "frameRate": 10,
+                                    "repeat": -1
+                            }
+                },
+                
+        "jacket" : {
+                            "castup" : {
+                                    "frames" : {"key": "jacket","start" : 0, "end" : 6},
+                                    "frameRate" : 10,
+                                    "repeat" : -1
+                            },
+                            "castleft": {
+                                    "frames" : { "key": "jacket","start" : 13, "end" : 19 },
+                                    "frameRate" : 10,
+                                    "repeat" : -1
+                            },
+                            "castdown": {
+                                    "frames": { "key": "jacket","start" : 26, "end" : 32},
+                                    "frameRate": 10
+                            },
+                            "castright": {
+                                    "frames": { "key": "jacket","start" : 39, "end" : 45},
+                                    "frameRate": 10
+                            },
+        
+                            "thrustup": {
+                                    "frames": { "key": "jacket","start" : 52, "end" : 59},
+                                    "frameRate": 10
+                            },
+                            "thrustleft": {
+                                    "frames": { "key": "jacket","start" : 65, "end" : 72},
+                                    "frameRate": 10
+                            },
+                            "thrustdown": {
+                                    "frames": { "key": "jacket","start" : 78, "end" : 85},
+                                    "frameRate": 10
+                            },
+                            "thrustright": {
+                                    "frames": { "key": "jacket","start" : 91, "end" : 98},
+                                    "frameRate": 10
+                            },
+                            "walkup": {
+                                    "frames": { "key": "jacket","start" : 104, "end" : 112},
+                                    "frameRate": 10,
+                                    "repeat": -1
+                            },
+                            "walkleft": {
+                                    "frames": { "key": "jacket","start" : 117, "end" : 125},
+                                    "frameRate": 10,
+                                    "repeat": -1
+                            },
+                            "walkdown": {
+                                    "frames": { "key": "jacket","start" : 130, "end" : 138},
+                                    "frameRate": 10,
+                                    "repeat": -1
+                            },
+                            "walkright": {
+                                    "frames": { "key": "jacket","start" : 143, "end" : 151},
+                                    "frameRate": 10,
+                                    "repeat": -1
+                            }
+                },
+                "shield" : {
+                            "castup" : {
+                                    "frames" : {"key": "shield","start" : 0, "end" : 6},
+                                    "frameRate" : 10,
+                                    "repeat" : -1
+                            },
+                            "castleft": {
+                                    "frames" : { "key": "shield","start" : 13, "end" : 19 },
+                                    "frameRate" : 10,
+                                    "repeat" : -1
+                            },
+                            "castdown": {
+                                    "frames": { "key": "shield","start" : 26, "end" : 32},
+                                    "frameRate": 10
+                            },
+                            "castright": {
+                                    "frames": { "key": "shield","start" : 39, "end" : 45},
+                                    "frameRate": 10
+                            },
+
+                            "thrustup": {
+                                    "frames": { "key": "shield","start" : 52, "end" : 59},
+                                    "frameRate": 10
+                            },
+                            "thrustleft": {
+                                    "frames": { "key": "shield","start" : 65, "end" : 72},
+                                    "frameRate": 10
+                            },
+                            "thrustdown": {
+                                    "frames": { "key": "shield","start" : 78, "end" : 85},
+                                    "frameRate": 10
+                            },
+                            "thrustright": {
+                                    "frames": { "key": "shield","start" : 91, "end" : 98},
+                                    "frameRate": 10
+                            },
+                            "walkup": {
+                                    "frames": { "key": "shield","start" : 104, "end" : 112},
+                                    "frameRate": 10,
+                                    "repeat": -1
+                            },
+                            "walkleft": {
+                                    "frames": { "key": "shield","start" : 117, "end" : 125},
+                                    "frameRate": 10,
+                                    "repeat": -1
+                            },
+                            "walkdown": {
+                                    "frames": { "key": "shield","start" : 130, "end" : 138},
+                                    "frameRate": 10,
+                                    "repeat": -1
+                            },
+                            "walkright": {
+                                    "frames": { "key": "shield","start" : 143, "end" : 151},
+                                    "frameRate": 10,
+                                    "repeat": -1
+                            }
+                }
+    }
