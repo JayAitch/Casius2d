@@ -63,10 +63,12 @@ class GameScene extends Phaser.Scene {
         this.mapEntities[id] = new Player(this, {x:x,y:y});
     }
 
-    moveEntity(id, x, y){
+    moveEntity(id, x, y, facing, state){
         let entity = this.mapEntities[id];
         if(entity)
         entity.newPosition = {x:x, y:y};
+        entity.facing = facing;
+        entity.state = state;
     }
 
     playerSpawn(id, x, y){

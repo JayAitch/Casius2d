@@ -7,6 +7,8 @@ class MovingSprite{
         this.newPosition = pos;
         this.lastAnim = "";
         this.animationLookup = animationLookup;
+        this.facing = "up"
+        this.state = "walk" // move all this to animation handler
     }
 
     move(){
@@ -32,27 +34,9 @@ class MovingSprite{
         let direction = {x:0,y:0};
         direction.x =  this.newPosition.x - this.pos.x;
         direction.y  =  this.newPosition.y - this.pos.y;
-        let animPrefix = "thrust";
+        let animPrefix = this.state;
 
-        let anim = "";
-        // not like this
-        if(direction.x === 0){
-         if(direction.y < 0){
-                anim = animPrefix +"up";
-            }
-
-            else if(direction.y > 0){
-                anim = animPrefix + "down";
-            }
-        }
-        else{
-            if(direction.x < 0){
-                anim = animPrefix + "left";
-            }
-            else if(direction.x > 0){
-                anim = animPrefix + "right";
-            }
-        }
+        let anim = animPrefix + this.facing;
 
 
 

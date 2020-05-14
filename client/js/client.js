@@ -33,7 +33,7 @@ class Receiver{
         });
 
         this.socket.on('moveEntity',(data)=>{
-            this.gameScene.moveEntity(data.id, data.x, data.y);
+            this.gameScene.moveEntity(data.id, data.x, data.y, data.facing, data.state);
         });
 
         this.socket.on('entityList', (data)=>{
