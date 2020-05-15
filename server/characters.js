@@ -70,6 +70,16 @@ class MovingGameObject{
         this.pos = pos;
         this.animationComponent = new AnimationComponent(animLayers);
         this.components = [];
+        this.width = 64; //temp
+        this.height = 64;//temp
+        this.isActive = true; //temp
+    }
+
+    get x(){
+        return this.pos.x;
+    }
+    get y(){
+        return this.pos.y;
     }
 
     addMovement(addedVelocity){

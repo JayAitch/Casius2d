@@ -17,7 +17,7 @@ players = {
         paperDoll:{
             HEAD: items.data.goldhelm,
             BODY: items.data.jacket,
-            WEAPON: undefined,
+            WEAPON: items.data.spear,
             OFFHAND: undefined,
             LEGS: items.data.goldlegs,
             BOOTS: undefined
@@ -40,7 +40,6 @@ io.on('connect', function(client) {
     });
 
     client.on('move',function(data) {
-        console.log(rm.roomManager.rooms);
         client.player.addMovement({x:data.x, y:data.y});
     });
 

@@ -71,6 +71,7 @@ class CollisionManager {
         })
     }
 
+    scane
     collides (a, b) {
         let aWidth = a.width / 2;
         let aHeight = a.height / 2;

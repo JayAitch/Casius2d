@@ -19,6 +19,7 @@ class Zone{
         this.entities = [];
         this.room = roomManager.roomManager.createRoom();
         systems.addToUpdate(this);
+        this.collisionManager = new systems.CollisionManager();
     }
 
     join(client){
@@ -29,12 +30,28 @@ class Zone{
 
     addPlayerCharacter(client){
         let entityPos = this.entities.length;
-        let newPlayer = new characters.Player({x:400,y:400},players[0]);
+        let newPlayer = new characters.Player({x:400,y:400}, players[0]);
         client.player = newPlayer;
+        this.testCollisons(newPlayer);
+
         this.entities.push(newPlayer);
+
         this.notifyNewEntity(client, newPlayer, entityPos);
         client.emit("entityList", this.allEntities());
+
     }
+
+    testCollisons(nEnity){
+        let collisionCount = 0;
+        this.entities.forEach((entity)=>{
+            console.log("addded colliion foir");
+            this.collisionManager.addCollision(entity,nEnity, function(obj){
+                collisionCount++
+                console.log("collsioin " + collisionCount);
+            })
+        })
+    }
+
 
     allEntities() {
         let tempEntities = [];
@@ -91,6 +108,7 @@ class Zone{
             entitiy.update();
             this.notifyEntityUpdate(entitiy, i);
         }
+            this.collisionManager.update();
     }
 }
 

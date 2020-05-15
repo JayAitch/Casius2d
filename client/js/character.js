@@ -61,6 +61,7 @@ class MovingMultiSprite extends MovingSprite{
             let sprite = scene.add.sprite(pos.x, pos.y);
             this.spriteList[elem] = sprite
         })
+
     }
 
     set animation(animKey){
