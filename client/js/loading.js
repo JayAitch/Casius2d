@@ -129,6 +129,9 @@ class PreloadScene extends Phaser.Scene{
                     case 'tilemapTiledJSON':
                         this.load[group](key, value);
                         break;
+                    case 'html':
+                        this.load[group](key, value);
+                        break;
                     default:
 
                 }

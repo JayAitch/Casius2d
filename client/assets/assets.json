@@ -1,0 +1,52 @@
+{
+  "html":{
+    "paperdoll": "assets/text/paperDoll.html"
+  },
+    "json": {
+      "animations": "assets/animations.json",
+      "items": "assets/items.json"
+    },
+    "image": {
+        "tiles": "assets/tilesets/magecity.png"
+    },
+    "tilemapTiledJSON": {
+        "map": "assets/tilemaps/testmap.json"
+    },
+    "spritesheet":{
+                "goldhelm": {
+                    "path":"assets/character/armour/helm/golden_helm_male.png",
+                    "options":{"frameWidth":64,"frameHeight":64}
+                },
+                "goldlegs": {
+                    "path":"assets/character/armour/legs/golden_greaves_male.png",
+                    "options":{"frameWidth":64,"frameHeight":64}
+                },
+                "basecharacter": {
+                    "path":"assets/character/body/tanned.png",
+                    "options":{"frameWidth":64,"frameHeight":64}
+                },
+                "leatherbelt": {
+                    "path":"assets/character/armour/belt/leather_male.png",
+                    "options":{"frameWidth":64,"frameHeight":64}
+                },
+                "jacket": {
+                    "path":"assets/character/armour/body/jacket_male.png",
+                    "options":{"frameWidth":64,"frameHeight":64}
+                },
+                "spear": {
+                    "path":"assets/character/weapon/spear.png",
+                    "options":{"frameWidth":64,"frameHeight":64}
+                },
+                "dspear": {
+                     "path":"assets/character/weapon/dragonspear.png",
+                     "options":{"frameWidth":192,"frameHeight":192}
+                },
+                "shield": {
+                     "path":"assets/character/weapon/shield.png",
+                     "options":{"frameWidth":64,"frameHeight":64}
+                }
+    },
+    "audio": {
+    }
+
+}

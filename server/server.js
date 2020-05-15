@@ -31,7 +31,7 @@ class Zone{
 
     addPlayerCharacter(client){
         let entityPos = this.entities.length;
-        let newPlayer = new Player({x:400,y:400});
+        let newPlayer = new Player({x:400,y:400},players[0]);
         client.player = newPlayer;
         this.entities.push(newPlayer);
         this.notifyNewEntity(client, newPlayer, entityPos);
@@ -107,25 +107,67 @@ states  = {"THRUST":"thrust", "WALK":"walk","CAST":"cast", "STOP":"stop"}
 
 
 allGear = ["dspear", "goldhelm", "goldlegs", "leatherbelt", "jacket","dspear", "goldhelm", "goldlegs", "leatherbelt", "jacket"]
-let compCount = 0;
+
+items = {
+    "goldhelm": {
+        "animString" : "goldhelm",
+        "inventoryIcon": "goldHelm",
+        "slot": "HEAD"
+    },
+    "dspear": {
+        "animString" : "dspear",
+        "inventoryIcon": "dspear",
+        "slot": "WEAPON"
+    },
+    "goldlegs": {
+        "animString" : "goldlegs",
+        "inventoryIcon": "goldlegs",
+        "slot": "LEGS"
+    },
+    "leatherbelt": {
+        "animString" : "leatherbelt",
+        "inventoryIcon": "leatherbelt",
+        "slot": "BELT"
+    },
+    "jacket": {
+        "animString" : "jacket",
+        "inventoryIcon": "jacket",
+        "slot": "BODY"
+    },
+    "shield": {
+        "animString" : "shield",
+        "inventoryIcon": "shield",
+        "slot": "OFFHAND"
+    },
+    "spear": {
+        "animString" : "spear",
+        "inventoryIcon": "spear",
+        "slot": "WEAPON"
+    }
+};
+
+
+players = {
+    0:{
+        base:"basecharacter",
+        paperDoll:{
+            HEAD: items.goldhelm,
+            BODY: items.jacket,
+            WEAPON: undefined,
+            OFFHAND: undefined,
+            LEGS: items.goldlegs,
+            BOOTS: undefined
+        }
+    }
+};
+
 
 class AnimationComponent{
-    constructor() {
+    constructor(animLayers) {
         this.currentState = states.STOP;
         this.facing = directions.NORTH;
-        this.baseSprite = "basecharacter"
-        if(compCount % 2){
-            this.spriteLayers = ["spear", "goldhelm", "goldlegs", "leatherbelt", "shield"]
-        }else{
-            this.spriteLayers = ["spear", "jacket", "goldlegs", "leatherbelt"]
-        }
-       // this.spriteLayers = ["spear", "goldhelm", "goldlegs", "leatherbelt", "shield"]
-        this.testDifferentGear();
-        compCount++;
-    }
-
-    testDifferentGear(){
-    //    this.spriteLayers.push(randomGear[randomInt(0, randomGear.length -1)]);
+        this.baseSprite = animLayers.base
+        this.spriteLayers = animLayers.layers;
     }
 
     set facing(val){
@@ -183,11 +225,11 @@ class AnimationComponent{
 
 
 class MovingGameObject{
-    constructor(pos) {
+    constructor(pos, animLayers) {
         this.velocity = {x: 0, y: 0};
         this.moveSpeed = 4;
         this.pos = pos;
-        this.animationComponent = new AnimationComponent();
+        this.animationComponent = new AnimationComponent(animLayers);
         this.components = [];
     }
 
@@ -240,11 +282,40 @@ class MovingGameObject{
     }
 }
 
+function getGearSlot(paperdoll, key) {
+    let gearSlot = paperdoll[key];
+    return gearSlot;
+}
+
 
 class Player extends MovingGameObject{
-    constructor(pos){
-        super(pos);
+    constructor(pos, playerConfig){
+        let animLayers = {base:playerConfig.base};
+        let paperDoll = playerConfig.paperDoll;
+        let layers = [];
+        let item = getGearSlot(paperDoll, "BOOTS")
+        if(item)layers.push(item.animString);
+
+        item = getGearSlot(paperDoll, "LEGS")
+        if(item)layers.push(item.animString);
+
+        item = getGearSlot(paperDoll, "BODY")
+        if(item)layers.push(item.animString);
+
+        item = getGearSlot(paperDoll, "HEAD")
+        if(item)layers.push(item.animString);
+
+        item = getGearSlot(paperDoll, "WEAPON")
+        if(item)layers.push(item.animString);
+
+        item = getGearSlot(paperDoll, "OFFHAND")
+        if(item)layers.push(item.animString);
+
+        animLayers.layers = layers;
+
+        super(pos, animLayers);
     }
+
 }
 
 

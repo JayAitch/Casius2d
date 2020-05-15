@@ -1,6 +1,8 @@
 let anim = "nothing";
 
-let slots = {"HEAD":"HEAD","BODY":"BODY","BELT":"BELT","LEGS":"LEGS", "1HWEAPON":"1HWEAPON", "2HWEAPON":"2HWEAPON", "OFFHAND":"OFFHAND"}
+//let slots = {"HEAD":"HEAD","BODY":"BODY","BELT":"BELT","LEGS":"LEGS", "1HWEAPON":"1HWEAPON", "2HWEAPON":"2HWEAPON", "OFFHAND":"OFFHAND"}
+
+let slots = {"HEAD":"HEAD","BODY":"BODY","BELT":"BELT","LEGS":"LEGS", "BOOT":"BOOT", "WEAPON":"WEAPON", "OFFHAND":"OFFHAND"}
 class Item {
     constructor(iconString, name, description){
         this.iconString = iconString;
@@ -28,6 +30,35 @@ equiptableItems[5] = new EquiptableItem("shield");
 equiptableItems[6] = new EquiptableItem("tspear");
 
 
+class PaperDollScene extends  Phaser.Scene {
+    constructor() {
+        super({key: 'paperdoll'});
+        this.slots = {"HEAD":"HEAD","BODY":"BODY","BELT":"BELT","LEGS":"LEGS", "BOOTS":"BOOTS", "WEAPON":"WEAPON", "OFFHAND":"OFFHAND"}
+    }
+
+    preload(){
+    }
+
+    create() {
+        this.paperDoll = this.add.dom(100, 600).createFromCache('paperdoll');
+        let node = this.paperDoll.node
+
+        let slots = node.querySelectorAll(".inventory_slot");
+        slots.forEach((slot)=>{
+            slot.addEventListener('click', (event)=>{
+                let slotName = this.slots[slot.getAttribute("slot")];
+                this.clickSlot(slotName);
+            });
+        });
+
+    }
+
+    clickSlot(slot){
+        console.log(slot);
+    }
+}
+let items; // move to serverside
+
 
 class GameScene extends Phaser.Scene {
     constructor() {
@@ -44,7 +75,7 @@ class GameScene extends Phaser.Scene {
         const client = new GameClient(this, "localhost", "55000");
         client.sender.connect();
         const map = this.make.tilemap({ key: "map" });
-
+        this.scene.launch("paperdoll");
         // Parameters are the name you gave the tilesets in Tiled and then the key of the tilesets image in
         // Phaser's cache (i.e. the name you used in preload)
         const tileset = map.addTilesetImage("magecity", "tiles");
@@ -53,7 +84,7 @@ class GameScene extends Phaser.Scene {
         const belowLayer = map.createStaticLayer("Ground Layer", tileset, 0, 0);
         const worldLayer = map.createStaticLayer("Below player", tileset, 0, 0);
         const aboveLayer = map.createStaticLayer("Above player", tileset, 0, 0);
-
+        items = this.cache.json.get('items');
         this.controller = new Controller(this,client);
     }
 
@@ -98,7 +129,7 @@ class Controller{
 
         spaceKey.on('down', (event)=> {
            // console.log(scene.mapEntities);
-            scene.mapEntities[0].animation = "walkup"
+          //  scene.mapEntities[0].animation = "walkup"
         });
         this.client = client;
 

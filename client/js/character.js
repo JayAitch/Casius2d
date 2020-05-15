@@ -88,7 +88,14 @@ class MovingMultiSprite extends MovingSprite{
 
 class Player extends MovingMultiSprite{
     constructor(scene, pos, facing, state, base, layers){
-        super(scene, pos, base, layers);z
+
+        // do this serverside
+        // let spriteLayers = [];
+        // layers.forEach((itemid)=>{
+        //     let newLayer = items[itemid].animString;
+        //     spriteLayers.push(newLayer);
+        // })
+        super(scene, pos, base, layers);
     }
 
     update(){
