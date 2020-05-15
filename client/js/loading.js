@@ -112,7 +112,6 @@ class PreloadScene extends Phaser.Scene{
                 // now we can store any property we want against the asset location
                 switch(group) {
                     case 'json':
-                        console.log("json");
                         this.load[group](key,value);
 
                     case 'image':
@@ -153,8 +152,6 @@ class PreloadScene extends Phaser.Scene{
                 let animation = json[objectKey][typeKey];
                 let animLookup = new AnimationLookup(typeKey, objectKey);
                 animGroup[typeKey] = animLookup.lookup;
-
-                console.log(animLookup);
                 if (animation.frames.frame || animation.frames.frame === 0) {
 
                     // yes - load the animation from the json data
@@ -173,7 +170,6 @@ class PreloadScene extends Phaser.Scene{
                         frameRate: animation.frameRate,
                         repeat: animation.repeat
                     });
-                    console.log(anim);
                 }
             }, this);
 

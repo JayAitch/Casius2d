@@ -54,6 +54,22 @@
                             "frames": { "key": "basecharacter","start" : 143, "end" : 151},
                             "frameRate": 10,
                             "repeat": -1
+                    },
+                    "stopup": {
+                      "frames": { "key": "basecharacter","frame" : 104},
+                      "frameRate": 10
+                    },
+                    "stopleft": {
+                      "frames": { "key": "basecharacter","frame" : 117},
+                      "frameRate": 10
+                    },
+                    "stopdown": {
+                      "frames": { "key": "basecharacter","frame" : 130},
+                      "frameRate": 10
+                    },
+                    "stopright": {
+                      "frames": { "key": "basecharacter","frame" : 143},
+                      "frameRate": 10
                     }
         },
         "goldhelm" : {
@@ -111,6 +127,22 @@
                             "frames": { "key": "goldhelm","start" : 143, "end" : 151},
                             "frameRate": 10,
                             "repeat": -1
+                    },
+                    "stopleft": {
+                      "frames": { "key": "goldhelm","frame" : 117},
+                      "frameRate": 10
+                    },
+                    "stopup": {
+                      "frames": { "key": "goldhelm","frame" : 104},
+                      "frameRate": 10
+                    },
+                    "stopdown": {
+                      "frames": { "key": "goldhelm","frame" : 130},
+                      "frameRate": 10
+                    },
+                    "stopright": {
+                      "frames": { "key": "goldhelm","frame" : 143},
+                      "frameRate": 10
                     }
         },
         "spear" : {
@@ -168,6 +200,22 @@
                             "frames": { "key": "spear","start" : 143, "end" : 151},
                             "frameRate": 10,
                             "repeat": -1
+                    },
+                    "stopup": {
+                      "frames": { "key": "spear","frame" : 104},
+                      "frameRate": 10
+                    },
+                    "stopleft": {
+                      "frames": { "key": "spear","frame" : 117},
+                      "frameRate": 10
+                    },
+                    "stopdown": {
+                      "frames": { "key": "spear","frame" : 130},
+                      "frameRate": 10
+                    },
+                    "stopright": {
+                      "frames": { "key": "spear","frame" : 143},
+                      "frameRate": 10
                     }
         },
         "goldlegs" : {
@@ -225,6 +273,22 @@
                             "frames": { "key": "goldlegs","start" : 143, "end" : 151},
                             "frameRate": 10,
                             "repeat": -1
+                    },
+                    "stopup": {
+                      "frames": { "key": "goldlegs","frame" : 104},
+                      "frameRate": 10
+                    },
+                    "stopleft": {
+                      "frames": { "key": "goldlegs","frame" : 117},
+                      "frameRate": 10
+                    },
+                    "stopdown": {
+                      "frames": { "key": "goldlegs","frame" : 130},
+                      "frameRate": 10
+                    },
+                    "stopright": {
+                      "frames": { "key": "goldlegs","frame" : 143},
+                      "frameRate": 10
                     }
         },
         "leatherbelt" : {
@@ -282,6 +346,22 @@
                                     "frames": { "key": "leatherbelt","start" : 143, "end" : 151},
                                     "frameRate": 10,
                                     "repeat": -1
+                            },
+                            "stopup": {
+                              "frames": { "key": "leatherbelt","frame" : 104},
+                              "frameRate": 10
+                            },
+                            "stopleft": {
+                              "frames": { "key": "leatherbelt","frame" : 117},
+                              "frameRate": 10
+                            },
+                            "stopdown": {
+                              "frames": { "key": "leatherbelt","frame" : 130},
+                              "frameRate": 10
+                            },
+                            "stopright": {
+                              "frames": { "key": "leatherbelt","frame" : 143},
+                              "frameRate": 10
                             }
                 },
                 
@@ -340,6 +420,22 @@
                                     "frames": { "key": "jacket","start" : 143, "end" : 151},
                                     "frameRate": 10,
                                     "repeat": -1
+                            },
+                            "stopup": {
+                              "frames": { "key": "jacket","frame" : 104},
+                              "frameRate": 10
+                            },
+                            "stopleft": {
+                              "frames": { "key": "jacket","frame" : 117},
+                              "frameRate": 10
+                            },
+                            "stopdown": {
+                              "frames": { "key": "jacket","frame" : 130},
+                              "frameRate": 10
+                            },
+                            "stopright": {
+                              "frames": { "key": "jacket","frame" : 143},
+                              "frameRate": 10
                             }
                 },
                 "shield" : {
@@ -397,6 +493,22 @@
                                     "frames": { "key": "shield","start" : 143, "end" : 151},
                                     "frameRate": 10,
                                     "repeat": -1
+                            },
+                            "stopup": {
+                              "frames": { "key": "shield","frame" : 104},
+                              "frameRate": 10
+                            },
+                            "stopleft": {
+                              "frames": { "key": "shield","frame" : 117},
+                              "frameRate": 10
+                            },
+                            "stopdown": {
+                              "frames": { "key": "shield","frame" : 130},
+                              "frameRate": 10
+                            },
+                            "stopright": {
+                              "frames": { "key": "shield","frame" : 143},
+                              "frameRate": 10
                             }
                 },
                 "dspear" : {
@@ -453,6 +565,22 @@
                                     "frames": { "key": "dspear","start" : 32, "end" : 38},
                                     "frameRate": 10,
                                     "repeat": -1
+                            },
+                            "stopup": {
+                              "frames": { "key": "dspear","frame" : 32},
+                              "frameRate": 10
+                            },
+                            "stopleft": {
+                              "frames": { "key": "dspear","frame" : 32},
+                              "frameRate": 10
+                            },
+                            "stopdown": {
+                              "frames": { "key": "dspear","frame" : 32},
+                              "frameRate": 10
+                            },
+                            "stopright": {
+                              "frames": { "key": "dspear","frame" : 32},
+                              "frameRate": 10
                             }
 
                 }

@@ -87,8 +87,8 @@ class MovingMultiSprite extends MovingSprite{
 //"goldhelm", "goldlegs", "leatherbelt","jacket","dspear", "shield",
 
 class Player extends MovingMultiSprite{
-    constructor(scene, pos){
-        super(scene,pos, "basecharacter", ["dspear","goldhelm", "goldlegs", "leatherbelt","jacket"]);
+    constructor(scene, pos, facing, state, base, layers){
+        super(scene, pos, base, layers);z
     }
 
     update(){

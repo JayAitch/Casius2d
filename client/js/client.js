@@ -25,11 +25,8 @@ class Receiver{
     }
 
     createListeners(){
-        // this.socket.on('move',(data)=>{
-        //     this.gameScene.movePlayer(data);
-        // });
         this.socket.on('newEntity',(data)=>{
-            this.gameScene.newEntity(data.id, data.x, data.y);
+            this.gameScene.newEntity(data.id, data.x, data.y, data.facing, data.state, data.base, data.layers);
         });
 
         this.socket.on('moveEntity',(data)=>{
@@ -37,13 +34,9 @@ class Receiver{
         });
 
         this.socket.on('entityList', (data)=>{
-
             for(let i = 0; data.length > i; i++){
                 let dataRow = data[i];
-          //       console.log(dataRow);
-              //  console.log(dataRow.id);
-                if(dataRow.pos != undefined)
-                this.gameScene.newEntity(i, dataRow.pos.x, dataRow.pos.y);
+                this.gameScene.newEntity(i, dataRow.x, dataRow.y, dataRow.facing, dataRow.state, dataRow.base, dataRow.layers);
             }
         });
     }

@@ -54,32 +54,31 @@ class GameScene extends Phaser.Scene {
         const worldLayer = map.createStaticLayer("Below player", tileset, 0, 0);
         const aboveLayer = map.createStaticLayer("Above player", tileset, 0, 0);
 
-
-       // this.player = new Player(this, {x:40,y:40});
         this.controller = new Controller(this,client);
     }
 
-    newEntity(id, x, y){
-        this.mapEntities[id] = new Player(this, {x:x,y:y});
+    newEntity(id, x, y, facing, state, base, layers){
+        this.mapEntities[id] = new Player(this, {x:x,y:y}, facing, state, base, layers);
     }
 
     moveEntity(id, x, y, facing, state){
         let entity = this.mapEntities[id];
-        if(entity)
-        entity.newPosition = {x:x, y:y};
-        entity.facing = facing;
-        entity.state = state;
+        if(entity){
+            entity.newPosition = {x:x, y:y};
+            entity.facing = facing;
+            entity.state = state;
+        }
+
     }
 
-    playerSpawn(id, x, y){
-        this.newEntity(id, x, y);
+    playerSpawn(id, x, y, facing, state, base, layers){
+        this.newEntity(id, x, y, facing, state, base, layers);
     }
 
     update(){
         Object.keys(this.mapEntities).forEach((key)=>{
             this.mapEntities[key].update()
         });
-        //this.player.update();
     }
 
 
