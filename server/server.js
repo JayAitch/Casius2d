@@ -106,16 +106,22 @@ directions = {"NORTH":"up", "WEST":"left", "SOUTH":"down", "EAST":"right" }
 states  = {"THRUST":"thrust", "WALK":"walk","CAST":"cast", "STOP":"stop"}
 
 
-randomGear = ["dspear", "goldhelm", "goldlegs", "leatherbelt", "jacket","dspear", "goldhelm", "goldlegs", "leatherbelt", "jacket"]
-
+allGear = ["dspear", "goldhelm", "goldlegs", "leatherbelt", "jacket","dspear", "goldhelm", "goldlegs", "leatherbelt", "jacket"]
+let compCount = 0;
 
 class AnimationComponent{
     constructor() {
         this.currentState = states.STOP;
         this.facing = directions.NORTH;
         this.baseSprite = "basecharacter"
-        this.spriteLayers = ["spear", "goldhelm", "goldlegs", "leatherbelt", "shield"]
+        if(compCount % 2){
+            this.spriteLayers = ["spear", "goldhelm", "goldlegs", "leatherbelt", "shield"]
+        }else{
+            this.spriteLayers = ["spear", "jacket", "goldlegs", "leatherbelt"]
+        }
+       // this.spriteLayers = ["spear", "goldhelm", "goldlegs", "leatherbelt", "shield"]
         this.testDifferentGear();
+        compCount++;
     }
 
     testDifferentGear(){
