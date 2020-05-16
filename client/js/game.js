@@ -90,6 +90,7 @@ class GameScene extends Phaser.Scene {
 
     newEntity(id, x, y, facing, state, base, layers){
         this.mapEntities[id] = new Player(this, {x:x,y:y}, facing, state, base, layers);
+        console.log(layers);
     }
 
     moveEntity(id, x, y, facing, state){

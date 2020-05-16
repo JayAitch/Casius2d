@@ -51,6 +51,39 @@ class MovingSprite{
     }
 }
 
+function sixPlusEffect(sprite, scene){
+    let previouseTint
+    scene.tweens.addCounter({
+        from: 255,
+        to: 0,
+        duration: 2000,
+        yoyo:true,
+        repeat: -1,
+        onUpdate: (tween)=>
+        {
+            let value = Math.floor(tween.getValue());
+            sprite.setTint(Phaser.Display.Color.GetColor(255, value, 255));
+        }
+    });
+
+    scene.tweens.addCounter({
+        from: 255,
+        to: 0,
+        duration: 1000,
+        yoyo:true,
+        repeat: -1,
+        onUpdate: (tween)=>
+        {
+            let value = Math.floor(tween.getValue());
+            sprite.setTint(Phaser.Display.Color.GetColor(255, 255, value));
+        }
+    });
+}
+
+
+function addItemEffect(sprite,scene,level){
+    if(level === 6) sixPlusEffect(sprite,scene);
+}
 
 class MovingMultiSprite extends MovingSprite{
 
@@ -59,7 +92,8 @@ class MovingMultiSprite extends MovingSprite{
         this.spriteList = {};
         array.forEach((elem)=>{
             let sprite = scene.add.sprite(pos.x, pos.y);
-            this.spriteList[elem] = sprite
+            this.spriteList[elem.base] = sprite;
+            addItemEffect(sprite,scene, elem.plus); //temp
         })
 
     }
@@ -67,7 +101,6 @@ class MovingMultiSprite extends MovingSprite{
     set animation(animKey){
         super.animation = animKey;
         let keyList = Object.keys(this.spriteList);
-
         keyList.forEach((key)=>{
             let sprite = this.spriteList[key];
             sprite.anims.play(key + animKey);
@@ -87,6 +120,8 @@ class MovingMultiSprite extends MovingSprite{
 }
 //"goldhelm", "goldlegs", "leatherbelt","jacket","dspear", "shield",
 
+
+
 class Player extends MovingMultiSprite{
     constructor(scene, pos, facing, state, base, layers){
 
@@ -97,6 +132,36 @@ class Player extends MovingMultiSprite{
         //     spriteLayers.push(newLayer);
         // })
         super(scene, pos, base, layers);
+        let update =  (tween) =>{
+
+            let value = Math.floor(tween.getValue());
+            image.setTint(Phaser.Display.Color.GetColor(value, value, value));
+        }
+
+
+
+
+
+
+
+        // var tween = scene.tweens.add({
+        //     targets: this.sprite,
+        //     alpha: { from: 0, to: 1 },
+        //     // alpha: { start: 0, to: 1 },
+        //     // alpha: 1,
+        //     // alpha: '+=1',
+        //     // onUpdate: (tween) =>
+        //     // {
+        //     //     var value = Math.floor(tween.getValue());
+        //     //     this.sprite.setTint(Phaser.Display.Color.GetColor(value, value, value));
+        //     // },
+        //     paused:false,
+        //     ease: 'Linear',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
+        //     duration: 1000,
+        //     repeat: -1,            // -1: infinity
+        //     yoyo: true
+        // });
+      //  tween.start();
     }
 
     update(){

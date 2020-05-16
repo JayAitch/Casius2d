@@ -17,6 +17,10 @@
                     "path":"assets/character/armour/helm/golden_helm_male.png",
                     "options":{"frameWidth":64,"frameHeight":64}
                 },
+                "bronzehelm": {
+                  "path":"assets/character/armour/helm/bronze_helm.png",
+                  "options":{"frameWidth":64,"frameHeight":64}
+                },
                 "goldlegs": {
                     "path":"assets/character/armour/legs/golden_greaves_male.png",
                     "options":{"frameWidth":64,"frameHeight":64}

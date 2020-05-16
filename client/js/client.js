@@ -27,6 +27,7 @@ class Receiver{
     createListeners(){
         this.socket.on('newEntity',(data)=>{
             this.gameScene.newEntity(data.id, data.x, data.y, data.facing, data.state, data.base, data.layers);
+            console.log(data.layers);
         });
 
         this.socket.on('moveEntity',(data)=>{
@@ -36,6 +37,7 @@ class Receiver{
         this.socket.on('entityList', (data)=>{
             for(let i = 0; data.length > i; i++){
                 let dataRow = data[i];
+                console.log(dataRow.layers);
                 this.gameScene.newEntity(i, dataRow.x, dataRow.y, dataRow.facing, dataRow.state, dataRow.base, dataRow.layers);
             }
         });

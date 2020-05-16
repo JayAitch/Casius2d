@@ -15,11 +15,22 @@ players = {
     0:{
         base:"basecharacter",
         paperDoll:{
-            HEAD: items.data.goldhelm,
-            BODY: items.data.jacket,
-            WEAPON: items.data.spear,
+            HEAD: {
+                base: items.data.bronzehelm,
+                plus:6
+            },
+            BODY: {
+                base: items.data.jacket,
+                plus:1
+            },
+            WEAPON: {
+                base: items.data.spear,
+                plus:1
+            },
             OFFHAND: undefined,
-            LEGS: items.data.goldlegs,
+            LEGS: {base: items.data.goldlegs,
+                plus: 1
+            },
             BOOTS: undefined
         }
     }

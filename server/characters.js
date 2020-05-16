@@ -137,28 +137,28 @@ function getGearSlot(paperdoll, key) {
 }
 
 
-class Player extends MovingGameObject{
+class ServerPlayer extends MovingGameObject{
     constructor(pos, playerConfig){
         let animLayers = {base:playerConfig.base};
         let paperDoll = playerConfig.paperDoll;
         let layers = [];
         let item = getGearSlot(paperDoll, "BOOTS")
-        if(item)layers.push(item.animString);
+        if(item)layers.push({base:item.base.animString,plus: item.plus});
 
         item = getGearSlot(paperDoll, "LEGS")
-        if(item)layers.push(item.animString);
+        if(item)layers.push({base:item.base.animString,plus: item.plus});
 
         item = getGearSlot(paperDoll, "BODY")
-        if(item)layers.push(item.animString);
+        if(item)layers.push({base:item.base.animString,plus: item.plus});
 
         item = getGearSlot(paperDoll, "HEAD")
-        if(item)layers.push(item.animString);
+        if(item)layers.push({base:item.base.animString,plus: item.plus});
 
         item = getGearSlot(paperDoll, "WEAPON")
-        if(item)layers.push(item.animString);
+        if(item)layers.push({base:item.base.animString,plus: item.plus});
 
         item = getGearSlot(paperDoll, "OFFHAND")
-        if(item)layers.push(item.animString);
+        if(item)layers.push({base:item.base.animString,plus: item.plus});
 
         animLayers.layers = layers;
 
@@ -167,4 +167,4 @@ class Player extends MovingGameObject{
 
 }
 
-module.exports = {Player}
+module.exports = {Player: ServerPlayer}

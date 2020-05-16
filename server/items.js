@@ -4,6 +4,11 @@ data = {
         "inventoryIcon": "goldHelm",
         "slot": "HEAD"
     },
+    "bronzehelm": {
+        "animString" : "bronzehelm",
+        "inventoryIcon": "bronzehelm",
+        "slot": "HEAD"
+    },
     "dspear": {
         "animString" : "dspear",
         "inventoryIcon": "dspear",
