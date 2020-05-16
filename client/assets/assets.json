@@ -1,6 +1,7 @@
 {
   "html":{
-    "paperdoll": "assets/text/paperDoll.html"
+    "paperdoll": "assets/text/paperDoll.html",
+    "loginform": "assets/text/login.html"
   },
     "json": {
       "animations": "assets/animations.json",

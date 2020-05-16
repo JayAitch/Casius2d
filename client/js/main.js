@@ -12,7 +12,7 @@ const config = {
     dom: {
         createContainer: true
     },
-    scene: [BootScene, PreloadScene, GameScene, PaperDollScene],
+    scene: [BootScene, PreloadScene, LoginScene, GameScene, PaperDollScene],
 };
 let game;
 window.addEventListener('load', (event) => {

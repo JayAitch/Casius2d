@@ -44,19 +44,35 @@ players = {
 
 let firstZone = new zoneManager.Zone();
 io.on('connect', function(client) {
-    firstZone.join(client);
 
-    client.on('stop',function() {
-        client.player.stop();
+
+    client.on('login',function(){
+
+        client.emit('loggedIn');
+
+        client.on('joinzone',function(data) {
+
+            firstZone.join(client);
+
+            client.on('stop',function() {
+                client.player.stop();
+            });
+
+            client.on('move',function(data) {
+                client.player.addMovement({x:data.x, y:data.y});
+            });
+        });
+
     });
 
-    client.on('move',function(data) {
-        client.player.addMovement({x:data.x, y:data.y});
+    client.on('createaccount', function(){
+        console.log("creaste account");
     });
+
 
     client.on('disconnect', function(){
-   //.     systems.removeFromUpdater(client.player.updaterID);
-   //     client.player = undefined;
+        //.     systems.removeFromUpdater(client.player.updaterID);
+        //     client.player = undefined;
     });
 
 });

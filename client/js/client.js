@@ -4,12 +4,13 @@
 //
 //
 //
-
+const cip = "localHost";
+const csocket = "55000"
 
 
 class GameClient{
-    constructor(scene, ip, socket){
-        this.socket = io(`http://${ip}:${socket}`);
+    constructor(scene, socket){
+        this.socket = socket
         this.gameScene = scene;
         this.receiver = new Receiver(this.gameScene, this.socket);
         this.sender = new Sender(this.socket);
@@ -18,9 +19,10 @@ class GameClient{
 
 
 class Receiver{
-    constructor(gameScene,socket){
+    constructor(gameScene, socket){
         this.gameScene = gameScene;
         this.socket = socket;
+        console.log(this.socket)
         this.createListeners();
     }
 
@@ -29,11 +31,9 @@ class Receiver{
             this.gameScene.newEntity(data.id, data.x, data.y, data.facing, data.state, data.base, data.layers);
             console.log(data.layers);
         });
-
         this.socket.on('moveEntity',(data)=>{
             this.gameScene.moveEntity(data.id, data.x, data.y, data.facing, data.state);
         });
-
         this.socket.on('entityList', (data)=>{
             for(let i = 0; data.length > i; i++){
                 let dataRow = data[i];
@@ -45,19 +45,40 @@ class Receiver{
 }
 
 
+class LoginClient{
+    constructor(scene, ip, socket){
+        this.socket = io(`http://${ip}:${socket}`);
+        this.menuScene = scene;
+        this.sender = new Sender(this.socket);
+
+        this.socket.on('loggedIn', (data)=>{
+            this.menuScene.loggedIn(data);
+        });
+    }
+}
+
+
 class Sender{
     constructor(socket){
         this.socket = socket;
     }
     connect(){
         this.socket.emit('connect');
-        console.log("connection");
     }
-    move(direction){
+    move(direction) {
         this.socket.emit('move', direction);
+    }
+    joinZone(zone){
+        this.socket.emit('joinzone', zone);
     }
     stop(){
         this.socket.emit('stop');
+    }
+    login(username, password){
+        this.socket.emit('login', username, password);
+    }
+    createAccount(username, password){
+        this.socket.emit('createaccount', username, password);
     }
 }
 

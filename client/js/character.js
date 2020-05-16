@@ -81,7 +81,7 @@ function sixPlusEffect(sprite, scene){
 }
 
 
-function addItemEffect(sprite,scene,level){
+function addSpriteEffect(sprite,scene,level){
     if(level === 6) sixPlusEffect(sprite,scene);
 }
 
@@ -93,7 +93,7 @@ class MovingMultiSprite extends MovingSprite{
         array.forEach((elem)=>{
             let sprite = scene.add.sprite(pos.x, pos.y);
             this.spriteList[elem.base] = sprite;
-            addItemEffect(sprite,scene, elem.plus); //temp
+            addSpriteEffect(sprite,scene, elem.effect); //temp
         })
 
     }
@@ -124,44 +124,8 @@ class MovingMultiSprite extends MovingSprite{
 
 class Player extends MovingMultiSprite{
     constructor(scene, pos, facing, state, base, layers){
-
-        // do this serverside
-        // let spriteLayers = [];
-        // layers.forEach((itemid)=>{
-        //     let newLayer = items[itemid].animString;
-        //     spriteLayers.push(newLayer);
-        // })
         super(scene, pos, base, layers);
-        let update =  (tween) =>{
 
-            let value = Math.floor(tween.getValue());
-            image.setTint(Phaser.Display.Color.GetColor(value, value, value));
-        }
-
-
-
-
-
-
-
-        // var tween = scene.tweens.add({
-        //     targets: this.sprite,
-        //     alpha: { from: 0, to: 1 },
-        //     // alpha: { start: 0, to: 1 },
-        //     // alpha: 1,
-        //     // alpha: '+=1',
-        //     // onUpdate: (tween) =>
-        //     // {
-        //     //     var value = Math.floor(tween.getValue());
-        //     //     this.sprite.setTint(Phaser.Display.Color.GetColor(value, value, value));
-        //     // },
-        //     paused:false,
-        //     ease: 'Linear',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
-        //     duration: 1000,
-        //     repeat: -1,            // -1: infinity
-        //     yoyo: true
-        // });
-      //  tween.start();
     }
 
     update(){

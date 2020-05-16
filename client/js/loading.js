@@ -91,7 +91,7 @@ class PreloadScene extends Phaser.Scene{
         this.load.once('complete', function ()
         {
             //todo: move and test this at the end of on create
-            this.scene.start('maingame');
+            this.scene.start('loginscene');
         }, this);
     }
 

@@ -70,10 +70,13 @@ class GameScene extends Phaser.Scene {
     preload(){
     }
 
+    init(data){
+        this.client = new GameClient(this, data.socket);
+        this.client.sender.connect();
+        this.client.sender.joinZone(0);
+    }
 
     create(){
-        const client = new GameClient(this, "localhost", "55000");
-        client.sender.connect();
         const map = this.make.tilemap({ key: "map" });
         this.scene.launch("paperdoll");
         // Parameters are the name you gave the tilesets in Tiled and then the key of the tilesets image in
@@ -85,7 +88,7 @@ class GameScene extends Phaser.Scene {
         const worldLayer = map.createStaticLayer("Below player", tileset, 0, 0);
         const aboveLayer = map.createStaticLayer("Above player", tileset, 0, 0);
         items = this.cache.json.get('items');
-        this.controller = new Controller(this,client);
+        this.controller = new Controller(this,this.client);
     }
 
     newEntity(id, x, y, facing, state, base, layers){

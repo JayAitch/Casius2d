@@ -143,22 +143,22 @@ class ServerPlayer extends MovingGameObject{
         let paperDoll = playerConfig.paperDoll;
         let layers = [];
         let item = getGearSlot(paperDoll, "BOOTS")
-        if(item)layers.push({base:item.base.animString,plus: item.plus});
+        if(item)layers.push({base:item.base.animString,effect: item.plus});
 
         item = getGearSlot(paperDoll, "LEGS")
-        if(item)layers.push({base:item.base.animString,plus: item.plus});
+        if(item)layers.push({base:item.base.animString,effect: item.plus});
 
         item = getGearSlot(paperDoll, "BODY")
-        if(item)layers.push({base:item.base.animString,plus: item.plus});
+        if(item)layers.push({base:item.base.animString,effect: item.plus});
 
         item = getGearSlot(paperDoll, "HEAD")
-        if(item)layers.push({base:item.base.animString,plus: item.plus});
+        if(item)layers.push({base:item.base.animString,effect: item.plus});
 
         item = getGearSlot(paperDoll, "WEAPON")
-        if(item)layers.push({base:item.base.animString,plus: item.plus});
+        if(item)layers.push({base:item.base.animString,effect: item.plus});
 
         item = getGearSlot(paperDoll, "OFFHAND")
-        if(item)layers.push({base:item.base.animString,plus: item.plus});
+        if(item)layers.push({base:item.base.animString,effect: item.plus});
 
         animLayers.layers = layers;
 
