@@ -8,7 +8,7 @@ const zoneManager = require('./zone-manager.js')
 global.io = require('socket.io')(server);
 io = global.io;
 
-
+const dbManager = require('./db_connection.js')
 
 
 players = {
@@ -17,7 +17,7 @@ players = {
         paperDoll:{
             HEAD: {
                 base: items.data.goldhelm,
-                plus:1
+                plus:6
             },
             BODY: {
                 base: items.data.jacket,
@@ -25,7 +25,7 @@ players = {
             },
             WEAPON: {
                 base: items.data.spear,
-                plus:6
+                plus:1
             },
             OFFHAND: undefined,
             LEGS: {base: items.data.goldlegs,
@@ -46,27 +46,39 @@ let firstZone = new zoneManager.Zone();
 io.on('connect', function(client) {
 
 
-    client.on('login',function(){
+    client.on('login',function(username,password){
 
-        client.emit('loggedIn');
+        dbManager.databaseConnection.requestLogin(username,password,function(isLoggedIn){
 
-        client.on('joinzone',function(data) {
+            if(isLoggedIn){
 
-            firstZone.join(client);
+                client.emit('loggedIn');
 
-            client.on('stop',function() {
-                client.player.stop();
-            });
+                client.on('joinzone',function(data) {
 
-            client.on('move',function(data) {
-                client.player.addMovement({x:data.x, y:data.y});
-            });
-        });
+                    firstZone.join(client);
 
+                    client.on('stop',function() {
+                        client.player.stop();
+                    });
+
+                    client.on('move',function(data) {
+                        client.player.addMovement({x:data.x, y:data.y});
+                    });
+                });
+            }
+
+        })
     });
 
-    client.on('createaccount', function(){
-        console.log("creaste account");
+    client.on('createaccount', function(username,password){
+        dbManager.databaseConnection.createAccount(username,password,function(isAccountCreated){
+            if(isAccountCreated){
+                console.log("Account created!")
+            }else{
+                console.log("Account already exists!")
+            }
+        });
     });
 
 
@@ -76,7 +88,6 @@ io.on('connect', function(client) {
     });
 
 });
-
 
 
 server.listen(PORT, function(){
