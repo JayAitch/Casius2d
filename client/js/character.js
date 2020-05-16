@@ -52,30 +52,31 @@ class MovingSprite{
 }
 
 function sixPlusEffect(sprite, scene){
-    let previouseTint
+    let currentTint = [255,255,255]
     scene.tweens.addCounter({
         from: 255,
-        to: 0,
+        to: 111,
         duration: 2000,
         yoyo:true,
         repeat: -1,
         onUpdate: (tween)=>
         {
             let value = Math.floor(tween.getValue());
-            sprite.setTint(Phaser.Display.Color.GetColor(255, value, 255));
+            currentTint[0] = value;
+            sprite.setTint(Phaser.Display.Color.GetColor(currentTint[0], currentTint[1], currentTint[2]));
         }
     });
 
     scene.tweens.addCounter({
         from: 255,
-        to: 0,
+        to: 111,
         duration: 1000,
         yoyo:true,
         repeat: -1,
         onUpdate: (tween)=>
         {
             let value = Math.floor(tween.getValue());
-            sprite.setTint(Phaser.Display.Color.GetColor(255, 255, value));
+            currentTint[1] = value;
         }
     });
 }

@@ -16,7 +16,7 @@ players = {
         base:"basecharacter",
         paperDoll:{
             HEAD: {
-                base: items.data.bronzehelm,
+                base: items.data.goldhelm,
                 plus:6
             },
             BODY: {
