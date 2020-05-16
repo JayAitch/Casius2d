@@ -113,6 +113,7 @@ class MovingGameObject{
 
     update(){
         this.move();
+        //not on update probably
         if(this.velocity.x === 0 && this.velocity.y === 0){
             this.animationComponent.currentState = states.STOP;
         }else{

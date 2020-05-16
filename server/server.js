@@ -24,7 +24,7 @@ players = {
                 plus:1
             },
             WEAPON: {
-                base: items.data.spear,
+                base: items.data.dspear,
                 plus:1
             },
             OFFHAND: undefined,
