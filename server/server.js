@@ -17,7 +17,7 @@ players = {
         paperDoll:{
             HEAD: {
                 base: items.data.goldhelm,
-                plus:6
+                plus:1
             },
             BODY: {
                 base: items.data.jacket,
@@ -25,7 +25,7 @@ players = {
             },
             WEAPON: {
                 base: items.data.spear,
-                plus:1
+                plus:6
             },
             OFFHAND: undefined,
             LEGS: {base: items.data.goldlegs,
