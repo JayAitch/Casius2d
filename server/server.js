@@ -11,8 +11,6 @@ io = global.io;
 
 const dbManager = require('./db-connection.js')
 
-dbManager.databaseConnection.testConnect
-
 
 players = {
     0:{
