@@ -38,16 +38,18 @@ const databaseConnection = {
     },
     
     // Inserts into the character table if there is no character with this name
-    createCharacter: function(name,zoneId,xPosition,yPosition,callBack){
-        
-        this.doesCharacterExist(name,function(isCharacterExists){
-            
-            if(!    isCharacterExists){
+    createOrReturnCharacter: function(name,zoneId,xPosition,yPosition,callBack){
+        this.getCharacter(name,function(character){
+            if(character == undefined){
                 let statement = "INSERT INTO mydb.main_character(name,zone_id,x_position,y_position) VALUES(?,?,?,?);";      
-                con.query(statement,[name,zoneId,xPosition,yPosition],function (err, result) {if (err) throw err;});
-                callBack(true)
+                con.query(statement,[name,zoneId,xPosition,yPosition],function (err, result) {
+                    if (err) throw err;
+                    // Get character and return it since it's been created
+                    callBack(character)  
+                });
             }else{
-                callBack(false)
+                //  Character found - return it
+                callBack(character)
             }          
         })
 
@@ -73,13 +75,13 @@ const databaseConnection = {
         });
     },
 
-    // Returns false if no character exists with the name 'name'
-    doesCharacterExist: function(name,callback){
-        let statement = "SELECT id AS identifier FROM mydb.main_character WHERE name=?;"
+    // Returns character exists with the name 'name'
+    getCharacter: function(name,callback){
+        let statement = "SELECT * FROM mydb.main_character WHERE name=?;"
  
         con.query(statement,[name],  (err, result) => {
             if (err) throw err;
-            callback(result[0] != undefined);          
+            callback(result[0]);          
         });
     }
 

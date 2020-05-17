@@ -11,10 +11,6 @@ io = global.io;
 
 const dbManager = require('./db-connection.js')
 
-dbManager.databaseConnection.createCharacter("Best mmo god",1,0,0,function(isCreated){
-    console.log("Was character created: " + isCreated)
-})
-
 players = {
     0:{
         base:"basecharacter",
@@ -52,7 +48,7 @@ io.on('connect', function(client) {
     console.log("Connected")
 
     client.on('login',function(username,password){
-
+ 
         dbManager.databaseConnection.requestLogin(username,password,function(isLoggedIn){
 
             if(isLoggedIn){
@@ -60,6 +56,16 @@ io.on('connect', function(client) {
                 client.emit('loggedIn');
 
                 client.on('joinzone',function(data) {
+
+                    dbManager.databaseConnection.createOrReturnCharacter(username,1,0,0,function(character){
+                        if(character == undefined){ 
+                            dbManager.databaseConnection.getCharacter(username,function(newCharacter){
+                                console.log("New Character Created: " + newCharacter)
+                            })
+                        }else{
+                            console.log("Existing Character Retrieved: " + character)
+                        }
+                    })
 
                     firstZone.join(client);
 
