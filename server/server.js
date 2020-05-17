@@ -1,4 +1,5 @@
-const PORT = 55000;
+const configs = require("../config/configs.js")
+const PORT = configs.server_config.port;
 
 
 const server = require('http').createServer();
@@ -8,7 +9,9 @@ const zoneManager = require('./zone-manager.js')
 global.io = require('socket.io')(server);
 io = global.io;
 
-const dbManager = require('./db_connection.js')
+const dbManager = require('./db-connection.js')
+
+dbManager.databaseConnection.testConnect
 
 
 players = {
@@ -45,6 +48,7 @@ players = {
 let firstZone = new zoneManager.Zone();
 io.on('connect', function(client) {
 
+    console.log("Connected")
 
     client.on('login',function(username,password){
 

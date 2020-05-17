@@ -1,11 +1,7 @@
-// var Client = {};
-// Client.socket = io('http://localhost:55000');
-//
-//
-//
-//
-const cip = "localHost";
-const csocket = "55000"
+const configs = require("../configs/configs.js");
+
+const cip = configs.host_config.cip;
+const csocket = configs.host_config.csocket;
 
 
 class GameClient{

@@ -1,10 +1,11 @@
 const mysql  = require('mysql');
+const config = require('../config/configs.js');
 
 const con = mysql.createPool({
               connectionLimit: 10,
-              host: "192.168.1.19",
-              user: "admin",
-              password: "652910802!*Rr"
+              host: config.db_config.host,
+              user: config.db_config.user,
+              password: config.db_config.pw
 });
 
 
