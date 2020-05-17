@@ -1,7 +1,5 @@
-const configs = require("../configs/configs.js");
-
-const cip = configs.host_config.cip;
-const csocket = configs.host_config.csocket;
+const cip = host_config.cip;
+const csocket = host_config.csocket;
 
 
 class GameClient{

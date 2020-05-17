@@ -11,6 +11,9 @@ io = global.io;
 
 const dbManager = require('./db-connection.js')
 
+dbManager.databaseConnection.createCharacter("Best mmo god",1,0,0,function(isCreated){
+    console.log("Was character created: " + isCreated)
+})
 
 players = {
     0:{
