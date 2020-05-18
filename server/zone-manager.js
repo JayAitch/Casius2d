@@ -44,9 +44,10 @@ class Zone{
     testCollisons(nEnity){
         let collisionCount = 0;
         this.entities.forEach((entity)=>{
-            console.log("addded colliion foir");
             this.collisionManager.addCollision(entity,nEnity, function(obj){
                 collisionCount++
+                entity.backStep();
+                nEnity.backStep();
                 console.log("collsioin " + collisionCount);
             })
         })
@@ -103,12 +104,13 @@ class Zone{
     }
 
     update(){
+
         for(let i = 0; this.entities.length > i; i++){
             let entitiy = this.entities[i];
             entitiy.update();
             this.notifyEntityUpdate(entitiy, i);
         }
-            this.collisionManager.update();
+        this.collisionManager.update();
     }
 }
 

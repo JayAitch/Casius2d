@@ -68,10 +68,11 @@ class MovingGameObject{
         this.velocity = {x: 0, y: 0};
         this.moveSpeed = 4;
         this.pos = pos;
+        this.previousePos = pos;
         this.animationComponent = new AnimationComponent(animLayers);
         this.components = [];
-        this.width = 64; //temp
-        this.height = 64;//temp
+        this.width = 24; //temp
+        this.height = 24;//temp
         this.isActive = true; //temp
     }
 
@@ -107,24 +108,31 @@ class MovingGameObject{
     }
 
     move(){
-        this.pos.x = this.pos.x + this.velocity.x;
-        this.pos.y = this.pos.y + this.velocity.y;
+        this.previousePos = this.pos;
+        this.pos.x = this.previousePos.x + this.velocity.x;
+        this.pos.y = this.previousePos.y + this.velocity.y;
     }
 
     update(){
+
         this.move();
-        //not on update probably
+
         if(this.velocity.x === 0 && this.velocity.y === 0){
             this.animationComponent.currentState = states.STOP;
         }else{
             this.animationComponent.currentState = states.WALK;
         }
+
         this.components.forEach(function (component) {
             component.update(this);
-
         },this);
     }
 
+    backStep(){
+     //   this.pos = this.previousePos;
+        this.pos.x = this.previousePos.x - this.velocity.x;
+        this.pos.y = this.previousePos.y - this.velocity.y;
+    }
 
 
     stop(){

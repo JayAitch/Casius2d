@@ -45,57 +45,38 @@ players = {
 let firstZone = new zoneManager.Zone();
 io.on('connect', function(client) {
 
-    console.log("Connected")
-
     client.on('login',function(username,password){
- 
-        dbManager.databaseConnection.requestLogin(username,password,function(isLoggedIn){
 
-            if(isLoggedIn){
+        tryLogin(client, username, password);
 
-                client.emit('loggedIn');
+        client.on('joinzone',function(data) {
+            tryJoinZone(client, username);
 
-                client.on('joinzone',function(data) {
+            client.on('stop',function() {
+                client.player.stop();
+            });
 
-                    dbManager.databaseConnection.createOrReturnCharacter(username,1,0,0,function(character){
-                        if(character == undefined){ 
-                            dbManager.databaseConnection.getCharacter(username,function(newCharacter){
-                                console.log("New Character Created: " + newCharacter)
-                            })
-                        }else{
-                            console.log("Existing Character Retrieved: " + character)
-                        }
-                    })
-
-                    firstZone.join(client);
-
-                    client.on('stop',function() {
-                        client.player.stop();
-                    });
-
-                    client.on('move',function(data) {
-                        client.player.addMovement({x:data.x, y:data.y});
-                    });
-                });
-            }
-
-        })
+            client.on('move',function(data) {
+                client.player.addMovement({x:data.x, y:data.y});
+            });
+        });
     });
 
     client.on('createaccount', function(username,password){
-        dbManager.databaseConnection.createAccount(username,password,function(isAccountCreated){
-            if(isAccountCreated){
+        dbManager.databaseConnection.createAccount(username,password).then(function(accountExists){
+            console.log(accountExists);
+            if(!accountExists){
                 console.log("Account created!")
             }else{
                 console.log("Account already exists!")
             }
+
+
         });
     });
 
 
     client.on('disconnect', function(){
-        //.     systems.removeFromUpdater(client.player.updaterID);
-        //     client.player = undefined;
     });
 
 });
@@ -105,3 +86,34 @@ server.listen(PORT, function(){
     console.log('Listening on ' + server.address().port);
 });
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function tryLogin(client, username, password){
+    let loginPromise = dbManager.databaseConnection.requestLogin(username,password);
+    loginPromise.then((doesExist) => {
+        if(doesExist){
+            client.emit('loggedIn');
+        }
+    })
+}
+
+function tryJoinZone(client, username){
+    let characterPromise = dbManager.databaseConnection.createOrReturnCharacter(username,1,1,0);
+    characterPromise.then(function (character) {
+        firstZone.join(client);
+    }).catch((err)=>{
+        console.log(err);
+    })
+}

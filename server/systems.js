@@ -39,6 +39,9 @@ const Updater = {
     clearUpdater: function(){
         this.updateables = [];
     },
+
+
+
     update: function () {
         for(let key in this.updateables){
             let object = this.updateables[key];
@@ -68,10 +71,9 @@ class CollisionManager {
             if (this.collides(obj.objA, obj.objB)) {
                 if((obj.objA.isActive && obj.objB.isActive)) obj.onCollision();
             }
-        })
+        });
     }
 
-    scane
     collides (a, b) {
         let aWidth = a.width / 2;
         let aHeight = a.height / 2;
