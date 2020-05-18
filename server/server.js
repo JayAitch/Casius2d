@@ -63,9 +63,9 @@ io.on('connect', function(client) {
     });
 
     client.on('createaccount', function(username,password){
-        dbManager.databaseConnection.createAccount(username,password).then(function(isAccountCreated){
-            console.log(isAccountCreated);
-            if(isAccountCreated){
+        dbManager.databaseConnection.createAccount(username,password).then(function(accountExists){
+            console.log(accountExists);
+            if(!accountExists){
                 console.log("Account created!")
             }else{
                 console.log("Account already exists!")

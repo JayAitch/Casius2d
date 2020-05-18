@@ -71,10 +71,9 @@ class CollisionManager {
             if (this.collides(obj.objA, obj.objB)) {
                 if((obj.objA.isActive && obj.objB.isActive)) obj.onCollision();
             }
-        })
+        });
     }
 
-    scane
     collides (a, b) {
         let aWidth = a.width / 2;
         let aHeight = a.height / 2;

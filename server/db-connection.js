@@ -40,6 +40,7 @@ const databaseConnection = {
                 return resolve(doesExist);
 
             }).catch((err) => {
+                console.log(err);
             })
         });
     },
