@@ -1,11 +1,5 @@
-// var Client = {};
-// Client.socket = io('http://localhost:55000');
-//
-//
-//
-//
-const cip = "localHost";
-const csocket = "55000"
+const cip = host_config.cip;
+const csocket = host_config.csocket;
 
 
 class GameClient{

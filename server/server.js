@@ -1,4 +1,5 @@
-const PORT = 55000;
+const configs = require("../config/configs.js")
+const PORT = configs.server_config.port;
 
 
 const server = require('http').createServer();
@@ -8,8 +9,7 @@ const zoneManager = require('./zone-manager.js')
 global.io = require('socket.io')(server);
 io = global.io;
 
-const dbManager = require('./db_connection.js')
-
+const dbManager = require('./db-connection.js')
 
 players = {
     0:{
@@ -45,9 +45,10 @@ players = {
 let firstZone = new zoneManager.Zone();
 io.on('connect', function(client) {
 
+    console.log("Connected")
 
     client.on('login',function(username,password){
-
+ 
         dbManager.databaseConnection.requestLogin(username,password,function(isLoggedIn){
 
             if(isLoggedIn){
@@ -55,6 +56,16 @@ io.on('connect', function(client) {
                 client.emit('loggedIn');
 
                 client.on('joinzone',function(data) {
+
+                    dbManager.databaseConnection.createOrReturnCharacter(username,1,0,0,function(character){
+                        if(character == undefined){ 
+                            dbManager.databaseConnection.getCharacter(username,function(newCharacter){
+                                console.log("New Character Created: " + newCharacter)
+                            })
+                        }else{
+                            console.log("Existing Character Retrieved: " + character)
+                        }
+                    })
 
                     firstZone.join(client);
 

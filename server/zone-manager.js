@@ -1,6 +1,6 @@
 const roomManager = require('./room-manager.js');
 const systems = require('./systems.js');
-const characters = require('./server_characters.js');
+const characters = require('./server-characters.js');
 systems.startUpdate();
 
 
