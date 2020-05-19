@@ -5,6 +5,7 @@ const PORT = configs.server_config.port;
 const server = require('http').createServer();
 const items = require('./items.js'); //consider converting
 const zoneManager = require('./zone-manager.js')
+const dbDisabled = true;
 
 global.io = require('socket.io')(server);
 io = global.io;
@@ -101,19 +102,30 @@ server.listen(PORT, function(){
 
 
 function tryLogin(client, username, password){
-    let loginPromise = dbManager.databaseConnection.requestLogin(username,password);
-    loginPromise.then((doesExist) => {
-        if(doesExist){
-            client.emit('loggedIn');
-        }
-    })
+    if(!dbDisabled){
+
+        let loginPromise = dbManager.databaseConnection.requestLogin(username,password);
+        loginPromise.then((doesExist) => {
+            if(doesExist){
+                client.emit('loggedIn');
+            }
+        })
+    }
+    else{
+        client.emit('loggedIn');
+    }
 }
 
 function tryJoinZone(client, username){
-    let characterPromise = dbManager.databaseConnection.createOrReturnCharacter(username,1,1,0);
-    characterPromise.then(function (character) {
+    if(!dbDisabled){
+        let characterPromise = dbManager.databaseConnection.createOrReturnCharacter(username,1,1,0);
+        characterPromise.then(function (character) {
+            firstZone.join(client);
+        }).catch((err)=>{
+            console.log(err);
+        })
+    }
+    else{
         firstZone.join(client);
-    }).catch((err)=>{
-        console.log(err);
-    })
+    }
 }
