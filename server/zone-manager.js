@@ -19,7 +19,7 @@ function getZoneData(zone){
 }
 
 
-
+ZONEMAPS= {0:"zone1.json",1:"zone2.json"}
 
 function getWorldObjects(id){
     let worldData = getZoneData(id);
@@ -60,7 +60,7 @@ function getProperty(properties, prop){
     return value;
 }
 
-ZONEMAPS= {0:"zone1.json",1:"zone2.json"}
+
 
 
 // receive mapped map!
@@ -93,6 +93,7 @@ class Zone{
 
     addPlayerCharacter(client, pos){
         let entityPos = this.entities.length;
+        console.log(pos);
         let newPos = JSON.parse(JSON.stringify(pos))
         let newPlayer = new characters.Player(newPos, players[0], this.collisionManager, client, entityPos);
         client.player = newPlayer;

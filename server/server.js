@@ -43,9 +43,10 @@ players = {
 
 
 
-let firstZone = new zoneManager.Zone();
-let secondZone = new zoneManager.Zone();
+let firstZone = new zoneManager.Zone(0);
+let secondZone = new zoneManager.Zone(1);
 
+const ZONES = {0:firstZone,1:secondZone}
 
 io.on('connect', function(client) {
 
@@ -54,7 +55,7 @@ io.on('connect', function(client) {
         tryLogin(client, username, password);
 
         client.on('joinzone',function(data) {
-            tryJoinZone(client, username);
+            tryJoinZone(client, username, 0,{x:250,y:250});
 
             client.on('stop',function() {
                 client.player.stop();
@@ -119,16 +120,25 @@ function tryLogin(client, username, password){
     }
 }
 
-function tryJoinZone(client, username){
+function tryJoinZone(client, username, zoneid, position){
     if(!dbDisabled){
         let characterPromise = dbManager.databaseConnection.createOrReturnCharacter(username,1,1,0);
         characterPromise.then(function (character) {
-            firstZone.join(client);
+
+            if(client.zone)client.zone.leave(client);
+            let zone = ZONES[zoneid];
+            zone.join(client,position);
         }).catch((err)=>{
             console.log(err);
         })
     }
     else{
-        firstZone.join(client);
+        if(client.zone)client.zone.leave(client);
+        let zone = ZONES[zoneid];
+        zone.join(client,position);
     }
+}
+
+global.testZoneJoin =function(client, username, zoneid, position){
+    tryJoinZone(client, username, zoneid, position)
 }
