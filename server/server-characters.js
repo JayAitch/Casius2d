@@ -69,8 +69,12 @@ class ColliderComponent{
         this.height = colliderConfig.height;
         this.pos = colliderConfig.pos;
         this.type = colliderConfig.type;
-        collisionManager.addCollider(colliderConfig.layer,this);
+        this.collisionRegistration = collisionManager.addCollider(colliderConfig.layer,this);
+        this.remove = ()=>{
+            collisionManager.removeCollider(this.collisionRegistration);
+        }
     }
+
     get x(){
         return this.pos.x;
     }
@@ -148,6 +152,11 @@ class MovingGameObject{
         },this);
     }
 
+    removeComponents(){
+        this.components.forEach(function (component) {
+            component.remove();
+        },this);
+    }
     backStep(){
         this.pos = this.previousePos;
         this.pos.x = this.previousePos.x - this.velocity.x;
@@ -199,14 +208,13 @@ class ZonePortal{
     }
 
     collisionCallback(other){
-        console.log("ZONE PORTAL");
     }
 }
 
 
 
 class ServerPlayer extends MovingGameObject{
-    constructor(pos, playerConfig, collisionManager){
+    constructor(pos, playerConfig, collisionManager, client, entityPos){
         let animLayers = {base:playerConfig.base};
         let paperDoll = playerConfig.paperDoll;
         let layers = [];
@@ -233,10 +241,10 @@ class ServerPlayer extends MovingGameObject{
 
         super(pos, animLayers);
         this.width = 32;
-        this.height=32;
-        this.createCollider(collisionManager);
-
-
+        this.height = 32;
+        this.colliderPosition = this.createCollider(collisionManager);
+        this.client = client;
+        this.entityPos = entityPos;
     }
 
     createCollider(collisionManager){
@@ -256,11 +264,19 @@ class ServerPlayer extends MovingGameObject{
         switch(other.type){
             case colliderTypes.NONPASSIBLE:
                this.backStep();
+               break;
             case colliderTypes.PLAYER:
+                break;
             case colliderTypes.TRIGGER:
+                this.pos = {x:9999999999999999,y:9999999999999999}
+                this.removeComponents();
+
+                global.testZoneJoin(this.client,"",other.zoneTarget);
+                break;
 
         }
     }
+
 }
 
 module.exports = {Player: ServerPlayer, NonPassibleTerrain, ZonePortal}

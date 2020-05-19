@@ -93,8 +93,15 @@ class GameScene extends Phaser.Scene {
 
     newEntity(id, x, y, facing, state, base, layers){
         this.mapEntities[id] = new Player(this, {x:x,y:y}, facing, state, base, layers);
-        console.log(layers);
     }
+
+    // clearEnities() {
+    //     let entityKeys = Object.keys(this.mapEntities);
+    //     entityKeys.forEach(function (entity) {
+    //         entity.destroy();
+    //     })
+    //     this.mapEntities = {};
+    // }
 
     moveEntity(id, x, y, facing, state){
         let entity = this.mapEntities[id];
@@ -104,6 +111,11 @@ class GameScene extends Phaser.Scene {
             entity.state = state;
         }
 
+    }
+    removeEntity(id){
+        let entity = this.mapEntities[id];
+        if(entity)
+        entity.destroy();
     }
 
     playerSpawn(id, x, y, facing, state, base, layers){

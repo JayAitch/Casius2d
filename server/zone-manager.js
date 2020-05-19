@@ -11,8 +11,9 @@ function randomInt(low, high) {
 }
 
 
-function getZoneData(){
-    let rawdata = fs.readFileSync('./tilemaps/zone1.json');
+function getZoneData(zone){
+    let file = ZONEMAPS[zone];
+    let rawdata = fs.readFileSync('./tilemaps/'+ file);
     let tilemap = JSON.parse(rawdata);
     return tilemap;
 }
@@ -20,11 +21,10 @@ function getZoneData(){
 
 
 
-function getWorldObjects(){
-    let worldData = getZoneData();
+function getWorldObjects(id){
+    let worldData = getZoneData(id);
     let worldObjects = [];
     worldData.forEach(function(layer){
-        console.log(layer);
         layer.objects.forEach(function(object){
             let newObject = {
                 width:object.width,
@@ -32,9 +32,8 @@ function getWorldObjects(){
                 pos: {x: object.x,y:object.y},
                 type:object.type,
             }
-            let zone = getProperty(object.properties, "zone")
-            if(zone) object.zone = zone;
-
+            let newzone = getProperty(object.properties, "zone");
+            if(newzone !== undefined) newObject.zone = newzone;
             worldObjects.push(newObject);
         });
     })
@@ -42,25 +41,28 @@ function getWorldObjects(){
 }
 
 function getProperty(properties, prop){
-    if(!properties) return false;
+    let value = undefined
+    if(!properties) return value;
     properties.forEach(function (property) {
         if(prop === property.name){
-            return property.value;
+            value =  property.value;
         }
     })
-    return false;
+    return value;
 }
+
+ZONEMAPS= {0:"zone1.json",1:"zone2.json"}
 
 
 // receive mapped map!
 class Zone{
-    constructor() {
+    constructor(zoneid) {
         this.physicsWorld = new PhysicsWorld(800, 800);
         this.entities = [];
         this.room = roomManager.roomManager.createRoom();
         systems.addToUpdate(this);
         this.collisionManager = new systems.CollisionManager();
-        this.worldObjects = getWorldObjects(); // use this to target specfic zone
+        this.worldObjects = getWorldObjects(zoneid); // use this to target specfic zone
         this.createNonPassibles(this.worldObjects);
 
 
@@ -68,12 +70,20 @@ class Zone{
 
     join(client){
         this.room.join(client);
+        client.zone = this;
         this.addPlayerCharacter(client);
     }
 
+    leave(client){
+        this.notifyEntityRemove(client.player.entityPos);
+        this.room.leave(client);
+        this.entities.splice(client.player.entityPos);
+    }
+
+
     addPlayerCharacter(client){
         let entityPos = this.entities.length;
-        let newPlayer = new characters.Player({x:150,y:150}, players[0], this.collisionManager);
+        let newPlayer = new characters.Player({x:150,y:150}, players[0], this.collisionManager, client, entityPos);
         client.player = newPlayer;
         this.entities.push(newPlayer);
 
@@ -133,6 +143,11 @@ class Zone{
             y:entity.pos.y,
             facing: entity.direction,
             state:entity.state
+        })
+    }
+    notifyEntityRemove(entityPos){
+        this.room.roomMessage('removeEntity', {
+            id:entityPos
         })
     }
 
