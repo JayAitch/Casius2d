@@ -11,7 +11,8 @@
         "tiles": "assets/tilesets/magecity.png"
     },
     "tilemapTiledJSON": {
-        "map": "assets/tilemaps/testmap.json"
+        "map": "assets/tilemaps/testmap.json",
+        "map2": "assets/tilemaps/testmap2.json"
     },
     "spritesheet":{
                 "goldhelm": {

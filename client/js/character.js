@@ -29,6 +29,9 @@ class MovingSprite{
         let lookup = animations[this.animationLookup][animKey];
         this.sprite.anims.play(lookup);
     }
+    destroy() {
+        this.sprite.destroy();
+    }
 
     testAnimWalk(){
         let direction = {x:0,y:0};
@@ -37,8 +40,6 @@ class MovingSprite{
         let animPrefix = this.state;
 
         let anim = animPrefix + this.facing;
-
-
 
         if(this.lastAnim === anim){
 
@@ -107,7 +108,15 @@ class MovingMultiSprite extends MovingSprite{
             sprite.anims.play(key + animKey);
         })
     }
-
+    destroy(){
+        super.destroy();
+        let keyList = Object.keys(this.spriteList);
+        keyList.forEach((key)=>{
+            let sprite = this.spriteList[key];
+            console.log("destroying sprites");
+            sprite.destroy();
+        })
+    }
 
     setPosition(x, y){
         super.setPosition(x,y);

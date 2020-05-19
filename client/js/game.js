@@ -57,9 +57,9 @@ class PaperDollScene extends  Phaser.Scene {
         console.log(slot);
     }
 }
-let items; // move to serverside
 
-
+let items;
+let MAPS = {0:"map",1:"map2"}
 class GameScene extends Phaser.Scene {
     constructor() {
         super({key: 'maingame'});
@@ -77,24 +77,32 @@ class GameScene extends Phaser.Scene {
     }
 
     create(){
-        const map = this.make.tilemap({ key: "map" });
         this.scene.launch("paperdoll");
-        // Parameters are the name you gave the tilesets in Tiled and then the key of the tilesets image in
-        // Phaser's cache (i.e. the name you used in preload)
-        const tileset = map.addTilesetImage("magecity", "tiles");
-
-        // Parameters: layer name (or index) from Tiled, tilesets, x, y
-        const belowLayer = map.createStaticLayer("Ground Layer", tileset, 0, 0);
-        const worldLayer = map.createStaticLayer("Below player", tileset, 0, 0);
-        const aboveLayer = map.createStaticLayer("Above player", tileset, 0, 0);
         items = this.cache.json.get('items');
         this.controller = new Controller(this,this.client);
     }
 
+
+    loadMap(id){
+        let key = MAPS[id];
+        const map = this.make.tilemap({ key: key });
+        const tileset = map.addTilesetImage("magecity", "tiles");
+        const belowLayer = map.createStaticLayer("Ground Layer", tileset, 0, 0);
+        const worldLayer = map.createStaticLayer("Below player", tileset, 0, 0);
+        const aboveLayer = map.createStaticLayer("Above player", tileset, 0, 0);
+    }
+
     newEntity(id, x, y, facing, state, base, layers){
         this.mapEntities[id] = new Player(this, {x:x,y:y}, facing, state, base, layers);
-        console.log(layers);
     }
+
+    // clearEnities() {
+    //     let entityKeys = Object.keys(this.mapEntities);
+    //     entityKeys.forEach(function (entity) {
+    //         entity.destroy();
+    //     })
+    //     this.mapEntities = {};
+    // }
 
     moveEntity(id, x, y, facing, state){
         let entity = this.mapEntities[id];
@@ -104,6 +112,12 @@ class GameScene extends Phaser.Scene {
             entity.state = state;
         }
 
+    }
+    removeEntity(id){
+        let entity = this.mapEntities[id];
+        if(entity)
+        entity.destroy();
+        this.mapEntities.splice(id, 1)
     }
 
     playerSpawn(id, x, y, facing, state, base, layers){

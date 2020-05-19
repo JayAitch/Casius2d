@@ -1,6 +1,6 @@
 directions = {"NORTH":"up", "WEST":"left", "SOUTH":"down", "EAST":"right" }
 states  = {"THRUST":"thrust", "WALK":"walk","CAST":"cast", "STOP":"stop"}
-
+colliderTypes = {"PLAYER":0,"NONPASSIBLE":1, "TRIGGER":2, "ZONETRIGGER":3};
 class AnimationComponent{
     constructor(animLayers) {
         this.currentState = states.STOP;
@@ -62,6 +62,34 @@ class AnimationComponent{
 
 
 
+class ColliderComponent{
+    constructor(collisionManager, colliderConfig) {
+        this.collisionCallback = colliderConfig.callback;
+        this.width = colliderConfig.width;
+        this.height = colliderConfig.height;
+        this.pos = colliderConfig.pos;
+        this.type = colliderConfig.type;
+        this.collisionRegistration = collisionManager.addCollider(colliderConfig.layer,this);
+        this.remove = ()=>{
+            collisionManager.removeCollider(this.collisionRegistration);
+            console.log(collisionManager.layers[this.collisionRegistration.layer][this.collisionRegistration.position]);
+        }
+    }
+
+    get x(){
+        return this.pos.x;
+    }
+    get y(){
+        return this.pos.y;
+    }
+    onCollision(otherObj){
+        this.collisionCallback(otherObj);
+    }
+    update(parent){
+        this.pos = parent.pos;
+    }
+}
+
 
 class MovingGameObject{
     constructor(pos, animLayers) {
@@ -71,9 +99,6 @@ class MovingGameObject{
         this.previousePos = pos;
         this.animationComponent = new AnimationComponent(animLayers);
         this.components = [];
-        this.width = 24; //temp
-        this.height = 24;//temp
-        this.isActive = true; //temp
     }
 
     get x(){
@@ -116,7 +141,7 @@ class MovingGameObject{
     update(){
 
         this.move();
-
+   //     console.log(this.pos);
         if(this.velocity.x === 0 && this.velocity.y === 0){
             this.animationComponent.currentState = states.STOP;
         }else{
@@ -128,12 +153,16 @@ class MovingGameObject{
         },this);
     }
 
+    removeComponents(){
+        this.components.forEach(function (component) {
+            component.remove();
+        },this);
+    }
     backStep(){
-     //   this.pos = this.previousePos;
+        this.pos = this.previousePos;
         this.pos.x = this.previousePos.x - this.velocity.x;
         this.pos.y = this.previousePos.y - this.velocity.y;
     }
-
 
     stop(){
         this.velocity = {x:0,y:0};
@@ -146,11 +175,52 @@ function getGearSlot(paperdoll, key) {
 }
 
 
+
+class NonPassibleTerrain{
+    constructor(pos, width, height, collisionManager) {
+        let colliderConfig = {
+            width:width,
+            height: height,
+            pos: pos,
+            layer:0,
+            callback: this.collisionCallback,
+            type: colliderTypes.NONPASSIBLE
+        }
+        this.collider = new ColliderComponent(collisionManager, colliderConfig)
+    }
+
+    collisionCallback(other){
+    }
+}
+
+// this needs to be ona  different layer
+class ZonePortal{
+    constructor(pos, width, height, collisionManager, zoneTarget, x, y) {
+        let colliderConfig = {
+            width:width,
+            height: height,
+            pos: pos,
+            layer:0,
+            callback: this.collisionCallback,
+            type: colliderTypes.ZONETRIGGER
+        }
+        this.collider = new ColliderComponent(collisionManager, colliderConfig);
+        this.collider.zoneTarget = zoneTarget;
+        this.collider.posTarget = {x:x || 0, y:y  || 0};
+    }
+
+    collisionCallback(other){
+    }
+}
+
+
+
 class ServerPlayer extends MovingGameObject{
-    constructor(pos, playerConfig){
+    constructor(pos, playerConfig, collisionManager, client, entityPos){
         let animLayers = {base:playerConfig.base};
         let paperDoll = playerConfig.paperDoll;
         let layers = [];
+
         let item = getGearSlot(paperDoll, "BOOTS")
         if(item)layers.push({base:item.base.animString,effect: item.plus});
 
@@ -172,8 +242,46 @@ class ServerPlayer extends MovingGameObject{
         animLayers.layers = layers;
 
         super(pos, animLayers);
+        this.width = 32;
+        this.height = 32;
+        this.createCollider(collisionManager);
+        this.client = client;
+        this.entityPos = entityPos;
+    }
+
+    createCollider(collisionManager){
+        let colliderConfig = {
+            width:this.width,
+            height: this.height,
+            pos: this.pos,
+            layer:0,
+            callback: (other)=>{
+                this.collisionCallback(other);
+            },
+            type: colliderTypes.PLAYER
+        }
+        this.components.push(new ColliderComponent(collisionManager, colliderConfig));
+    }
+
+    collisionCallback(other){
+        switch(other.type){
+            case colliderTypes.NONPASSIBLE:
+               this.backStep();
+               break;
+            case colliderTypes.PLAYER:
+                break;
+            case colliderTypes.TRIGGER:
+                break;
+            case colliderTypes.ZONETRIGGER:
+                    this.removeComponents();
+                    let zoneTarget = other.zoneTarget;
+                    let posTarget = other.posTarget;
+                    global.testZoneJoin(this.client,"", zoneTarget, posTarget);
+
+                break;
+        }
     }
 
 }
 
-module.exports = {Player: ServerPlayer}
+module.exports = {Player: ServerPlayer, NonPassibleTerrain, ZonePortal}

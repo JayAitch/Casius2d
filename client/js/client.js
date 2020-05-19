@@ -16,24 +16,28 @@ class Receiver{
     constructor(gameScene, socket){
         this.gameScene = gameScene;
         this.socket = socket;
-        console.log(this.socket)
         this.createListeners();
     }
 
     createListeners(){
         this.socket.on('newEntity',(data)=>{
             this.gameScene.newEntity(data.id, data.x, data.y, data.facing, data.state, data.base, data.layers);
-            console.log(data.layers);
         });
         this.socket.on('moveEntity',(data)=>{
             this.gameScene.moveEntity(data.id, data.x, data.y, data.facing, data.state);
         });
+        this.socket.on('loadMap', (data)=> {
+            this.gameScene.loadMap(data.id);
+        });
         this.socket.on('entityList', (data)=>{
             for(let i = 0; data.length > i; i++){
                 let dataRow = data[i];
-                console.log(dataRow.layers);
                 this.gameScene.newEntity(i, dataRow.x, dataRow.y, dataRow.facing, dataRow.state, dataRow.base, dataRow.layers);
             }
+        });
+
+        this.socket.on('removeEntity',(data)=>{
+            this.gameScene.removeEntity(data.id);
         });
     }
 }

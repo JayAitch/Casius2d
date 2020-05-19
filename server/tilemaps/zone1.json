@@ -1,0 +1,126 @@
+[{
+ "draworder":"topdown",
+ "id":5,
+ "name":"World Objects",
+ "objects":[
+  {
+   "height":198,
+   "id":12,
+   "name":"",
+   "rotation":0,
+   "type":"NONPASSIBLE",
+   "visible":true,
+   "width":224,
+   "x":352.333,
+   "y":288.167
+  },
+  {
+   "height":54,
+   "id":15,
+   "name":"",
+   "rotation":0,
+   "type":"NONPASSIBLE",
+   "visible":true,
+   "width":58,
+   "x":674.5,
+   "y":224.5
+  },
+  {
+   "height":54,
+   "id":16,
+   "name":"",
+   "properties":[
+    {
+     "name":"x",
+     "type":"int",
+     "value":600
+    },
+    {
+     "name":"y",
+     "type":"int",
+     "value":600
+    },
+    {
+     "name":"zone",
+     "type":"int",
+     "value":1
+    }],
+   "rotation":0,
+   "type":"TRIGGER_ZONE_CHANGE",
+   "visible":true,
+   "width":90,
+   "x":0,
+   "y":486
+  }],
+ "opacity":1,
+ "type":"objectgroup",
+ "visible":true,
+ "x":0,
+ "y":0
+},
+{
+"draworder":"topdown",
+"id":2,
+"name":"Boundry Object",
+"objects":[
+{
+"height":426,
+"id":1,
+"name":"",
+"rotation":0,
+"type":"NONPASSIBLE",
+"visible":true,
+"width":54,
+"x":-22,
+"y":546
+},
+{
+"height":34,
+"id":2,
+"name":"",
+"rotation":0,
+"type":"NONPASSIBLE",
+"visible":true,
+"width":1030,
+"x":-32,
+"y":944
+},
+{
+"height":980,
+"id":3,
+"name":"",
+"rotation":0,
+"type":"NONPASSIBLE",
+"visible":true,
+"width":56,
+"x":940,
+"y":-11.3333
+},
+{
+"height":54,
+"id":4,
+"name":"",
+"rotation":0,
+"type":"NONPASSIBLE",
+"visible":true,
+"width":1040,
+"x":-58,
+"y":-34
+},
+{
+"height":494,
+"id":5,
+"name":"",
+"rotation":0,
+"type":"NONPASSIBLE",
+"visible":true,
+"width":56,
+"x":-32,
+"y":-14
+}],
+"opacity":1,
+"type":"objectgroup",
+"visible":true,
+"x":0,
+"y":0
+}]
