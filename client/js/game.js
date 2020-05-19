@@ -57,9 +57,9 @@ class PaperDollScene extends  Phaser.Scene {
         console.log(slot);
     }
 }
-let items; // move to serverside
 
-
+let items;
+let MAPS = {0:"map",1:"map2"}
 class GameScene extends Phaser.Scene {
     constructor() {
         super({key: 'maingame'});
@@ -77,18 +77,19 @@ class GameScene extends Phaser.Scene {
     }
 
     create(){
-        const map = this.make.tilemap({ key: "map" });
         this.scene.launch("paperdoll");
-        // Parameters are the name you gave the tilesets in Tiled and then the key of the tilesets image in
-        // Phaser's cache (i.e. the name you used in preload)
-        const tileset = map.addTilesetImage("magecity", "tiles");
+        items = this.cache.json.get('items');
+        this.controller = new Controller(this,this.client);
+    }
 
-        // Parameters: layer name (or index) from Tiled, tilesets, x, y
+
+    loadMap(id){
+        let key = MAPS[id];
+        const map = this.make.tilemap({ key: key });
+        const tileset = map.addTilesetImage("magecity", "tiles");
         const belowLayer = map.createStaticLayer("Ground Layer", tileset, 0, 0);
         const worldLayer = map.createStaticLayer("Below player", tileset, 0, 0);
         const aboveLayer = map.createStaticLayer("Above player", tileset, 0, 0);
-        items = this.cache.json.get('items');
-        this.controller = new Controller(this,this.client);
     }
 
     newEntity(id, x, y, facing, state, base, layers){
@@ -116,6 +117,7 @@ class GameScene extends Phaser.Scene {
         let entity = this.mapEntities[id];
         if(entity)
         entity.destroy();
+        this.mapEntities.splice(id, 1)
     }
 
     playerSpawn(id, x, y, facing, state, base, layers){

@@ -26,10 +26,10 @@ class Receiver{
         this.socket.on('moveEntity',(data)=>{
             this.gameScene.moveEntity(data.id, data.x, data.y, data.facing, data.state);
         });
+        this.socket.on('loadMap', (data)=> {
+            this.gameScene.loadMap(data.id);
+        });
         this.socket.on('entityList', (data)=>{
-            console.log("new enitty list");
-            console.log(data);
-
             for(let i = 0; data.length > i; i++){
                 let dataRow = data[i];
                 this.gameScene.newEntity(i, dataRow.x, dataRow.y, dataRow.facing, dataRow.state, dataRow.base, dataRow.layers);

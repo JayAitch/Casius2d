@@ -79,6 +79,16 @@
                  "name":"",
                  "properties":[
                         {
+                         "name":"x",
+                         "type":"int",
+                         "value":600
+                        }, 
+                        {
+                         "name":"y",
+                         "type":"int",
+                         "value":400
+                        }, 
+                        {
                          "name":"zone",
                          "type":"int",
                          "value":1

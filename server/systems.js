@@ -64,7 +64,7 @@ class CollisionManager {
         return {layer:layer, position: this.layers[layer].length - 1}
     }
     removeCollider(colliderPosition) {
-        this.layers[colliderPosition.layer].splice(colliderPosition.position);
+        this.layers[colliderPosition.layer].splice(colliderPosition.position, 1);
     }
     // addCollision(a, b, callback) {
     //     let collisionObject = {};

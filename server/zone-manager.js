@@ -34,6 +34,15 @@ function getWorldObjects(id){
             }
             let newzone = getProperty(object.properties, "zone");
             if(newzone !== undefined) newObject.zone = newzone;
+
+            let xpos = getProperty(object.properties, "x");
+            if(xpos !== undefined) newObject.x = xpos;
+
+            let ypos = getProperty(object.properties, "y");
+            if(ypos !== undefined) newObject.y = ypos;
+
+
+
             worldObjects.push(newObject);
         });
     })
@@ -60,30 +69,32 @@ class Zone{
         this.physicsWorld = new PhysicsWorld(800, 800);
         this.entities = [];
         this.room = roomManager.roomManager.createRoom();
+        this.zoneID = zoneid;
         systems.addToUpdate(this);
         this.collisionManager = new systems.CollisionManager();
         this.worldObjects = getWorldObjects(zoneid); // use this to target specfic zone
         this.createNonPassibles(this.worldObjects);
-
-
     }
 
-    join(client){
+    join(client, pos){
         this.room.join(client);
-        client.zone = this;
-        this.addPlayerCharacter(client);
+        client.zone = this; // might not need
+        client.emit("loadMap", {id:this.zoneID});
+        this.addPlayerCharacter(client, pos);
     }
 
     leave(client){
         this.notifyEntityRemove(client.player.entityPos);
         this.room.leave(client);
-        this.entities.splice(client.player.entityPos);
+        this.entities.splice(client.player.entityPos, 1);
+        console.log(this.entities);
     }
 
 
-    addPlayerCharacter(client){
+    addPlayerCharacter(client, pos){
         let entityPos = this.entities.length;
-        let newPlayer = new characters.Player({x:150,y:150}, players[0], this.collisionManager, client, entityPos);
+        let newPos = JSON.parse(JSON.stringify(pos))
+        let newPlayer = new characters.Player(newPos, players[0], this.collisionManager, client, entityPos);
         client.player = newPlayer;
         this.entities.push(newPlayer);
 
@@ -102,7 +113,8 @@ class Zone{
                     let testNonPassible = new characters.NonPassibleTerrain(correctPos, object.width,object.height,this.collisionManager);
                     break;
                 case "TRIGGER_ZONE_CHANGE":
-                    let testZonePortal = new characters.ZonePortal(correctPos, object.width,object.height,this.collisionManager, object.zone);
+                    let testZonePortal = new characters.ZonePortal(correctPos, object.width,object.height,this.collisionManager, object.zone, object.x,object.y);
+
             }
 
         })

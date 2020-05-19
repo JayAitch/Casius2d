@@ -1,6 +1,6 @@
 directions = {"NORTH":"up", "WEST":"left", "SOUTH":"down", "EAST":"right" }
 states  = {"THRUST":"thrust", "WALK":"walk","CAST":"cast", "STOP":"stop"}
-colliderTypes = {"PLAYER":0,"NONPASSIBLE":1, "TRIGGER":2};
+colliderTypes = {"PLAYER":0,"NONPASSIBLE":1, "TRIGGER":2, "ZONETRIGGER":3};
 class AnimationComponent{
     constructor(animLayers) {
         this.currentState = states.STOP;
@@ -72,6 +72,7 @@ class ColliderComponent{
         this.collisionRegistration = collisionManager.addCollider(colliderConfig.layer,this);
         this.remove = ()=>{
             collisionManager.removeCollider(this.collisionRegistration);
+            console.log(collisionManager.layers[this.collisionRegistration.layer][this.collisionRegistration.position]);
         }
     }
 
@@ -140,7 +141,7 @@ class MovingGameObject{
     update(){
 
         this.move();
-
+   //     console.log(this.pos);
         if(this.velocity.x === 0 && this.velocity.y === 0){
             this.animationComponent.currentState = states.STOP;
         }else{
@@ -192,19 +193,20 @@ class NonPassibleTerrain{
     }
 }
 
-
+// this needs to be ona  different layer
 class ZonePortal{
-    constructor(pos, width, height, collisionManager, zoneTarget) {
+    constructor(pos, width, height, collisionManager, zoneTarget, x, y) {
         let colliderConfig = {
             width:width,
             height: height,
             pos: pos,
             layer:0,
             callback: this.collisionCallback,
-            type: colliderTypes.TRIGGER
+            type: colliderTypes.ZONETRIGGER
         }
         this.collider = new ColliderComponent(collisionManager, colliderConfig);
         this.collider.zoneTarget = zoneTarget;
+        this.collider.posTarget = {x:x || 0, y:y  || 0};
     }
 
     collisionCallback(other){
@@ -242,7 +244,7 @@ class ServerPlayer extends MovingGameObject{
         super(pos, animLayers);
         this.width = 32;
         this.height = 32;
-        this.colliderPosition = this.createCollider(collisionManager);
+        this.createCollider(collisionManager);
         this.client = client;
         this.entityPos = entityPos;
     }
@@ -253,10 +255,11 @@ class ServerPlayer extends MovingGameObject{
             height: this.height,
             pos: this.pos,
             layer:0,
-            callback: (other)=>{this.collisionCallback(other)},
+            callback: (other)=>{
+                this.collisionCallback(other);
+            },
             type: colliderTypes.PLAYER
         }
-
         this.components.push(new ColliderComponent(collisionManager, colliderConfig));
     }
 
@@ -268,12 +271,14 @@ class ServerPlayer extends MovingGameObject{
             case colliderTypes.PLAYER:
                 break;
             case colliderTypes.TRIGGER:
-                this.pos = {x:9999999999999999,y:9999999999999999}
-                this.removeComponents();
-
-                global.testZoneJoin(this.client,"",other.zoneTarget);
                 break;
+            case colliderTypes.ZONETRIGGER:
+                    this.removeComponents();
+                    let zoneTarget = other.zoneTarget;
+                    let posTarget = other.posTarget;
+                    global.testZoneJoin(this.client,"", zoneTarget, posTarget);
 
+                break;
         }
     }
 
