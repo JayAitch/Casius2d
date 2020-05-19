@@ -1,6 +1,6 @@
 directions = {"NORTH":"up", "WEST":"left", "SOUTH":"down", "EAST":"right" }
 states  = {"THRUST":"thrust", "WALK":"walk","CAST":"cast", "STOP":"stop"}
-colliderTypes = {"PLAYER":0,"NONPASSIBLE":1};
+colliderTypes = {"PLAYER":0,"NONPASSIBLE":1, "TRIGGER":2};
 class AnimationComponent{
     constructor(animLayers) {
         this.currentState = states.STOP;
@@ -164,6 +164,8 @@ function getGearSlot(paperdoll, key) {
     return gearSlot;
 }
 
+
+
 class NonPassibleTerrain{
     constructor(pos, width, height, collisionManager) {
         let colliderConfig = {
@@ -180,6 +182,28 @@ class NonPassibleTerrain{
     collisionCallback(other){
     }
 }
+
+
+class ZonePortal{
+    constructor(pos, width, height, collisionManager, zoneTarget) {
+        let colliderConfig = {
+            width:width,
+            height: height,
+            pos: pos,
+            layer:0,
+            callback: this.collisionCallback,
+            type: colliderTypes.TRIGGER
+        }
+        this.collider = new ColliderComponent(collisionManager, colliderConfig);
+        this.collider.zoneTarget = zoneTarget;
+    }
+
+    collisionCallback(other){
+        console.log("ZONE PORTAL");
+    }
+}
+
+
 
 class ServerPlayer extends MovingGameObject{
     constructor(pos, playerConfig, collisionManager){
@@ -233,8 +257,10 @@ class ServerPlayer extends MovingGameObject{
             case colliderTypes.NONPASSIBLE:
                this.backStep();
             case colliderTypes.PLAYER:
+            case colliderTypes.TRIGGER:
+
         }
     }
 }
 
-module.exports = {Player: ServerPlayer, NonPassibleTerrain}
+module.exports = {Player: ServerPlayer, NonPassibleTerrain, ZonePortal}

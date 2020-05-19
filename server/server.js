@@ -44,6 +44,9 @@ players = {
 
 
 let firstZone = new zoneManager.Zone();
+let secondZone = new zoneManager.Zone();
+
+
 io.on('connect', function(client) {
 
     client.on('login',function(username,password){

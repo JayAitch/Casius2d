@@ -1,4 +1,12 @@
 { "compressionlevel":-1,
+ "editorsettings":
+    {
+     "export":
+        {
+         "format":"json",
+         "target":"testmap.json"
+        }
+    },
  "height":30,
  "infinite":false,
  "layers":[
@@ -48,7 +56,7 @@
                  "id":12,
                  "name":"",
                  "rotation":0,
-                 "type":"",
+                 "type":"NONPASSIBLE",
                  "visible":true,
                  "width":224,
                  "x":352.333,
@@ -59,11 +67,28 @@
                  "id":15,
                  "name":"",
                  "rotation":0,
-                 "type":"",
+                 "type":"NONPASSIBLE",
                  "visible":true,
                  "width":58,
                  "x":674.5,
                  "y":224.5
+                }, 
+                {
+                 "height":54,
+                 "id":16,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"zone",
+                         "type":"int",
+                         "value":1
+                        }],
+                 "rotation":0,
+                 "type":"TRIGGER_ZONE_CHANGE",
+                 "visible":true,
+                 "width":90,
+                 "x":-42,
+                 "y":486
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -81,7 +106,7 @@
                  "id":1,
                  "name":"",
                  "rotation":0,
-                 "type":"",
+                 "type":"NONPASSIBLE",
                  "visible":true,
                  "width":54,
                  "x":-22,
@@ -92,18 +117,18 @@
                  "id":2,
                  "name":"",
                  "rotation":0,
-                 "type":"",
+                 "type":"NONPASSIBLE",
                  "visible":true,
                  "width":1030,
-                 "x":-40,
-                 "y":942
+                 "x":-32,
+                 "y":944
                 }, 
                 {
                  "height":980,
                  "id":3,
                  "name":"",
                  "rotation":0,
-                 "type":"",
+                 "type":"NONPASSIBLE",
                  "visible":true,
                  "width":56,
                  "x":940,
@@ -114,7 +139,7 @@
                  "id":4,
                  "name":"",
                  "rotation":0,
-                 "type":"",
+                 "type":"NONPASSIBLE",
                  "visible":true,
                  "width":1040,
                  "x":-58,
@@ -125,7 +150,7 @@
                  "id":5,
                  "name":"",
                  "rotation":0,
-                 "type":"",
+                 "type":"NONPASSIBLE",
                  "visible":true,
                  "width":56,
                  "x":-32,
@@ -138,7 +163,7 @@
          "y":0
         }],
  "nextlayerid":6,
- "nextobjectid":16,
+ "nextobjectid":18,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.3.4",

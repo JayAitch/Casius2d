@@ -61,7 +61,6 @@ class CollisionManager {
 
     addCollider(layer, obj){
         this.layers[layer].push(obj);
-        console.log(this.layers);
     }
 
     // addCollision(a, b, callback) {
