@@ -142,14 +142,15 @@ class Controller{
         let rightKey = scene.input.keyboard.addKey("RIGHT");
         let upKey = scene.input.keyboard.addKey("UP");
         let downKey = scene.input.keyboard.addKey("DOWN");
+    //    let spaceKey = scene.input.keyboard.addKey("SPACE");
         let spaceKey = scene.input.keyboard.addKey("SPACE");
 
 
-        spaceKey.on('down', (event)=> {
-           // console.log(scene.mapEntities);
-          //  scene.mapEntities[0].animation = "walkup"
-        });
         this.client = client;
+
+        spaceKey.on('down', (event)=> {
+            client.sender.attack();
+        });
 
         leftKey.on('down', (event)=> {
             client.sender.move({x: -1, y:0});

@@ -55,8 +55,7 @@ const Updater = {
 
 class CollisionManager {
     constructor(){
-        //this.colliders = [];
-        this.layers = {0:[],1:[]};
+        this.layers = {0:[],1:[],2:[],3:[],4:[],5:[],6:[],7:[],8:[],9:[]};
     }
 
     addCollider(layer, obj){
@@ -66,43 +65,38 @@ class CollisionManager {
     removeCollider(colliderPosition) {
         this.layers[colliderPosition.layer].splice(colliderPosition.position, 1);
     }
-    // addCollision(a, b, callback) {
-    //     let collisionObject = {};
-    //     collisionObject.objA = a;
-    //     collisionObject.objB = b;
-    //     collisionObject.onCollision = callback;
-    //     this.colliders.push(collisionObject);
-    // }
 
     update() {
         let layerKeys = Object.keys(this.layers);
         layerKeys.forEach((key)=>{
+            // get all colliders in the layer
             let colliders = this.layers[key];
             for(let i = 0; i < colliders.length;i++){
-                for(let c = 0; c < colliders.length;c++){
-                    if(i !== c){
-                        let objA = colliders[i];
-                        let objB = colliders[c];
+                // get all layers this collider interacts with
+                let objA = colliders[i];
+                let interacts = objA.interacts || [];
+                interacts.forEach((layer)=>{
+                    // go through all colliders in relivant layers
+                    let layerColliders = this.layers[layer];
+                    for(let c = 0; c < layerColliders.length;c++){
+
+                        let objB = layerColliders[c];
                         if(this.collides(objA, objB)){
                             objA.onCollision(objB);
                             objB.onCollision(objA);
                         }
+
                     }
-                }
+                })
+
             }
         })
 
-
-
-        // this.colliders.forEach((obj) => {
-        //     if (this.collides(obj.objA, obj.objB)) {
-        //         if((obj.objA.isActive && obj.objB.isActive)) obj.onCollision();
-        //     }
-        // });
     }
 
 
-    boxScan(position, width, height, scanLayers){
+
+    boxScan(position, width, height, scanLayers,colReg){
         let scan = {
             x:position.x,
             y:position.y,
@@ -112,13 +106,14 @@ class CollisionManager {
         let collision = [];
         if(scanLayers === undefined) scanLayers = Object.keys(this.layers);
 
-        //let layerKeys = Object.keys(this.layers);
 
         scanLayers.forEach((key)=>{
             let colliders = this.layers[key];
             colliders.forEach((collider)=>{
-                if (this.collides(scan, collider)) {
-                    collision.push(collider);
+                if(collider.collisionRegistration !== colReg || colReg === undefined){
+                    if (this.collides(scan, collider)) {
+                        collision.push(collider);
+                    }
                 }
             })
         })

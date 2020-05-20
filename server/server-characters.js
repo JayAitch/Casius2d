@@ -1,6 +1,8 @@
-directions = {"NORTH":"up", "WEST":"left", "SOUTH":"down", "EAST":"right" }
-states  = {"THRUST":"thrust", "WALK":"walk","CAST":"cast", "STOP":"stop"}
-colliderTypes = {"PLAYER":0,"NONPASSIBLE":1, "TRIGGER":2, "ZONETRIGGER":3};
+directions = {"NORTH":"up", "WEST":"left", "SOUTH":"down", "EAST":"right" };
+states  = {"THRUST":"thrust", "WALK":"walk","CAST":"cast", "STOP":"stop"};
+colliderTypes = {"PLAYER":0,"NONPASSIBLE":1, "TRIGGER":2, "ZONETRIGGER":3, "ATTACKSCAN":4};
+
+
 class AnimationComponent{
     constructor(animLayers) {
         this.currentState = states.STOP;
@@ -59,7 +61,50 @@ class AnimationComponent{
 //     }
 // }
 //
+function directionAsVector(direction){
+    switch (direction) {
+        case "up":
+            return {x:0,y:-1}
+            break;
+        case "left":
+            return {x:-1,y:0}
+            break;
+        case "down":
+            return {x:0,y:1}
+            break;
+        case "right":
+            return {x:1,y:0}
+            break;
+    }
+}
 
+
+class AttackingComponent{
+    constructor(collisionManager, origin, directionObject, colReg){
+        this.collisionManager = collisionManager;
+        this.origin = origin;
+        this.directionObject = directionObject;
+        this.collisionRegistry = colReg;
+    }
+
+    scanForEntities(x,y,width,height){
+        return this.collisionManager.boxScan({x:x,y:y},width,height,[1],this.collisionRegistry);
+    }
+
+    attack(){
+        let direction = directionAsVector(this.directionObject.direction);
+        let x = (direction.x * 30) + this.origin.x;
+        let y = (direction.y * 30) + this.origin.y;
+        let hitEntities = this.scanForEntities(x,y,150,150);
+        let damageMessage = {type:colliderTypes.ATTACKSCAN};
+        hitEntities.forEach((entities)=>{
+            entities.onCollision(damageMessage);
+        })
+
+
+    }
+
+}
 
 
 class ColliderComponent{
@@ -70,6 +115,7 @@ class ColliderComponent{
         this.pos = colliderConfig.pos;
         this.type = colliderConfig.type;
         this.collisionRegistration = collisionManager.addCollider(colliderConfig.layer,this);
+        this.interacts = colliderConfig.interacts;
         this.remove = ()=>{
             collisionManager.removeCollider(this.collisionRegistration);
             console.log(collisionManager.layers[this.collisionRegistration.layer][this.collisionRegistration.position]);
@@ -213,9 +259,20 @@ class ZonePortal{
     }
 }
 
+class DamageableCharacter extends MovingGameObject {
+    constructor(pos, animLayers) {
+    super(pos, animLayers);
+        this.maxHealth = 100;
+        this.health = this.maxHealth;
+    }
 
+    takeDamage(){
+        this.health -= 30;
+        console.log(this.health);
+    }
+}
 
-class ServerPlayer extends MovingGameObject{
+class ServerPlayer extends DamageableCharacter{
     constructor(pos, playerConfig, collisionManager, client, entityPos){
         let animLayers = {base:playerConfig.base};
         let paperDoll = playerConfig.paperDoll;
@@ -244,7 +301,8 @@ class ServerPlayer extends MovingGameObject{
         super(pos, animLayers);
         this.width = 32;
         this.height = 32;
-        this.createCollider(collisionManager);
+        let collider = this.createCollider(collisionManager);
+        this.attackingComponent = new AttackingComponent(collisionManager,this.pos, this.animationComponent, collider.collisionRegistration);
         this.client = client;
         this.entityPos = entityPos;
     }
@@ -254,14 +312,21 @@ class ServerPlayer extends MovingGameObject{
             width:this.width,
             height: this.height,
             pos: this.pos,
-            layer:0,
+            layer:1,
+            interacts:[0,2,3,4],
             callback: (other)=>{
                 this.collisionCallback(other);
             },
             type: colliderTypes.PLAYER
         }
-        this.components.push(new ColliderComponent(collisionManager, colliderConfig));
+        let collider = new ColliderComponent(collisionManager, colliderConfig)
+        this.components.push(collider);
+        return collider;
     }
+    attack(){
+        this.attackingComponent.attack();
+    }
+
 
     collisionCallback(other){
         switch(other.type){
@@ -277,7 +342,8 @@ class ServerPlayer extends MovingGameObject{
                     let zoneTarget = other.zoneTarget;
                     let posTarget = other.posTarget;
                     global.testZoneJoin(this.client,"", zoneTarget, posTarget);
-
+            case colliderTypes.ATTACKSCAN:
+                    this.takeDamage();
                 break;
         }
     }

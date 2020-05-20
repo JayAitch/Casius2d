@@ -64,6 +64,10 @@ io.on('connect', function(client) {
             client.on('move',function(data) {
                 client.player.addMovement({x:data.x, y:data.y});
             });
+
+            client.on('attack',function(data) {
+                client.player.attack();
+            });
         });
     });
 
@@ -90,12 +94,6 @@ io.on('connect', function(client) {
 server.listen(PORT, function(){
     console.log('Listening on ' + server.address().port);
 });
-
-
-
-
-
-
 
 
 

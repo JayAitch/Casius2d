@@ -66,6 +66,9 @@ class Sender{
     move(direction) {
         this.socket.emit('move', direction);
     }
+    attack() {
+        this.socket.emit('attack');
+    }
     joinZone(zone){
         this.socket.emit('joinzone', zone);
     }
