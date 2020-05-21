@@ -21,10 +21,11 @@ class Receiver{
 
     createListeners(){
         this.socket.on('newEntity',(data)=>{
-            this.gameScene.newEntity(data.id, data.x, data.y, data.facing, data.state, data.base, data.layers);
+            this.gameScene.newEntity(data.id, data.x, data.y, data.facing, data.state, data.base, data.layers, data.health, data.mHealth);
         });
         this.socket.on('moveEntity',(data)=>{
-            this.gameScene.moveEntity(data.id, data.x, data.y, data.facing, data.state);
+            // poentially seperate message
+            this.gameScene.moveEntity(data.id, data.x, data.y, data.facing, data.state,  data.health, data.mHealth);
         });
         this.socket.on('loadMap', (data)=> {
             this.gameScene.loadMap(data.id);
@@ -32,7 +33,7 @@ class Receiver{
         this.socket.on('entityList', (data)=>{
             for(let i = 0; data.length > i; i++){
                 let dataRow = data[i];
-                this.gameScene.newEntity(i, dataRow.x, dataRow.y, dataRow.facing, dataRow.state, dataRow.base, dataRow.layers);
+                this.gameScene.newEntity(dataRow.position, dataRow.x, dataRow.y, dataRow.facing, dataRow.state, dataRow.base, dataRow.layers, data.health, data.mHealth);
             }
         });
 

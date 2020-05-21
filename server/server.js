@@ -38,6 +38,14 @@ players = {
 };
 
 
+class PlayerStats {
+    constructor(health, experience) {
+        this.maxHealth = health;
+        this.health = health;
+        this.experience = experience;
+    }
+
+}
 
 
 
@@ -51,7 +59,8 @@ const ZONES = {0:firstZone,1:secondZone}
 io.on('connect', function(client) {
 
     client.on('login',function(username,password){
-
+        let playerStats = new PlayerStats(200,200);
+        client.playerStats = playerStats;
         tryLogin(client, username, password);
 
         client.on('joinzone',function(data) {
@@ -139,4 +148,11 @@ function tryJoinZone(client, username, zoneid, position){
 
 global.testZoneJoin =function(client, username, zoneid, position){
     tryJoinZone(client, username, zoneid, position)
+}
+
+global.killPlayer = function(client){
+    console.log("killing player");
+    let zoneid = client.playerStats.zone;
+    let zone = ZONES[zoneid];
+    zone.killEntity(client.player.entityPos);
 }

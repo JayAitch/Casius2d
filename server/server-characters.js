@@ -80,11 +80,12 @@ function directionAsVector(direction){
 
 
 class AttackingComponent{
-    constructor(collisionManager, origin, directionObject, colReg){
+    constructor(collisionManager, origin, directionObject, colReg, stats){
         this.collisionManager = collisionManager;
         this.origin = origin;
         this.directionObject = directionObject;
         this.collisionRegistry = colReg;
+        this.stats = stats;
     }
 
     scanForEntities(x,y,width,height){
@@ -97,11 +98,11 @@ class AttackingComponent{
         let y = (direction.y * 30) + this.origin.y;
         let hitEntities = this.scanForEntities(x,y,150,150);
         let damageMessage = {type:colliderTypes.ATTACKSCAN};
+        let reward = 0;
         hitEntities.forEach((entities)=>{
-            entities.onCollision(damageMessage);
+            reward += entities.onCollision(damageMessage);
         })
-
-
+        return reward;
     }
 
 }
@@ -118,7 +119,6 @@ class ColliderComponent{
         this.interacts = colliderConfig.interacts;
         this.remove = ()=>{
             collisionManager.removeCollider(this.collisionRegistration);
-            console.log(collisionManager.layers[this.collisionRegistration.layer][this.collisionRegistration.position]);
         }
     }
 
@@ -128,8 +128,9 @@ class ColliderComponent{
     get y(){
         return this.pos.y;
     }
+
     onCollision(otherObj){
-        this.collisionCallback(otherObj);
+        return this.collisionCallback(otherObj);
     }
     update(parent){
         this.pos = parent.pos;
@@ -152,6 +153,13 @@ class MovingGameObject{
     }
     get y(){
         return this.pos.y;
+    }
+    get health(){
+        return 0;
+    }
+
+    get maxHealth(){
+        return 0;
     }
 
     addMovement(addedVelocity){
@@ -195,7 +203,7 @@ class MovingGameObject{
         }
 
         this.components.forEach(function (component) {
-            component.update(this);
+            component.update(this); // this should be done via pass by reference
         },this);
     }
 
@@ -204,6 +212,7 @@ class MovingGameObject{
             component.remove();
         },this);
     }
+
     backStep(){
         this.pos = this.previousePos;
         this.pos.x = this.previousePos.x - this.velocity.x;
@@ -260,20 +269,33 @@ class ZonePortal{
 }
 
 class DamageableCharacter extends MovingGameObject {
-    constructor(pos, animLayers) {
+    constructor(pos, animLayers, stats) {
     super(pos, animLayers);
-        this.maxHealth = 100;
-        this.health = this.maxHealth;
+        this.stats = stats;
     }
 
     takeDamage(){
         this.health -= 30;
-        console.log(this.health);
+        if(this.health <= 0) this.kill();
+        let reward = 30;
+        return reward;
+    }
+    get health(){
+        return this.stats.health;
+    }
+    set health(val){
+        this.stats.health = val;
+    }
+    kill(){
+        return;
+    }
+    get maxHealth(){
+        return this.stats.maxHealth;
     }
 }
 
 class ServerPlayer extends DamageableCharacter{
-    constructor(pos, playerConfig, collisionManager, client, entityPos){
+    constructor(pos, playerConfig, collisionManager, client, entityPos, playerStats){
         let animLayers = {base:playerConfig.base};
         let paperDoll = playerConfig.paperDoll;
         let layers = [];
@@ -298,13 +320,20 @@ class ServerPlayer extends DamageableCharacter{
 
         animLayers.layers = layers;
 
-        super(pos, animLayers);
+        super(pos, animLayers, playerStats);
         this.width = 32;
         this.height = 32;
         let collider = this.createCollider(collisionManager);
-        this.attackingComponent = new AttackingComponent(collisionManager,this.pos, this.animationComponent, collider.collisionRegistration);
+        // may need stats to calculate damage etc
+        this.attackingComponent = new AttackingComponent(collisionManager,
+            this.pos,
+            this.animationComponent,
+            collider.collisionRegistration,
+            playerStats
+            );
         this.client = client;
         this.entityPos = entityPos;
+        this.playerStats = playerStats;
     }
 
     createCollider(collisionManager){
@@ -315,7 +344,7 @@ class ServerPlayer extends DamageableCharacter{
             layer:1,
             interacts:[0,2,3,4],
             callback: (other)=>{
-                this.collisionCallback(other);
+                return this.collisionCallback(other);
             },
             type: colliderTypes.PLAYER
         }
@@ -323,10 +352,17 @@ class ServerPlayer extends DamageableCharacter{
         this.components.push(collider);
         return collider;
     }
+
+
     attack(){
-        this.attackingComponent.attack();
+        let reward = this.attackingComponent.attack();
+        this.playerStats.experience += reward;
     }
 
+    kill() {
+        global.killPlayer(this.client);
+        //this.removeComponents();
+    }
 
     collisionCallback(other){
         switch(other.type){
@@ -338,12 +374,13 @@ class ServerPlayer extends DamageableCharacter{
             case colliderTypes.TRIGGER:
                 break;
             case colliderTypes.ZONETRIGGER:
-                    this.removeComponents();
-                    let zoneTarget = other.zoneTarget;
-                    let posTarget = other.posTarget;
-                    global.testZoneJoin(this.client,"", zoneTarget, posTarget);
+                this.removeComponents();
+                let zoneTarget = other.zoneTarget;
+                let posTarget = other.posTarget;
+                global.testZoneJoin(this.client,"", zoneTarget, posTarget);
+                break;
             case colliderTypes.ATTACKSCAN:
-                    this.takeDamage();
+                return this.takeDamage();
                 break;
         }
     }

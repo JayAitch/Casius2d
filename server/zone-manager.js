@@ -67,9 +67,10 @@ function getProperty(properties, prop){
 class Zone{
     constructor(zoneid) {
         this.physicsWorld = new PhysicsWorld(800, 800);
-        this.entities = [];
+        this.entities = {};
         this.room = roomManager.roomManager.createRoom();
         this.zoneID = zoneid;
+        this.lastEntityId = 0;
         systems.addToUpdate(this);
         this.collisionManager = new systems.CollisionManager();
         this.worldObjects = getWorldObjects(zoneid); // use this to target specfic zone
@@ -86,22 +87,30 @@ class Zone{
     leave(client){
         this.notifyEntityRemove(client.player.entityPos);
         this.room.leave(client);
-        this.entities.splice(client.player.entityPos, 1);
-        console.log(this.entities);
+        delete this.entities[client.player.entityPos, 1];
     }
 
+    killEntity(id){
+        let entity = this.entities[id];
+        if(entity){
+            this.notifyEntityRemove(id);
+            delete this.entities[id];
+        }
+    }
 
     addPlayerCharacter(client, pos){
-        let entityPos = this.entities.length;
-        console.log(pos);
+        let entityPos = this.lastEntityId;
+
         let newPos = JSON.parse(JSON.stringify(pos))
-        let newPlayer = new characters.Player(newPos, players[0], this.collisionManager, client, entityPos);
+        let newPlayer = new characters.Player(newPos, players[0], this.collisionManager, client, entityPos, client.playerStats);
+        client.playerStats.zone = this.zoneID;
         client.player = newPlayer;
-        this.entities.push(newPlayer);
+
+        this.entities[entityPos] = newPlayer;
 
         this.notifyNewEntity(client, newPlayer, entityPos);
         client.emit("entityList", this.allEntities());
-
+        this.lastEntityId++
     }
 
     createNonPassibles(objects){
@@ -124,16 +133,22 @@ class Zone{
 
     allEntities() {
         let tempEntities = [];
-        this.entities.forEach(function (entity) {
+        let entityKeys = Object.keys(this.entities);
+        entityKeys.forEach( (key)=> {
+
+            let entity = this.entities[key];
             tempEntities.push({
+                position:entity.entityPos,
                 x:entity.pos.x,
                 y:entity.pos.y,
                 facing: entity.direction,
                 state:entity.state,
                 base: entity.animationComponent.baseSprite,
-                layers: entity.animationComponent.spriteLayers
+                layers: entity.animationComponent.spriteLayers,
+                health: entity.health,
+                mHealth: entity.maxHealth
             })
-        })
+        });
         return tempEntities;
     }
 
@@ -145,19 +160,24 @@ class Zone{
             facing: entity.direction,
             state:entity.state,
             base: entity.animationComponent.baseSprite,
-            layers: entity.animationComponent.spriteLayers
+            layers: entity.animationComponent.spriteLayers,
+            health: entity.health,
+            mHealth: entity.maxHealth
         })
     }
 
-    notifyEntityUpdate(entity, entityPos){
+    notifyEntityUpdate(entity){
         this.room.roomMessage('moveEntity', {
-            id:entityPos,
+            id:entity.entityPos,
             x:entity.pos.x,
             y:entity.pos.y,
             facing: entity.direction,
-            state:entity.state
+            state:entity.state,
+            health: entity.health,
+            mHealth: entity.maxHealth
         })
     }
+
     notifyEntityRemove(entityPos){
         this.room.roomMessage('removeEntity', {
             id:entityPos
@@ -175,12 +195,12 @@ class Zone{
     }
 
     update(){
-
-        for(let i = 0; this.entities.length > i; i++){
-            let entitiy = this.entities[i];
-            entitiy.update();
-            this.notifyEntityUpdate(entitiy, i);
-        }
+        let entityKeys = Object.keys(this.entities);
+        entityKeys.forEach( (key)=> {
+            let entity = this.entities[key];
+            entity.update();
+            this.notifyEntityUpdate(entity);
+        });
         this.collisionManager.update();
     }
 }

@@ -92,8 +92,8 @@ class GameScene extends Phaser.Scene {
         const aboveLayer = map.createStaticLayer("Above player", tileset, 0, 0);
     }
 
-    newEntity(id, x, y, facing, state, base, layers){
-        this.mapEntities[id] = new Player(this, {x:x,y:y}, facing, state, base, layers);
+    newEntity(id, x, y, facing, state, base, layers, health, mHealt){
+        this.mapEntities[id] = new Player(this, {x:x,y:y}, facing, state, base, layers, health, mHealt);
     }
 
     // clearEnities() {
@@ -104,24 +104,29 @@ class GameScene extends Phaser.Scene {
     //     this.mapEntities = {};
     // }
 
-    moveEntity(id, x, y, facing, state){
+    moveEntity(id, x, y, facing, state, health, mHealth){
         let entity = this.mapEntities[id];
         if(entity){
             entity.newPosition = {x:x, y:y};
             entity.facing = facing;
             entity.state = state;
+            entity.health = health;
+            entity.maxHealth = mHealth;
         }
-
     }
+
+
     removeEntity(id){
         let entity = this.mapEntities[id];
-        if(entity)
-        entity.destroy();
-        this.mapEntities.splice(id, 1)
+        if(entity) {
+            entity.destroy();
+           // this.mapEntities.splice(id, 1);
+            delete this.mapEntities[id];
+        }
     }
 
-    playerSpawn(id, x, y, facing, state, base, layers){
-        this.newEntity(id, x, y, facing, state, base, layers);
+    playerSpawn(id, x, y, facing, state, base, layers, health, mHealth){
+        this.newEntity(id, x, y, facing, state, base, layers, health, mHealt);
     }
 
     update(){
