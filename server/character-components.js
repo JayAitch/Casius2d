@@ -55,6 +55,22 @@ class AttackingComponent{
 
 }
 
+function directionAsVector(direction){
+    switch (direction) {
+        case "up":
+            return {x:0,y:-1}
+            break;
+        case "left":
+            return {x:-1,y:0}
+            break;
+        case "down":
+            return {x:0,y:1}
+            break;
+        case "right":
+            return {x:1,y:0}
+            break;
+    }
+}
 
 class ColliderComponent{
     constructor(collisionManager, colliderConfig) {
@@ -142,6 +158,8 @@ class AIComponent{
         }
     }
 }
+
+
 
 // not currently used
 class MovementComponent{

@@ -174,3 +174,7 @@ global.respawn = function(client){
     zone.join(client,{x:150,y:150});
     console.log(Object.keys(zone.entities));
 }
+
+global.randomInteger = function(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
