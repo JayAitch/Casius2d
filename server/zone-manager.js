@@ -75,7 +75,17 @@ class Zone{
         this.collisionManager = new systems.CollisionManager();
         this.worldObjects = getWorldObjects(zoneid); // use this to target specfic zone
         this.createNonPassibles(this.worldObjects);
+
+        this.testCreateMob();
+
     }
+
+    testCreateMob(){
+        this.testMob = new characters.BasicMob(this.collisionManager);
+        this.entities[this.lastEntityId] = this.testMob;
+        this.lastEntityId++
+    }
+
 
     join(client, pos){
         this.room.join(client);
@@ -87,7 +97,7 @@ class Zone{
     leave(client){
         this.notifyEntityRemove(client.player.entityPos);
         this.room.leave(client);
-        delete this.entities[client.player.entityPos, 1];
+        delete this.entities[client.player.entityPos];
     }
 
     killEntity(id){
@@ -101,7 +111,7 @@ class Zone{
     addPlayerCharacter(client, pos){
         let entityPos = this.lastEntityId;
 
-        let newPos = JSON.parse(JSON.stringify(pos))
+        let newPos = JSON.parse(JSON.stringify(pos));
         let newPlayer = new characters.Player(newPos, players[0], this.collisionManager, client, entityPos, client.playerStats);
         client.playerStats.zone = this.zoneID;
         client.player = newPlayer;
@@ -138,7 +148,7 @@ class Zone{
 
             let entity = this.entities[key];
             tempEntities.push({
-                position:entity.entityPos,
+                position:key,
                 x:entity.pos.x,
                 y:entity.pos.y,
                 facing: entity.direction,
@@ -166,9 +176,9 @@ class Zone{
         })
     }
 
-    notifyEntityUpdate(entity){
+    notifyEntityUpdate(entity, key){
         this.room.roomMessage('moveEntity', {
-            id:entity.entityPos,
+            id:entity.entityPos || key,
             x:entity.pos.x,
             y:entity.pos.y,
             facing: entity.direction,
@@ -198,8 +208,14 @@ class Zone{
         let entityKeys = Object.keys(this.entities);
         entityKeys.forEach( (key)=> {
             let entity = this.entities[key];
-            entity.update();
-            this.notifyEntityUpdate(entity);
+
+            if(entity.isDelete){
+                this.killEntity(key);
+            }else{
+                entity.update();
+                this.notifyEntityUpdate(entity, key);
+            }
+
         });
         this.collisionManager.update();
     }

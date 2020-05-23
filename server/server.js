@@ -100,9 +100,13 @@ io.on('connect', function(client) {
 });
 
 
+
+
 server.listen(PORT, function(){
     console.log('Listening on ' + server.address().port);
 });
+
+
 
 
 
@@ -126,6 +130,8 @@ function tryLogin(client, username, password){
         client.emit('loggedIn');
     }
 }
+
+
 
 function tryJoinZone(client, username, zoneid, position){
     if(!dbDisabled){
@@ -151,8 +157,20 @@ global.testZoneJoin =function(client, username, zoneid, position){
 }
 
 global.killPlayer = function(client){
-    console.log("killing player");
     let zoneid = client.playerStats.zone;
     let zone = ZONES[zoneid];
     zone.killEntity(client.player.entityPos);
+
+    let testRespawn = setTimeout(function() {
+        global.respawn(client);
+        clearTimeout(testRespawn);
+    }, 2000);
+}
+
+global.respawn = function(client){
+    let zoneid = client.playerStats.zone;
+    client.playerStats.health = client.playerStats.maxHealth;
+    let zone = ZONES[zoneid];
+    zone.join(client,{x:150,y:150});
+    console.log(Object.keys(zone.entities));
 }

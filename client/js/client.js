@@ -31,6 +31,8 @@ class Receiver{
             this.gameScene.loadMap(data.id);
         });
         this.socket.on('entityList', (data)=>{
+
+            // health is always blank here
             for(let i = 0; data.length > i; i++){
                 let dataRow = data[i];
                 this.gameScene.newEntity(dataRow.position, dataRow.x, dataRow.y, dataRow.facing, dataRow.state, dataRow.base, dataRow.layers, data.health, data.mHealth);

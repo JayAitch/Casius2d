@@ -169,10 +169,10 @@ function addSpriteEffect(sprite,scene,level){
 
 class MovingMultiSprite extends MovingSprite{
 
-    constructor(scene, pos, base, array){
+    constructor(scene, pos, base, layers){
         super(scene,pos, base);
         this.spriteList = {};
-        array.forEach((elem)=>{
+        layers.forEach((elem)=>{
             let sprite = scene.add.sprite(pos.x, pos.y);
             this.spriteList[elem.base] = sprite;
             addSpriteEffect(sprite,scene, elem.effect); //temp
@@ -211,6 +211,31 @@ class MovingMultiSprite extends MovingSprite{
 }
 //"goldhelm", "goldlegs", "leatherbelt","jacket","dspear", "shield",
 
+class TestMonster extends MovingSprite{
+    constructor(scene, pos, base, health, mHealth){
+        console.log(health);
+        super(scene, pos, base);
+        this.healthBar = new HealthBar(scene,pos.x,pos.y,100,12, health, mHealth)
+    }
+    set health(val){
+        console.log("health update");
+        this.healthBar.health = val;
+    }
+
+    set maxHealth(val){
+        this.healthBar.maxHealth = val;
+    }
+    destroy() {
+        super.destroy();
+        this.healthBar.destroy();
+    }
+
+    update(){
+        this.healthBar.x = this.pos.x;
+        this.healthBar.y = this.pos.y;
+        this.healthBar.draw();
+    }
+}
 
 
 class Player extends MovingMultiSprite{

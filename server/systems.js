@@ -56,15 +56,54 @@ const Updater = {
 class CollisionManager {
     constructor(){
         this.layers = {0:[],1:[],2:[],3:[],4:[],5:[],6:[],7:[],8:[],9:[]};
+        //this.layers = {0:{i:0},1:{i:0},2:{i:0},3:{i:0},4:{i:0},5:{i:0},6:{i:0},7:{i:0},8:{i:0},9:{i:0}};
     }
 
     addCollider(layer, obj){
+   //     let inc = this.layers[layer].i;
+        let inc = this.layers[layer].length;
+   //     this.layers[layer].i++;
         this.layers[layer].push(obj);
-        return {layer:layer, position: this.layers[layer].length - 1}
+     //   this.layers[layer][inc] = obj;
+        return {layer:layer, position: inc}
     }
     removeCollider(colliderPosition) {
-        this.layers[colliderPosition.layer].splice(colliderPosition.position, 1);
+
+        //this.layers[colliderPosition.layer].splice(colliderPosition.position, 1);
+       // delete this.layers[colliderPosition.layer][colliderPosition.position];
+
     }
+
+
+    // update() {
+    //     let layerKeys = Object.keys(this.layers);
+    //     layerKeys.forEach((key)=>{
+    //         // get all colliders in the layer
+    //         let colliders = this.layers[key];
+    //         let colKeys = Object.keys(colliders)
+    //         colKeys.forEach((colKey)=>{
+    //             // get all layers this collider interacts with
+    //             let objA = colliders[colKey];
+    //             let interacts = objA.interacts || [];
+    //             interacts.forEach((layer)=>{
+    //                 // go through all colliders in relivant layers
+    //                 let layerColliders = this.layers[layer];
+    //                 let layerKeys = Object.keys(layerColliders);
+    //                 layerKeys.forEach((interactsColKey)=>{
+    //
+    //                     let objB = layerColliders[interactsColKey];
+    //                     if(this.collides(objA, objB)){
+    //                         objA.onCollision(objB);
+    //                         objB.onCollision(objA);
+    //                     }
+    //
+    //                 });
+    //             })
+    //
+    //         });
+    //     })
+    //
+    // }
 
     update() {
         let layerKeys = Object.keys(this.layers);
@@ -74,26 +113,56 @@ class CollisionManager {
             for(let i = 0; i < colliders.length;i++){
                 // get all layers this collider interacts with
                 let objA = colliders[i];
-                let interacts = objA.interacts || [];
-                interacts.forEach((layer)=>{
-                    // go through all colliders in relivant layers
-                    let layerColliders = this.layers[layer];
-                    for(let c = 0; c < layerColliders.length;c++){
+                if(objA.isDelete) {
+                    colliders.splice(i,1);
+                }else{
+                    let interacts = objA.interacts || [];
+                    interacts.forEach((layer)=>{
+                        // go through all colliders in relivant layers
+                        let layerColliders = this.layers[layer];
+                        for(let c = 0; c < layerColliders.length;c++){
 
-                        let objB = layerColliders[c];
-                        if(this.collides(objA, objB)){
-                            objA.onCollision(objB);
-                            objB.onCollision(objA);
+                            let objB = layerColliders[c];
+                            if(this.collides(objA, objB)){
+                                objA.onCollision(objB);
+                                objB.onCollision(objA);
+                            }
+
                         }
+                    })
+                }
 
-                    }
-                })
 
             }
         })
 
     }
 
+    // boxScan(position, width, height, scanLayers,colReg){
+    //     let scan = {
+    //         x:position.x,
+    //         y:position.y,
+    //         width:width,
+    //         height:height
+    //     }
+    //     let collision = [];
+    //     if(scanLayers === undefined) scanLayers = Object.keys(this.layers);
+    //
+    //
+    //     scanLayers.forEach((key)=>{
+    //         let colliders = this.layers[key];
+    //         let colKeys = Object.keys(colliders);
+    //         colKeys.forEach((collider)=>{
+    //             if(collider.collisionRegistration !== colReg || colReg === undefined){
+    //                 if (this.collides(scan, collider)) {
+    //                     collision.push(collider);
+    //                 }
+    //             }
+    //         })
+    //     })
+    //
+    //     return collision;
+    // }
 
 
     boxScan(position, width, height, scanLayers,colReg){
@@ -110,7 +179,9 @@ class CollisionManager {
         scanLayers.forEach((key)=>{
             let colliders = this.layers[key];
             colliders.forEach((collider)=>{
+                // this wont work now self hitting must be done throguh layer manipulation
                 if(collider.collisionRegistration !== colReg || colReg === undefined){
+                    
                     if (this.collides(scan, collider)) {
                         collision.push(collider);
                     }

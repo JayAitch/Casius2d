@@ -92,8 +92,13 @@ class GameScene extends Phaser.Scene {
         const aboveLayer = map.createStaticLayer("Above player", tileset, 0, 0);
     }
 
-    newEntity(id, x, y, facing, state, base, layers, health, mHealt){
-        this.mapEntities[id] = new Player(this, {x:x,y:y}, facing, state, base, layers, health, mHealt);
+    newEntity(id, x, y, facing, state, base, layers, health, mHealth){
+        if(layers) {
+            this.mapEntities[id] = new Player(this, {x: x, y: y}, facing, state, base, layers, health, mHealth);
+        }
+        else{
+            this.mapEntities[id] = new TestMonster(this, {x: x, y: y}, base,health,mHealth);
+        }
     }
 
     // clearEnities() {
