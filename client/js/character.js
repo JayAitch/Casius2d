@@ -218,7 +218,6 @@ class TestMonster extends MovingSprite{
         this.healthBar = new HealthBar(scene,pos.x,pos.y,100,12, health, mHealth)
     }
     set health(val){
-        console.log("health update");
         this.healthBar.health = val;
     }
 
@@ -230,7 +229,9 @@ class TestMonster extends MovingSprite{
         this.healthBar.destroy();
     }
 
+
     update(){
+        this.move();
         this.healthBar.x = this.pos.x;
         this.healthBar.y = this.pos.y;
         this.healthBar.draw();

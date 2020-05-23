@@ -33,34 +33,34 @@ class AnimationComponent{
 }
 
 
-// class MovementComponent{
-//     constructor(pos) {
-//         this.velocity = {x: 0, y: 0};
-//         this.moveSpeed = 4;
-//         this.pos = pos;
-//     }
-//     move(){
-//         this.pos.x = this.pos.x + this.velocity.x;
-//         this.pos.y = this.pos.y + this.velocity.y;
-//     }
-//     addMovement(addedVelocity){
-//         let previouseVelocity = this.velocity;
-//         let x = Math.sign(addedVelocity.x) + Math.sign(previouseVelocity.x);
-//         let y = Math.sign(addedVelocity.y) + Math.sign(previouseVelocity.y);
-//
-//         if(Math.abs(x) > 0 && Math.abs(y) > 0){
-//             let xSign = Math.sign(x);
-//             let ySign = Math.sign(y);
-//             let mX = x;
-//             let mY = y;
-//             x = Math.pow(0.8,(mX * mX) + (mY * mY)) * xSign;
-//             y = Math.pow(0.8,(mX * mX) + (mY *mY)) * ySign;
-//         }
-//
-//         this.velocity = {x: x * this.moveSpeed, y:  y * this.moveSpeed};
-//     }
-// }
-//
+class MovementComponent{
+    constructor(pos) {
+        this.velocity = {x: 0, y: 0};
+        this.moveSpeed = 4;
+        this.pos = pos;
+    }
+    move(){
+        this.pos.x = this.pos.x + this.velocity.x;
+        this.pos.y = this.pos.y + this.velocity.y;
+    }
+    addMovement(addedVelocity){
+        let previouseVelocity = this.velocity;
+        let x = Math.sign(addedVelocity.x) + Math.sign(previouseVelocity.x);
+        let y = Math.sign(addedVelocity.y) + Math.sign(previouseVelocity.y);
+
+        if(Math.abs(x) > 0 && Math.abs(y) > 0){
+            let xSign = Math.sign(x);
+            let ySign = Math.sign(y);
+            let mX = x;
+            let mY = y;
+            x = Math.pow(0.8,(mX * mX) + (mY * mY)) * xSign;
+            y = Math.pow(0.8,(mX * mX) + (mY *mY)) * ySign;
+        }
+
+        this.velocity = {x: x * this.moveSpeed, y:  y * this.moveSpeed};
+    }
+}
+
 function directionAsVector(direction){
     switch (direction) {
         case "up":
@@ -78,6 +78,69 @@ function directionAsVector(direction){
     }
 }
 
+class AIComponent{
+    constructor(pos, velocity){
+        this.tick = 0;
+        this.pos = pos;
+        this.velocity = velocity;
+        this.flip = true
+        this.firstAction = 100;
+    }
+    update(entity){
+        this.tick++;
+        switch (this.tick % this.firstAction) {
+            case 0:
+                this.changeDirection();
+                let velocity = {
+                    x: this.direction.x * 10,
+                    y: this.direction.y * 10
+                }
+                entity.addMovement(velocity);
+                break
+            case 50:
+                this.changeDirection();
+                entity.stop();
+                break;
+            default:
+        }
+    }
+    changeDirection(){
+        // if(this.flip){
+        //     this.flip =!this.flip;
+        //     this.direction = {x:0,y:1};
+        // }
+        // else{
+        //     this.flip =!this.flip;
+        //     this.direction = {x:0,y:-1};
+        // }
+        let int = randomInteger(0,3);
+        this.firstAction = randomInteger(50,300);
+        switch (int) {
+            case 0:
+                this.direction = {x:0,y:1};
+                break;
+            case 1:
+                this.direction = {x:0,y:-1};
+                break;
+            case 2:
+                this.direction = {x:1,y:0};
+                break;
+            case 3:
+                this.direction = {x:-1,y:0};
+                break;
+        }
+        // console.log("this.direction: ")
+        // console.log(this.direction);
+        // console.log("this.velocity")
+        //     console.log(this.velocity);
+        // console.log("this.pos")
+        //     console.log(this.pos);
+    }
+}
+
+function randomInteger(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 class AttackingComponent{
     constructor(collisionManager, origin, directionObject, stats){
@@ -137,7 +200,7 @@ class ColliderComponent{
         return this.collisionCallback(otherObj);
     }
     update(parent){
-        this.pos = parent.pos;
+        this.pos = parent.pos;//wrong
     }
 }
 
@@ -264,7 +327,7 @@ class ZonePortal{
     collisionCallback(other){
     }
 }
-
+// make damaging character seperate from MGO
 class DamageableCharacter extends MovingGameObject {
     constructor(pos, animLayers, stats) {
     super(pos, animLayers);
@@ -303,6 +366,8 @@ class BasicMob extends  DamageableCharacter{
         this.width = 32; // temp
         this.height = 32; // temp
         this.createCollider(collisionManager);
+        this.components.push(new AIComponent(this.pos, this.velocity));
+        //this.addMovement({x:1,y:1})
     }
 
     createCollider(collisionManager){
@@ -330,6 +395,10 @@ class BasicMob extends  DamageableCharacter{
 
     collisionCallback(other){
         switch(other.type){
+            case colliderTypes.NONPASSIBLE:
+                this.backStep();
+                this.stop();
+                break;
             case colliderTypes.ATTACKSCAN:
                 return this.takeDamage();
                 break;
@@ -371,7 +440,7 @@ class ServerPlayer extends DamageableCharacter{
         // may need stats to calculate damage etc
         this.attackingComponent = new AttackingComponent(collisionManager,
             this.pos,
-            this.animationComponent,
+            this.animationComponent,//wrong
             collider.collisionRegistration, // wrong this may change
             playerStats
             );

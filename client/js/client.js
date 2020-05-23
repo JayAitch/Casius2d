@@ -25,6 +25,7 @@ class Receiver{
         });
         this.socket.on('moveEntity',(data)=>{
             // poentially seperate message
+            console.log(data.x);
             this.gameScene.moveEntity(data.id, data.x, data.y, data.facing, data.state,  data.health, data.mHealth);
         });
         this.socket.on('loadMap', (data)=> {

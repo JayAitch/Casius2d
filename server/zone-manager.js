@@ -77,6 +77,22 @@ class Zone{
         this.createNonPassibles(this.worldObjects);
 
         this.testCreateMob();
+        this.testCreateMob();
+        this.testCreateMob();
+        this.testCreateMob();this.testCreateMob();
+        this.testCreateMob();
+        this.testCreateMob();
+        this.testCreateMob();
+        this.testCreateMob();
+        this.testCreateMob();
+        this.testCreateMob();
+        this.testCreateMob();this.testCreateMob();
+        this.testCreateMob();
+        this.testCreateMob();this.testCreateMob();this.testCreateMob();this.testCreateMob();
+
+
+
+
 
     }
 
@@ -177,6 +193,7 @@ class Zone{
     }
 
     notifyEntityUpdate(entity, key){
+        console.log(entity.pos)
         this.room.roomMessage('moveEntity', {
             id:entity.entityPos || key,
             x:entity.pos.x,
