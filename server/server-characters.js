@@ -6,28 +6,9 @@ colliderTypes = {"PLAYER":0,"MONSTER":1,"NONPASSIBLE":2, "TRIGGER":3, "ZONETRIGG
 
 
 
-function directionAsVector(direction){
-    switch (direction) {
-        case "up":
-            return {x:0,y:-1}
-            break;
-        case "left":
-            return {x:-1,y:0}
-            break;
-        case "down":
-            return {x:0,y:1}
-            break;
-        case "right":
-            return {x:1,y:0}
-            break;
-    }
-}
 
 
 
-function randomInteger(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 
 class MovingGameObject{
     constructor(pos, animLayers) {
@@ -328,4 +309,4 @@ class ServerPlayer extends DamageableCharacter{
 
 }
 
-module.exports = {Player: ServerPlayer, NonPassibleTerrain, ZonePortal, BasicMob}
+module.exports = {ServerPlayer, NonPassibleTerrain, ZonePortal, BasicMob}

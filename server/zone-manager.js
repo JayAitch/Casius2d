@@ -6,10 +6,6 @@ systems.startUpdate();
 
 
 
-function randomInt(low, high) {
-    return Math.floor(Math.random() * (high - low) + low);
-}
-
 
 function getZoneData(zone){
     let file = ZONEMAPS[zone];
@@ -128,7 +124,7 @@ class Zone{
         let entityPos = this.lastEntityId;
 
         let newPos = JSON.parse(JSON.stringify(pos));
-        let newPlayer = new characters.Player(newPos, players[0], this.collisionManager, client, entityPos, client.playerStats);
+        let newPlayer = new characters.ServerPlayer(newPos, players[0], this.collisionManager, client, entityPos, client.playerStats);
         client.playerStats.zone = this.zoneID;
         client.player = newPlayer;
 
@@ -193,7 +189,6 @@ class Zone{
     }
 
     notifyEntityUpdate(entity, key){
-        console.log(entity.pos)
         this.room.roomMessage('moveEntity', {
             id:entity.entityPos || key,
             x:entity.pos.x,
