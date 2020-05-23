@@ -92,8 +92,13 @@ class GameScene extends Phaser.Scene {
         const aboveLayer = map.createStaticLayer("Above player", tileset, 0, 0);
     }
 
-    newEntity(id, x, y, facing, state, base, layers){
-        this.mapEntities[id] = new Player(this, {x:x,y:y}, facing, state, base, layers);
+    newEntity(id, x, y, facing, state, base, layers, health, mHealth){
+        if(layers) {
+            this.mapEntities[id] = new Player(this, {x: x, y: y}, facing, state, base, layers, health, mHealth);
+        }
+        else{
+            this.mapEntities[id] = new TestMonster(this, {x: x, y: y}, base,health,mHealth);
+        }
     }
 
     // clearEnities() {
@@ -104,24 +109,29 @@ class GameScene extends Phaser.Scene {
     //     this.mapEntities = {};
     // }
 
-    moveEntity(id, x, y, facing, state){
+    moveEntity(id, x, y, facing, state, health, mHealth){
         let entity = this.mapEntities[id];
         if(entity){
             entity.newPosition = {x:x, y:y};
             entity.facing = facing;
             entity.state = state;
+            entity.health = health;
+            entity.maxHealth = mHealth;
         }
-
     }
+
+
     removeEntity(id){
         let entity = this.mapEntities[id];
-        if(entity)
-        entity.destroy();
-        this.mapEntities.splice(id, 1)
+        if(entity) {
+            entity.destroy();
+           // this.mapEntities.splice(id, 1);
+            delete this.mapEntities[id];
+        }
     }
 
-    playerSpawn(id, x, y, facing, state, base, layers){
-        this.newEntity(id, x, y, facing, state, base, layers);
+    playerSpawn(id, x, y, facing, state, base, layers, health, mHealth){
+        this.newEntity(id, x, y, facing, state, base, layers, health, mHealt);
     }
 
     update(){
@@ -142,14 +152,15 @@ class Controller{
         let rightKey = scene.input.keyboard.addKey("RIGHT");
         let upKey = scene.input.keyboard.addKey("UP");
         let downKey = scene.input.keyboard.addKey("DOWN");
+    //    let spaceKey = scene.input.keyboard.addKey("SPACE");
         let spaceKey = scene.input.keyboard.addKey("SPACE");
 
 
-        spaceKey.on('down', (event)=> {
-           // console.log(scene.mapEntities);
-          //  scene.mapEntities[0].animation = "walkup"
-        });
         this.client = client;
+
+        spaceKey.on('down', (event)=> {
+            client.sender.attack();
+        });
 
         leftKey.on('down', (event)=> {
             client.sender.move({x: -1, y:0});

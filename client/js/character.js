@@ -1,4 +1,81 @@
+class HealthBar {
 
+    constructor (scene, x, y,width, height, max, value)
+    {
+        this.bar = new Phaser.GameObjects.Graphics(scene);
+
+        this.x = x;
+        this.y = y;
+        this.value = value;
+        this.maxValue = max;
+        this.width = width;
+        this.height = height;
+        this.draw();
+
+        scene.add.existing(this.bar);
+    }
+    destroy(){
+        this.bar.destroy();
+
+    }
+    decrease (amount)
+    {
+        this.value -= amount;
+
+        if (this.value < 0)
+        {
+            this.value = 0;
+        }
+
+        this.draw();
+
+        return (this.value === 0);
+    }
+
+    set health(val){
+        this.value = val;
+        if (this.value < 0)
+        {
+            this.value = 0;
+        }
+
+        this.draw();
+
+    }
+
+    set maxHealth(val){
+        this.maxValue = val;
+        this.draw();
+
+    }
+
+    draw ()
+    {
+        this.bar.clear();
+        let border = 4;
+        //  BG
+        this.bar.fillStyle(0x000000);
+        this.bar.fillRect(this.x, this.y, this.width + border, this.height + border);
+
+        //  Health
+        this.bar.fillStyle(0xffffff);
+        this.bar.fillRect(this.x + 2, this.y + 2, this.width, this.height);
+
+        if (this.value < 30)
+        {
+            this.bar.fillStyle(0xff0000);
+        }
+        else
+        {
+            this.bar.fillStyle(0x00ff00);
+        }
+
+        var d = Math.floor((this.value/ this.maxValue) * this.width);
+
+        this.bar.fillRect(this.x + 2, this.y + 2, d, this.height);
+    }
+
+}
 
 class MovingSprite{
     constructor(scene, pos, animationLookup){
@@ -27,10 +104,13 @@ class MovingSprite{
 
     set animation(animKey){
         let lookup = animations[this.animationLookup][animKey];
+        if(this.sprite.anims)
         this.sprite.anims.play(lookup);
     }
+
     destroy() {
         this.sprite.destroy();
+        delete this;
     }
 
     testAnimWalk(){
@@ -89,10 +169,10 @@ function addSpriteEffect(sprite,scene,level){
 
 class MovingMultiSprite extends MovingSprite{
 
-    constructor(scene, pos, base, array){
+    constructor(scene, pos, base, layers){
         super(scene,pos, base);
         this.spriteList = {};
-        array.forEach((elem)=>{
+        layers.forEach((elem)=>{
             let sprite = scene.add.sprite(pos.x, pos.y);
             this.spriteList[elem.base] = sprite;
             addSpriteEffect(sprite,scene, elem.effect); //temp
@@ -105,17 +185,18 @@ class MovingMultiSprite extends MovingSprite{
         let keyList = Object.keys(this.spriteList);
         keyList.forEach((key)=>{
             let sprite = this.spriteList[key];
+            if(sprite.anims)
             sprite.anims.play(key + animKey);
         })
     }
+
     destroy(){
         super.destroy();
         let keyList = Object.keys(this.spriteList);
         keyList.forEach((key)=>{
             let sprite = this.spriteList[key];
-            console.log("destroying sprites");
             sprite.destroy();
-        })
+        });
     }
 
     setPosition(x, y){
@@ -130,15 +211,55 @@ class MovingMultiSprite extends MovingSprite{
 }
 //"goldhelm", "goldlegs", "leatherbelt","jacket","dspear", "shield",
 
+class TestMonster extends MovingSprite{
+    constructor(scene, pos, base, health, mHealth){
+        console.log(health);
+        super(scene, pos, base);
+        this.healthBar = new HealthBar(scene,pos.x,pos.y,100,12, health, mHealth)
+    }
+    set health(val){
+        this.healthBar.health = val;
+    }
+
+    set maxHealth(val){
+        this.healthBar.maxHealth = val;
+    }
+    destroy() {
+        super.destroy();
+        this.healthBar.destroy();
+    }
+
+
+    update(){
+        this.move();
+        this.healthBar.x = this.pos.x;
+        this.healthBar.y = this.pos.y;
+        this.healthBar.draw();
+    }
+}
 
 
 class Player extends MovingMultiSprite{
-    constructor(scene, pos, facing, state, base, layers){
+    constructor(scene, pos, facing, state, base, layers, health, mHealth){
         super(scene, pos, base, layers);
+        this.healthBar = new HealthBar(scene,pos.x,pos.y,100,12, health, mHealth)
+    }
+    set health(val){
+        this.healthBar.health = val;
+    }
 
+    set maxHealth(val){
+        this.healthBar.maxHealth = val;
+    }
+    destroy() {
+        super.destroy();
+        this.healthBar.destroy();
     }
 
     update(){
        this.move();
+       this.healthBar.x = this.pos.x;
+       this.healthBar.y = this.pos.y;
+       this.healthBar.draw();
     }
 }

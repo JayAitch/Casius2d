@@ -38,6 +38,14 @@ players = {
 };
 
 
+class PlayerStats {
+    constructor(health, experience) {
+        this.maxHealth = health;
+        this.health = health;
+        this.experience = experience;
+    }
+
+}
 
 
 
@@ -51,7 +59,8 @@ const ZONES = {0:firstZone,1:secondZone}
 io.on('connect', function(client) {
 
     client.on('login',function(username,password){
-
+        let playerStats = new PlayerStats(200,200);
+        client.playerStats = playerStats;
         tryLogin(client, username, password);
 
         client.on('joinzone',function(data) {
@@ -63,6 +72,10 @@ io.on('connect', function(client) {
 
             client.on('move',function(data) {
                 client.player.addMovement({x:data.x, y:data.y});
+            });
+
+            client.on('attack',function(data) {
+                client.player.attack();
             });
         });
     });
@@ -87,13 +100,11 @@ io.on('connect', function(client) {
 });
 
 
+
+
 server.listen(PORT, function(){
     console.log('Listening on ' + server.address().port);
 });
-
-
-
-
 
 
 
@@ -120,6 +131,8 @@ function tryLogin(client, username, password){
     }
 }
 
+
+
 function tryJoinZone(client, username, zoneid, position){
     if(!dbDisabled){
         let characterPromise = dbManager.databaseConnection.createOrReturnCharacter(username,1,1,0);
@@ -141,4 +154,23 @@ function tryJoinZone(client, username, zoneid, position){
 
 global.testZoneJoin =function(client, username, zoneid, position){
     tryJoinZone(client, username, zoneid, position)
+}
+
+global.killPlayer = function(client){
+    let zoneid = client.playerStats.zone;
+    let zone = ZONES[zoneid];
+    zone.killEntity(client.player.entityPos);
+
+    let testRespawn = setTimeout(function() {
+        global.respawn(client);
+        clearTimeout(testRespawn);
+    }, 2000);
+}
+
+global.respawn = function(client){
+    let zoneid = client.playerStats.zone;
+    client.playerStats.health = client.playerStats.maxHealth;
+    let zone = ZONES[zoneid];
+    zone.join(client,{x:150,y:150});
+    console.log(Object.keys(zone.entities));
 }

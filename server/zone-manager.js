@@ -6,10 +6,6 @@ systems.startUpdate();
 
 
 
-function randomInt(low, high) {
-    return Math.floor(Math.random() * (high - low) + low);
-}
-
 
 function getZoneData(zone){
     let file = ZONEMAPS[zone];
@@ -67,14 +63,41 @@ function getProperty(properties, prop){
 class Zone{
     constructor(zoneid) {
         this.physicsWorld = new PhysicsWorld(800, 800);
-        this.entities = [];
+        this.entities = {};
         this.room = roomManager.roomManager.createRoom();
         this.zoneID = zoneid;
+        this.lastEntityId = 0;
         systems.addToUpdate(this);
         this.collisionManager = new systems.CollisionManager();
         this.worldObjects = getWorldObjects(zoneid); // use this to target specfic zone
         this.createNonPassibles(this.worldObjects);
+
+        this.testCreateMob();
+        this.testCreateMob();
+        this.testCreateMob();
+        this.testCreateMob();this.testCreateMob();
+        this.testCreateMob();
+        this.testCreateMob();
+        this.testCreateMob();
+        this.testCreateMob();
+        this.testCreateMob();
+        this.testCreateMob();
+        this.testCreateMob();this.testCreateMob();
+        this.testCreateMob();
+        this.testCreateMob();this.testCreateMob();this.testCreateMob();this.testCreateMob();
+
+
+
+
+
     }
+
+    testCreateMob(){
+        this.testMob = new characters.BasicMob(this.collisionManager);
+        this.entities[this.lastEntityId] = this.testMob;
+        this.lastEntityId++
+    }
+
 
     join(client, pos){
         this.room.join(client);
@@ -86,22 +109,30 @@ class Zone{
     leave(client){
         this.notifyEntityRemove(client.player.entityPos);
         this.room.leave(client);
-        this.entities.splice(client.player.entityPos, 1);
-        console.log(this.entities);
+        delete this.entities[client.player.entityPos];
     }
 
+    killEntity(id){
+        let entity = this.entities[id];
+        if(entity){
+            this.notifyEntityRemove(id);
+            delete this.entities[id];
+        }
+    }
 
     addPlayerCharacter(client, pos){
-        let entityPos = this.entities.length;
-        console.log(pos);
-        let newPos = JSON.parse(JSON.stringify(pos))
-        let newPlayer = new characters.Player(newPos, players[0], this.collisionManager, client, entityPos);
+        let entityPos = this.lastEntityId;
+
+        let newPos = JSON.parse(JSON.stringify(pos));
+        let newPlayer = new characters.ServerPlayer(newPos, players[0], this.collisionManager, client, entityPos, client.playerStats);
+        client.playerStats.zone = this.zoneID;
         client.player = newPlayer;
-        this.entities.push(newPlayer);
+
+        this.entities[entityPos] = newPlayer;
 
         this.notifyNewEntity(client, newPlayer, entityPos);
         client.emit("entityList", this.allEntities());
-
+        this.lastEntityId++
     }
 
     createNonPassibles(objects){
@@ -124,16 +155,22 @@ class Zone{
 
     allEntities() {
         let tempEntities = [];
-        this.entities.forEach(function (entity) {
+        let entityKeys = Object.keys(this.entities);
+        entityKeys.forEach( (key)=> {
+
+            let entity = this.entities[key];
             tempEntities.push({
+                position:key,
                 x:entity.pos.x,
                 y:entity.pos.y,
                 facing: entity.direction,
                 state:entity.state,
                 base: entity.animationComponent.baseSprite,
-                layers: entity.animationComponent.spriteLayers
+                layers: entity.animationComponent.spriteLayers,
+                health: entity.health,
+                mHealth: entity.maxHealth
             })
-        })
+        });
         return tempEntities;
     }
 
@@ -145,19 +182,24 @@ class Zone{
             facing: entity.direction,
             state:entity.state,
             base: entity.animationComponent.baseSprite,
-            layers: entity.animationComponent.spriteLayers
+            layers: entity.animationComponent.spriteLayers,
+            health: entity.health,
+            mHealth: entity.maxHealth
         })
     }
 
-    notifyEntityUpdate(entity, entityPos){
+    notifyEntityUpdate(entity, key){
         this.room.roomMessage('moveEntity', {
-            id:entityPos,
+            id:entity.entityPos || key,
             x:entity.pos.x,
             y:entity.pos.y,
             facing: entity.direction,
-            state:entity.state
+            state:entity.state,
+            health: entity.health,
+            mHealth: entity.maxHealth
         })
     }
+
     notifyEntityRemove(entityPos){
         this.room.roomMessage('removeEntity', {
             id:entityPos
@@ -175,12 +217,18 @@ class Zone{
     }
 
     update(){
+        let entityKeys = Object.keys(this.entities);
+        entityKeys.forEach( (key)=> {
+            let entity = this.entities[key];
 
-        for(let i = 0; this.entities.length > i; i++){
-            let entitiy = this.entities[i];
-            entitiy.update();
-            this.notifyEntityUpdate(entitiy, i);
-        }
+            if(entity.isDelete){
+                this.killEntity(key);
+            }else{
+                entity.update();
+                this.notifyEntityUpdate(entity, key);
+            }
+
+        });
         this.collisionManager.update();
     }
 }
