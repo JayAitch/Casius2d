@@ -57,38 +57,25 @@ function getProperty(properties, prop){
 }
 
 
-
+// move physics world into a seperate class after reducing coupling
 
 // receive mapped map!
 class Zone{
     constructor(zoneid) {
         this.physicsWorld = new PhysicsWorld(800, 800);
         this.entities = {};
+        this.floorItems = {};
         this.room = roomManager.roomManager.createRoom();
         this.zoneID = zoneid;
         this.lastEntityId = 0;
+        this.lastItemId = 0;
         systems.addToUpdate(this);
         this.collisionManager = new systems.CollisionManager();
         this.worldObjects = getWorldObjects(zoneid); // use this to target specfic zone
         this.createNonPassibles(this.worldObjects);
 
         this.testCreateMob();
-        this.testCreateMob();
-        this.testCreateMob();
-        this.testCreateMob();this.testCreateMob();
-        this.testCreateMob();
-        this.testCreateMob();
-        this.testCreateMob();
-        this.testCreateMob();
-        this.testCreateMob();
-        this.testCreateMob();
-        this.testCreateMob();this.testCreateMob();
-        this.testCreateMob();
-        this.testCreateMob();this.testCreateMob();this.testCreateMob();this.testCreateMob();
-
-
-
-
+        this.addItem(150,150);
 
     }
 
@@ -132,8 +119,29 @@ class Zone{
 
         this.notifyNewEntity(client, newPlayer, entityPos);
         client.emit("entityList", this.allEntities());
+        client.emit("itemList", this.floorItems);
         this.lastEntityId++
     }
+
+    addItem(pos){
+        let itemPos = this.lastItemId;
+
+        let newItem = {id:0,pos:pos};
+        this.floorItems[itemPos] = newItem;
+
+        this.notifyNewItem(newItem);
+        this.lastItemId++
+    }
+
+
+    removeItem(id) {
+        this.room.roomMessage('removeItem', id);
+    }
+
+    notifyNewItem(newItem){
+        this.room.roomMessage('newItem', newItem);
+    }
+
 
     createNonPassibles(objects){
         objects.forEach((object)=>{
@@ -154,12 +162,12 @@ class Zone{
     }
 
     allEntities() {
-        let tempEntities = [];
+        let tempEntities = {};
         let entityKeys = Object.keys(this.entities);
         entityKeys.forEach( (key)=> {
 
             let entity = this.entities[key];
-            tempEntities.push({
+            tempEntities[key] = {
                 position:key,
                 x:entity.pos.x,
                 y:entity.pos.y,
@@ -169,7 +177,7 @@ class Zone{
                 layers: entity.animationComponent.spriteLayers,
                 health: entity.health,
                 mHealth: entity.maxHealth
-            })
+            };
         });
         return tempEntities;
     }
@@ -234,9 +242,10 @@ class Zone{
 }
 
 class PhysicsWorld{
-    constructor(width,height){
-        this.width = 800;
-        this.height = 800;
+    constructor(json){
+    }
+    update(){
+
     }
 }
 

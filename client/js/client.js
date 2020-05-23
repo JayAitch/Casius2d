@@ -31,13 +31,24 @@ class Receiver{
             this.gameScene.loadMap(data.id);
         });
         this.socket.on('entityList', (data)=>{
-
             // health is always blank here
-            for(let i = 0; data.length > i; i++){
-                let dataRow = data[i];
+            let keyList = Object.keys(data);
+            keyList.forEach((key)=>{
+                let dataRow = data[key];
                 this.gameScene.newEntity(dataRow.position, dataRow.x, dataRow.y, dataRow.facing, dataRow.state, dataRow.base, dataRow.layers, data.health, data.mHealth);
-            }
+            })
         });
+
+
+        this.socket.on('itemList', (data)=>{
+            let keylist = Object.keys(data);
+            keylist.forEach((key)=>{
+                let dataRow = data[key];
+                this.gameScene.newItem(key,dataRow.id, dataRow.pos);
+            })
+
+        });
+
 
         this.socket.on('removeEntity',(data)=>{
             this.gameScene.removeEntity(data.id);

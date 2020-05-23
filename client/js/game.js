@@ -64,6 +64,7 @@ class GameScene extends Phaser.Scene {
     constructor() {
         super({key: 'maingame'});
         this.mapEntities = {};
+        this.floorItems = {};
     }
 
 
@@ -80,6 +81,8 @@ class GameScene extends Phaser.Scene {
         this.scene.launch("paperdoll");
         items = this.cache.json.get('items');
         this.controller = new Controller(this,this.client);
+
+
     }
 
 
@@ -90,8 +93,20 @@ class GameScene extends Phaser.Scene {
         const belowLayer = map.createStaticLayer("Ground Layer", tileset, 0, 0);
         const worldLayer = map.createStaticLayer("Below player", tileset, 0, 0);
         const aboveLayer = map.createStaticLayer("Above player", tileset, 0, 0);
+
+
+
+
     }
 
+
+    newItem(i,id,x,y){
+        let floorItem = this.add.sprite(x, y, "seeradish")
+        this.floorItems[i] = floorItem;
+        floorItem.anims.play(animations.seeradish.glint);
+    }
+
+// change to json!!
     newEntity(id, x, y, facing, state, base, layers, health, mHealth){
         if(layers) {
             this.mapEntities[id] = new Player(this, {x: x, y: y}, facing, state, base, layers, health, mHealth);
