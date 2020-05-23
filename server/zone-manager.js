@@ -58,36 +58,50 @@ function getProperty(properties, prop){
 
 
 // move physics world into a seperate class after reducing coupling
+class ItemWorld{
+    constructor(sender, phyW) {
+        this.sender = sender;
+       // this.addItem(150,150);
+        this.floorItems = {};
+        this.lastItemId = 0;
+    }
+
+    addItem(pos){
+        let itemPos = this.lastItemId;
+        let position = pos;
+        let newItem = {id:0,pos:position};
+        this.floorItems[itemPos] = newItem;
+
+        this.sender.notifyNewItem(itemPos, newItem);
+        this.lastItemId++
+    }
+}
 
 // receive mapped map!
 class Zone{
     constructor(zoneid) {
-        this.physicsWorld = new PhysicsWorld(zoneid, (id)=>{this.notifyEntityRemove(id)});//temp
-
-        this.floorItems = {};
-        this.room = roomManager.roomManager.createRoom();
+        this.zoneSender = new ZoneSender(zoneid);
+        this.physicsWorld = new PhysicsWorld(zoneid, this.zoneSender);
+        this.itemWorld = new ItemWorld(this.zoneSender,this.physicsWorld )
         this.zoneID = zoneid;
-        this.lastItemId = 0;
-
 
         systems.addToUpdate(this);
-        this.physicsWorld.testCreateMob();
-        this.addItem(150,150);
-
+        this.testCreateMobLots(500);
     }
 
-
-
+    testCreateMobLots(times){
+        for(let i = 0; i < times; i++){
+            this.physicsWorld.testCreateMob((pos)=>{this.itemWorld.addItem(pos)});
+        }
+    }
     join(client, pos){
-        this.room.join(client);
-        client.zone = this; // might not need
-        client.emit("loadMap", {id:this.zoneID});
+        this.zoneSender.subscribe(client, this);
         this.addPlayerCharacter(client, pos);
     }
 
     leave(client){
-        this.notifyEntityRemove(client.player.entityPos);
-        this.room.leave(client);
+        this.zoneSender.notifyEntityRemove(client.player.entityPos);
+        this.zoneSender.unsubscribe(client);
         this.physicsWorld.removeEntity(client.player.entityPos)
     }
 
@@ -98,38 +112,52 @@ class Zone{
         client.playerStats.zone = this.zoneID;
         client.player = newPlayer;
 
-        this.notifyNewEntity(client, newPlayer, newPlayer.entityPos);
-        client.emit("entityList", this.allEntities());
-        client.emit("itemList", this.floorItems);
+        this.zoneSender.notifyNewEntity(client, newPlayer, newPlayer.entityPos);
+        this.zoneSender.initMessage(client, this.physicsWorld.entities, this.itemWorld.floorItems);
     }
 
-    addItem(pos){
-        let itemPos = this.lastItemId;
-
-        let newItem = {id:0,pos:pos};
-        this.floorItems[itemPos] = newItem;
-
-        this.notifyNewItem(newItem);
-        this.lastItemId++
+    update(){
+        this.physicsWorld.update();
     }
+}
 
+
+class ZoneSender{
+    constructor(zoneid) {
+        this.room = roomManager.roomManager.createRoom();
+        this.zoneID = zoneid;
+    }
 
     removeItem(id) {
         this.room.roomMessage('removeItem', id);
     }
 
-    notifyNewItem(newItem){
-        this.room.roomMessage('newItem', newItem);
+    notifyNewItem(key,newItem){
+        let nItem= {key:key, id:newItem.id, pos: newItem.pos}
+        this.room.roomMessage('newItem', nItem);
     }
 
+    subscribe(client,zone){
+        this.room.join(client);
+        client.zone = zone; // temp
+        client.emit("loadMap", {id:this.zoneID});
+    }
 
-// create sender class
-    allEntities() {
+    unsubscribe(client){
+        this.room.leave(client);
+    }
+
+    initMessage(client, enities, items){
+        client.emit("entityList", this.sendEntities(enities));
+        client.emit("itemList", items);
+    }
+
+    sendEntities(entites) {
         let tempEntities = {};
-        let entityKeys = Object.keys(this.physicsWorld.entities);
+        let entityKeys = Object.keys(entites);
         entityKeys.forEach( (key)=> {
 
-            let entity = this.physicsWorld.entities[key];
+            let entity = entites[key];
             tempEntities[key] = {
                 position:key,
                 x:entity.pos.x,
@@ -187,23 +215,19 @@ class Zone{
         })
     }
 
-    update(){
-        this.physicsWorld.update((entity, key)=>{this.notifyEntityUpdate(entity, key)});
-    }
 }
-
 class PhysicsWorld{
 
-    constructor(zoneid, removemessage){
+    constructor(zoneid,  sender){
+        this.sender = sender;
         this.collisionManager = new systems.CollisionManager();
         this.worldObjects = getWorldObjects(zoneid); // use this to target specfic zone
         this.createNonPassibles(this.worldObjects);
         this.entities = {};
         this.lastEntityId = 0;
-        this.removeMessage = removemessage;
     }
 
-    update(message){
+    update(){
         let entityKeys = Object.keys(this.entities);
         entityKeys.forEach( (key)=> {
             let entity = this.entities[key];
@@ -212,7 +236,7 @@ class PhysicsWorld{
                 this.removeEntity(key);
             }else{
                 entity.update();
-                message(entity, key); //temp
+                this.sender.notifyEntityUpdate(entity, key); //temp
             }
 
         });
@@ -247,8 +271,8 @@ class PhysicsWorld{
         return newPlayer;
     }
 
-    testCreateMob(){
-        this.testMob = new characters.BasicMob(this.collisionManager);
+    testCreateMob(droptest){
+        this.testMob = new characters.BasicMob(this.collisionManager,droptest);
         this.entities[this.lastEntityId] = this.testMob;
         this.lastEntityId++
     }
@@ -256,7 +280,7 @@ class PhysicsWorld{
     removeEntity(id){
         let entity = this.entities[id];
         if(entity){
-            this.removeMessage(id);
+            this.sender.notifyEntityRemove(id);
             delete this.entities[id];
         }
     }

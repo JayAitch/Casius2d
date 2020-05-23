@@ -39,6 +39,9 @@ class Receiver{
             })
         });
 
+        this.socket.on('newItem', (data)=>{
+            this.gameScene.newItem(data.key,data.id, data.pos);
+        });
 
         this.socket.on('itemList', (data)=>{
             let keylist = Object.keys(data);

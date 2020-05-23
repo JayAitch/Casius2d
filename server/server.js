@@ -159,7 +159,7 @@ global.testZoneJoin =function(client, username, zoneid, position){
 global.killPlayer = function(client){
     let zoneid = client.playerStats.zone;
     let zone = ZONES[zoneid];
-    zone.killEntity(client.player.entityPos);
+    zone.physicsWorld.removeEntity(client.player.entityPos);
 
     let testRespawn = setTimeout(function() {
         global.respawn(client);
@@ -172,7 +172,6 @@ global.respawn = function(client){
     client.playerStats.health = client.playerStats.maxHealth;
     let zone = ZONES[zoneid];
     zone.join(client,{x:150,y:150});
-    console.log(Object.keys(zone.entities));
 }
 
 global.randomInteger = function(min, max) {

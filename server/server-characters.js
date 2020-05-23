@@ -1,7 +1,7 @@
 const characterComponents = require('./character-components.js');
 directions = {"NORTH":"up", "WEST":"left", "SOUTH":"down", "EAST":"right" };
 states  = {"THRUST":"thrust", "WALK":"walk","CAST":"cast", "STOP":"stop"};
-colliderTypes = {"PLAYER":0,"MONSTER":1,"NONPASSIBLE":2, "TRIGGER":3, "ZONETRIGGER":4, "ATTACKSCAN":5};
+global.colliderTypes = {"PLAYER":0,"MONSTER":1,"NONPASSIBLE":2, "TRIGGER":3, "ZONETRIGGER":4, "ATTACKSCAN":5};
 
 
 
@@ -162,7 +162,7 @@ class DamageableCharacter extends MovingGameObject {
 
 class BasicMob extends  DamageableCharacter{
 
-    constructor(collisionManager) {
+    constructor(collisionManager, test) {
         let layers = {base: "basecharacter"};
         let pos = {x: 150, y: 150};
         let stats = { health: 100, maxHealth:100 };
@@ -170,6 +170,7 @@ class BasicMob extends  DamageableCharacter{
         super(pos, layers, stats);
         this.width = 32; // temp
         this.height = 32; // temp
+        this.deathCallbackTest = test;
         this.createCollider(collisionManager);
         this.components.push(new characterComponents.AIComponent(this.pos, this.velocity));
         //this.addMovement({x:1,y:1})
@@ -196,6 +197,7 @@ class BasicMob extends  DamageableCharacter{
 
     kill(){
         this.isDelete = true;
+        this.deathCallbackTest(this.pos);
     }
 
 
@@ -281,7 +283,7 @@ class ServerPlayer extends DamageableCharacter{
 
     kill() {
         // try change to is delete!!
-        //global.killPlayer(this.client);
+       // global.killPlayer(this.client);
         this.isDelete = true;
         this.removeComponents();
     }

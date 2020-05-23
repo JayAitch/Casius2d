@@ -100,8 +100,8 @@ class GameScene extends Phaser.Scene {
     }
 
 
-    newItem(i,id,x,y){
-        let floorItem = this.add.sprite(x, y, "seeradish")
+    newItem(i,id,pos){
+        let floorItem = this.add.sprite(pos.x, pos.y, "seeradish")
         this.floorItems[i] = floorItem;
         floorItem.anims.play(animations.seeradish.glint);
     }
