@@ -1,5 +1,6 @@
-const configs = require("../config/configs.js")
-const PORT = configs.server_config.port;
+const dotenv = require('dotenv').config({path: '../config/config.env'});
+
+const PORT =process.env.SERVER_PORT;
 
 
 const server = require('http').createServer();
@@ -11,7 +12,13 @@ const dbDisabled = true;
 global.io = require('socket.io')(server);
 io = global.io;
 
-const dbManager = require('./db-connection.js')
+// const dbManager = require('./db-connection.js')
+
+const xDbManager = require('./persistance-manager.js')
+
+// xDbManager.databaseConnection.createAccount("user2","somesionms").then(done =>{
+//     console.log("I dided it?: " + done)
+// })
 
 players = {
     0:{
@@ -92,7 +99,7 @@ io.on('connect', function(client) {
     });
 
     client.on('createaccount', function(username,password){
-        dbManager.databaseConnection.createAccount(username,password).then(function(accountExists){
+        xDbManager.databaseConnection.createAccount(username,password).then(function(accountExists){
             console.log(accountExists);
             if(!accountExists){
                 console.log("Account created!")
@@ -130,7 +137,7 @@ server.listen(PORT, function(){
 function tryLogin(client, username, password){
     if(!dbDisabled){
 
-        let loginPromise = dbManager.databaseConnection.requestLogin(username,password);
+        let loginPromise = xDbManager.databaseConnection.requestLogin(username,password);
         loginPromise.then((doesExist) => {
             if(doesExist){
                 client.emit('loggedIn');
@@ -146,7 +153,7 @@ function tryLogin(client, username, password){
 
 function tryJoinZone(client, username, zoneid, position){
     if(!dbDisabled){
-        let characterPromise = dbManager.databaseConnection.createOrReturnCharacter(username,1,1,0);
+        // let characterPromise = dbManager.databaseConnection.createOrReturnCharacter(username,1,1,0);
         characterPromise.then(function (character) {
 
             if(client.zone)client.zone.leave(client);
