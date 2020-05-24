@@ -79,6 +79,16 @@ class GameScene extends Phaser.Scene {
 
     loadPlayerData(id){
         this.playerID = id;
+        let myPlayer = this.mapEntities[this.playerID];
+        console.log(myPlayer)
+
+         this.cameras.main.zoomTo(1.2,0);
+        this.cameras.main.startFollow(myPlayer.sprite);
+
+        // set background color, so the sky is not black
+        this.cameras.main.setBackgroundColor('#ccccff');
+
+
     }
 
     create(){
@@ -96,6 +106,7 @@ class GameScene extends Phaser.Scene {
         const worldLayer = map.createStaticLayer("Below player", tileset, 0, 0);
         const aboveLayer = map.createStaticLayer("Above player", tileset, 0, 0);
     }
+
     getClosestItem(){
         let pickupRange = 50;
         let itemkeys = Object.keys(this.floorItems);
@@ -110,6 +121,8 @@ class GameScene extends Phaser.Scene {
         })
         return itemKey;
     }
+
+
     newItem(i,id,pos){
         let floorItem = this.add.sprite(pos.x, pos.y, "seeradish")
         this.floorItems[i] = floorItem;

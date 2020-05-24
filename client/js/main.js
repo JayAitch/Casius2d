@@ -1,8 +1,8 @@
 
 const config = {
     type: Phaser.AUTO,
-    width:1200,
-    height: 1200,
+    width:800,
+    height: 800,
     parent:'phaser',
     scale: {
         mode: Phaser.Scale.FIT,
