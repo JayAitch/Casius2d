@@ -81,6 +81,10 @@ class ItemWorld{
         delete this.floorItems[id];
         return item;
     }
+    canPickup(id,position){
+        let item = this.floorItems[id];
+        return item;
+    }
 }
 
 // receive mapped map!
@@ -114,11 +118,15 @@ class Zone{
     }
 
     pickup(client, id){
+
+        let item = this.itemWorld.canPickup(id, client.player.pos);
+        if(!item) return;
+
         let hasPickedUp =  client.playerInventory.addItem({id:item.id,quantity:item.quantity});
 
         if(hasPickedUp){
+
             let item = this.itemWorld.removeItem(id);
-            if(!item) return;
         }
     }
 

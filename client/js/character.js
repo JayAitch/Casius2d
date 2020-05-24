@@ -130,6 +130,12 @@ class MovingSprite{
         }
 
     }
+    get x(){
+        return this.sprite.x;
+    }
+    get y(){
+        return this.sprite.y;
+    }
 }
 
 function sixPlusEffect(sprite, scene){
@@ -213,7 +219,6 @@ class MovingMultiSprite extends MovingSprite{
 
 class TestMonster extends MovingSprite{
     constructor(scene, pos, base, health, mHealth){
-        console.log(health);
         super(scene, pos, base);
         this.healthBar = new HealthBar(scene,pos.x,pos.y,100,12, health, mHealth)
     }

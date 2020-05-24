@@ -199,6 +199,7 @@ class BasicMob extends  DamageableCharacter{
     kill(){
         this.isDelete = true;
         this.deathCallbackTest(this.pos);
+        this.removeComponents();
     }
 
 
