@@ -61,7 +61,6 @@ function getProperty(properties, prop){
 class ItemWorld{
     constructor(sender, phyW) {
         this.sender = sender;
-       // this.addItem(150,150);
         this.floorItems = {};
         this.lastItemId = 0;
     }
@@ -69,11 +68,18 @@ class ItemWorld{
     addItem(pos){
         let itemPos = this.lastItemId;
         let position = pos;
-        let newItem = {id:0,pos:position};
+        let newItem = {id:0,pos:position, quantity: 1};
         this.floorItems[itemPos] = newItem;
 
         this.sender.notifyNewItem(itemPos, newItem);
         this.lastItemId++
+    }
+
+    removeItem(id){
+        let item = this.floorItems[id];
+        this.sender.notifyItemRemove(id);
+        delete this.floorItems[id];
+        return item;
     }
 }
 
@@ -86,7 +92,7 @@ class Zone{
         this.zoneID = zoneid;
 
         systems.addToUpdate(this);
-        this.testCreateMobLots(500);
+        this.testCreateMobLots(15);
     }
 
     testCreateMobLots(times){
@@ -94,8 +100,10 @@ class Zone{
             this.physicsWorld.testCreateMob((pos)=>{this.itemWorld.addItem(pos)});
         }
     }
+
     join(client, pos){
-        this.zoneSender.subscribe(client, this);
+        this.zoneSender.subscribe(client);
+        client.zone = this;
         this.addPlayerCharacter(client, pos);
     }
 
@@ -105,6 +113,14 @@ class Zone{
         this.physicsWorld.removeEntity(client.player.entityPos)
     }
 
+    pickup(client, id){
+        let hasPickedUp =  client.playerInventory.addItem({id:item.id,quantity:item.quantity});
+
+        if(hasPickedUp){
+            let item = this.itemWorld.removeItem(id);
+            if(!item) return;
+        }
+    }
 
     addPlayerCharacter(client, pos){
         let newPlayer = this.physicsWorld.addPlayerCharacter(client, pos)
@@ -113,7 +129,7 @@ class Zone{
         client.player = newPlayer;
 
         this.zoneSender.notifyNewEntity(client, newPlayer, newPlayer.entityPos);
-        this.zoneSender.initMessage(client, this.physicsWorld.entities, this.itemWorld.floorItems);
+        this.zoneSender.initMessage(client, this.physicsWorld.entities, this.itemWorld.floorItems, newPlayer.entityPos);
     }
 
     update(){
@@ -129,17 +145,16 @@ class ZoneSender{
     }
 
     removeItem(id) {
-        this.room.roomMessage('removeItem', id);
+        this.room.roomMessage('removeItem', {id:id});
     }
 
     notifyNewItem(key,newItem){
-        let nItem= {key:key, id:newItem.id, pos: newItem.pos}
+        let nItem = {key:key, id:newItem.id, pos: newItem.pos, quantity:1}
         this.room.roomMessage('newItem', nItem);
     }
 
-    subscribe(client,zone){
+    subscribe(client){
         this.room.join(client);
-        client.zone = zone; // temp
         client.emit("loadMap", {id:this.zoneID});
     }
 
@@ -150,6 +165,7 @@ class ZoneSender{
     initMessage(client, enities, items){
         client.emit("entityList", this.sendEntities(enities));
         client.emit("itemList", items);
+        client.emit("myPlayer", {id:client.player.entityPos});
     }
 
     sendEntities(entites) {
@@ -203,6 +219,10 @@ class ZoneSender{
         this.room.roomMessage('removeEntity', {
             id:entityPos
         })
+    }
+
+    notifyItemRemove(id){
+        this.room.roomMessage('removeItem', {id:id})
     }
 
     notifyClientPlayer(client, entity, entityPos){

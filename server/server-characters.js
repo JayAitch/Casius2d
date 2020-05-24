@@ -13,7 +13,7 @@ global.colliderTypes = {"PLAYER":0,"MONSTER":1,"NONPASSIBLE":2, "TRIGGER":3, "ZO
 class MovingGameObject{
     constructor(pos, animLayers) {
         this.velocity = {x: 0, y: 0};
-        this.moveSpeed = 4;
+        this.moveSpeed = 10;
         this.pos = pos;
         this.previousePos = pos;
         this.animationComponent = new characterComponents.AnimationComponent(animLayers);
@@ -183,7 +183,8 @@ class BasicMob extends  DamageableCharacter{
             this.height,
             pos: this.pos,
             layer:2,
-            interacts:[0,1,3,4],
+          //  interacts:[0,1,3,4],
+            interacts:[0],
             callback: (other)=>{
                 return this.collisionCallback(other);
             },

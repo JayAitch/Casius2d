@@ -77,12 +77,14 @@ class GameScene extends Phaser.Scene {
         this.client.sender.joinZone(0);
     }
 
+    loadPlayerData(id){
+        this.playerID = id;
+    }
+
     create(){
         this.scene.launch("paperdoll");
         items = this.cache.json.get('items');
         this.controller = new Controller(this,this.client);
-
-
     }
 
 
@@ -93,18 +95,33 @@ class GameScene extends Phaser.Scene {
         const belowLayer = map.createStaticLayer("Ground Layer", tileset, 0, 0);
         const worldLayer = map.createStaticLayer("Below player", tileset, 0, 0);
         const aboveLayer = map.createStaticLayer("Above player", tileset, 0, 0);
-
-
-
-
     }
-
-
+    getClosestItem(){
+        let pickupRange = 50;
+        let itemkeys = Object.keys(this.floorItems);
+        let myPlayer = this.mapEntities[this.playerID];
+        let itemKey = undefined
+        itemkeys.forEach((key)=>{
+            let item = this.floorItems[key]
+            let distance = Phaser.Math.Distance.Between(item.x,item.y,myPlayer.pos.x,myPlayer.pos.y);
+            if(distance < pickupRange){
+                itemKey = key;
+            }
+        })
+        return itemKey;
+    }
     newItem(i,id,pos){
         let floorItem = this.add.sprite(pos.x, pos.y, "seeradish")
         this.floorItems[i] = floorItem;
         floorItem.anims.play(animations.seeradish.glint);
     }
+
+    removeItem(id){
+        let floorItem = this.floorItems[id];
+        floorItem.destroy();
+        delete this.floorItems[id];
+    }
+
 
 // change to json!!
     newEntity(id, x, y, facing, state, base, layers, health, mHealth){
@@ -169,9 +186,15 @@ class Controller{
         let downKey = scene.input.keyboard.addKey("DOWN");
     //    let spaceKey = scene.input.keyboard.addKey("SPACE");
         let spaceKey = scene.input.keyboard.addKey("SPACE");
-
+        let ctrlKey = scene.input.keyboard.addKey("CTRL");
 
         this.client = client;
+
+        ctrlKey.on('down', (event)=> {
+            let itemID = scene.getClosestItem();
+            if(itemID)
+            client.sender.pickupItem(itemID);
+        });
 
         spaceKey.on('down', (event)=> {
             client.sender.attack();
