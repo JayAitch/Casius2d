@@ -27,17 +27,43 @@ class Receiver{
             // poentially seperate mesasge
             this.gameScene.moveEntity(data.id, data.x, data.y, data.facing, data.state,  data.health, data.mHealth);
         });
+
         this.socket.on('loadMap', (data)=> {
             this.gameScene.loadMap(data.id);
         });
-        this.socket.on('entityList', (data)=>{
 
-            // health is always blank here
-            for(let i = 0; data.length > i; i++){
-                let dataRow = data[i];
-                this.gameScene.newEntity(dataRow.position, dataRow.x, dataRow.y, dataRow.facing, dataRow.state, dataRow.base, dataRow.layers, data.health, data.mHealth);
-            }
+        this.socket.on('myPlayer', (data)=> {
+            this.gameScene.loadPlayerData(data.id);
         });
+
+        this.socket.on('entityList', (data)=>{
+            // health is always blank here
+            let keyList = Object.keys(data);
+            keyList.forEach((key)=>{
+                let dataRow = data[key];
+                this.gameScene.newEntity(dataRow.position, dataRow.x, dataRow.y, dataRow.facing, dataRow.state, dataRow.base, dataRow.layers, data.health, data.mHealth);
+            })
+        });
+
+        this.socket.on('removeItem', (data)=>{
+            console.log(data);
+            this.gameScene.removeItem(data.id);
+        });
+
+
+        this.socket.on('newItem', (data)=>{
+            this.gameScene.newItem(data.key,data.id, data.pos);
+        });
+
+        this.socket.on('itemList', (data)=>{
+            let keylist = Object.keys(data);
+            keylist.forEach((key)=>{
+                let dataRow = data[key];
+                this.gameScene.newItem(key,dataRow.id, dataRow.pos);
+            })
+
+        });
+
 
         this.socket.on('removeEntity',(data)=>{
             this.gameScene.removeEntity(data.id);
@@ -83,6 +109,9 @@ class Sender{
     }
     createAccount(username, password){
         this.socket.emit('createaccount', username, password);
+    }
+    pickupItem(id){
+        this.socket.emit('pickup', id);
     }
 }
 

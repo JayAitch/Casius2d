@@ -15,6 +15,10 @@
         "map2": "assets/tilemaps/testmap2.json"
     },
     "spritesheet":{
+                "seeradish": {
+                  "path":"assets/character/seeraddish.png",
+                  "options":{"frameWidth":32,"frameHeight":32}
+                },
                 "goldhelm": {
                     "path":"assets/character/armour/helm/golden_helm_male.png",
                     "options":{"frameWidth":64,"frameHeight":64}

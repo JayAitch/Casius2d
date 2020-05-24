@@ -57,109 +57,124 @@ function getProperty(properties, prop){
 }
 
 
+// move physics world into a seperate class after reducing coupling
+class ItemWorld{
+    constructor(sender, phyW) {
+        this.sender = sender;
+        this.floorItems = {};
+        this.lastItemId = 0;
+    }
 
+    addItem(pos){
+        let itemPos = this.lastItemId;
+        let position = pos;
+        let newItem = {id:0,pos:position, quantity: 1};
+        this.floorItems[itemPos] = newItem;
+
+        this.sender.notifyNewItem(itemPos, newItem);
+        this.lastItemId++
+    }
+
+    removeItem(id){
+        let item = this.floorItems[id];
+        this.sender.notifyItemRemove(id);
+        delete this.floorItems[id];
+        return item;
+    }
+}
 
 // receive mapped map!
 class Zone{
     constructor(zoneid) {
-        this.physicsWorld = new PhysicsWorld(800, 800);
-        this.entities = {};
-        this.room = roomManager.roomManager.createRoom();
+        this.zoneSender = new ZoneSender(zoneid);
+        this.physicsWorld = new PhysicsWorld(zoneid, this.zoneSender);
+        this.itemWorld = new ItemWorld(this.zoneSender,this.physicsWorld )
         this.zoneID = zoneid;
-        this.lastEntityId = 0;
+
         systems.addToUpdate(this);
-        this.collisionManager = new systems.CollisionManager();
-        this.worldObjects = getWorldObjects(zoneid); // use this to target specfic zone
-        this.createNonPassibles(this.worldObjects);
-
-        this.testCreateMob();
-        this.testCreateMob();
-        this.testCreateMob();
-        this.testCreateMob();this.testCreateMob();
-        this.testCreateMob();
-        this.testCreateMob();
-        this.testCreateMob();
-        this.testCreateMob();
-        this.testCreateMob();
-        this.testCreateMob();
-        this.testCreateMob();this.testCreateMob();
-        this.testCreateMob();
-        this.testCreateMob();this.testCreateMob();this.testCreateMob();this.testCreateMob();
-
-
-
-
-
+        this.testCreateMobLots(15);
     }
 
-    testCreateMob(){
-        this.testMob = new characters.BasicMob(this.collisionManager);
-        this.entities[this.lastEntityId] = this.testMob;
-        this.lastEntityId++
+    testCreateMobLots(times){
+        for(let i = 0; i < times; i++){
+            this.physicsWorld.testCreateMob((pos)=>{this.itemWorld.addItem(pos)});
+        }
     }
-
 
     join(client, pos){
-        this.room.join(client);
-        client.zone = this; // might not need
-        client.emit("loadMap", {id:this.zoneID});
+        this.zoneSender.subscribe(client);
+        client.zone = this;
         this.addPlayerCharacter(client, pos);
     }
 
     leave(client){
-        this.notifyEntityRemove(client.player.entityPos);
-        this.room.leave(client);
-        delete this.entities[client.player.entityPos];
+        this.zoneSender.notifyEntityRemove(client.player.entityPos);
+        this.zoneSender.unsubscribe(client);
+        this.physicsWorld.removeEntity(client.player.entityPos)
     }
 
-    killEntity(id){
-        let entity = this.entities[id];
-        if(entity){
-            this.notifyEntityRemove(id);
-            delete this.entities[id];
+    pickup(client, id){
+        let hasPickedUp =  client.playerInventory.addItem({id:item.id,quantity:item.quantity});
+
+        if(hasPickedUp){
+            let item = this.itemWorld.removeItem(id);
+            if(!item) return;
         }
     }
 
     addPlayerCharacter(client, pos){
-        let entityPos = this.lastEntityId;
+        let newPlayer = this.physicsWorld.addPlayerCharacter(client, pos)
 
-        let newPos = JSON.parse(JSON.stringify(pos));
-        let newPlayer = new characters.ServerPlayer(newPos, players[0], this.collisionManager, client, entityPos, client.playerStats);
         client.playerStats.zone = this.zoneID;
         client.player = newPlayer;
 
-        this.entities[entityPos] = newPlayer;
-
-        this.notifyNewEntity(client, newPlayer, entityPos);
-        client.emit("entityList", this.allEntities());
-        this.lastEntityId++
+        this.zoneSender.notifyNewEntity(client, newPlayer, newPlayer.entityPos);
+        this.zoneSender.initMessage(client, this.physicsWorld.entities, this.itemWorld.floorItems, newPlayer.entityPos);
     }
 
-    createNonPassibles(objects){
-        objects.forEach((object)=>{
-            let x = object.pos.x + object.width/2;//temp
-            let y = object.pos.y + object.height/2;
-            let correctPos = {x:x,y:y};
-            switch(object.type){
-                case "NONPASSIBLE":
-                    let testNonPassible = new characters.NonPassibleTerrain(correctPos, object.width,object.height,this.collisionManager);
-                    break;
-                case "TRIGGER_ZONE_CHANGE":
-                    let testZonePortal = new characters.ZonePortal(correctPos, object.width,object.height,this.collisionManager, object.zone, object.x,object.y);
+    update(){
+        this.physicsWorld.update();
+    }
+}
 
-            }
 
-        })
-
+class ZoneSender{
+    constructor(zoneid) {
+        this.room = roomManager.roomManager.createRoom();
+        this.zoneID = zoneid;
     }
 
-    allEntities() {
-        let tempEntities = [];
-        let entityKeys = Object.keys(this.entities);
+    removeItem(id) {
+        this.room.roomMessage('removeItem', {id:id});
+    }
+
+    notifyNewItem(key,newItem){
+        let nItem = {key:key, id:newItem.id, pos: newItem.pos, quantity:1}
+        this.room.roomMessage('newItem', nItem);
+    }
+
+    subscribe(client){
+        this.room.join(client);
+        client.emit("loadMap", {id:this.zoneID});
+    }
+
+    unsubscribe(client){
+        this.room.leave(client);
+    }
+
+    initMessage(client, enities, items){
+        client.emit("entityList", this.sendEntities(enities));
+        client.emit("itemList", items);
+        client.emit("myPlayer", {id:client.player.entityPos});
+    }
+
+    sendEntities(entites) {
+        let tempEntities = {};
+        let entityKeys = Object.keys(entites);
         entityKeys.forEach( (key)=> {
 
-            let entity = this.entities[key];
-            tempEntities.push({
+            let entity = entites[key];
+            tempEntities[key] = {
                 position:key,
                 x:entity.pos.x,
                 y:entity.pos.y,
@@ -169,7 +184,7 @@ class Zone{
                 layers: entity.animationComponent.spriteLayers,
                 health: entity.health,
                 mHealth: entity.maxHealth
-            })
+            };
         });
         return tempEntities;
     }
@@ -206,6 +221,10 @@ class Zone{
         })
     }
 
+    notifyItemRemove(id){
+        this.room.roomMessage('removeItem', {id:id})
+    }
+
     notifyClientPlayer(client, entity, entityPos){
         client.emit('playerSpawn', {
             id:entityPos,
@@ -216,28 +235,76 @@ class Zone{
         })
     }
 
+}
+class PhysicsWorld{
+
+    constructor(zoneid,  sender){
+        this.sender = sender;
+        this.collisionManager = new systems.CollisionManager();
+        this.worldObjects = getWorldObjects(zoneid); // use this to target specfic zone
+        this.createNonPassibles(this.worldObjects);
+        this.entities = {};
+        this.lastEntityId = 0;
+    }
+
     update(){
         let entityKeys = Object.keys(this.entities);
         entityKeys.forEach( (key)=> {
             let entity = this.entities[key];
 
             if(entity.isDelete){
-                this.killEntity(key);
+                this.removeEntity(key);
             }else{
                 entity.update();
-                this.notifyEntityUpdate(entity, key);
+                this.sender.notifyEntityUpdate(entity, key); //temp
             }
 
         });
         this.collisionManager.update();
     }
-}
 
-class PhysicsWorld{
-    constructor(width,height){
-        this.width = 800;
-        this.height = 800;
+    createNonPassibles(objects){
+        objects.forEach((object)=>{
+            let x = object.pos.x + object.width/2;//temp
+            let y = object.pos.y + object.height/2;
+            let correctPos = {x:x,y:y};
+            switch(object.type){
+                case "NONPASSIBLE":
+                    let testNonPassible = new characters.NonPassibleTerrain(correctPos, object.width,object.height,this.collisionManager);
+                    break;
+                case "TRIGGER_ZONE_CHANGE":
+                    let testZonePortal = new characters.ZonePortal(correctPos, object.width,object.height,this.collisionManager, object.zone, object.x,object.y);
+
+            }
+
+        })
+
     }
+
+    addPlayerCharacter(client, pos){
+        let entityPos = this.lastEntityId;
+        let newPos = JSON.parse(JSON.stringify(pos));
+        // need to remove client
+        let newPlayer = new characters.ServerPlayer(newPos, players[0], this.collisionManager, client, entityPos, client.playerStats);
+        this.entities[entityPos] = newPlayer;
+        this.lastEntityId++
+        return newPlayer;
+    }
+
+    testCreateMob(droptest){
+        this.testMob = new characters.BasicMob(this.collisionManager,droptest);
+        this.entities[this.lastEntityId] = this.testMob;
+        this.lastEntityId++
+    }
+
+    removeEntity(id){
+        let entity = this.entities[id];
+        if(entity){
+            this.sender.notifyEntityRemove(id);
+            delete this.entities[id];
+        }
+    }
+
 }
 
 

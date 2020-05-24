@@ -111,7 +111,7 @@ class AIComponent{
         this.tick = 0;
         this.pos = pos;
         this.velocity = velocity;
-        this.firstAction = 100;
+        this.firstAction = 10;
     }
     update(entity){
         this.tick++;
@@ -122,6 +122,7 @@ class AIComponent{
                     x: this.direction.x * 10,
                     y: this.direction.y * 10
                 }
+                entity.stop();
                 entity.addMovement(velocity);
                 break
             case 50:
@@ -141,7 +142,7 @@ class AIComponent{
         //     this.direction = {x:0,y:-1};
         // }
         let int = randomInteger(0,3);
-        this.firstAction = randomInteger(50,300);
+        this.firstAction = randomInteger(10,50);
         switch (int) {
             case 0:
                 this.direction = {x:0,y:1};
@@ -172,6 +173,7 @@ class MovementComponent{
         this.pos.x = this.pos.x + this.velocity.x;
         this.pos.y = this.pos.y + this.velocity.y;
     }
+
     addMovement(addedVelocity){
         let previouseVelocity = this.velocity;
         let x = Math.sign(addedVelocity.x) + Math.sign(previouseVelocity.x);

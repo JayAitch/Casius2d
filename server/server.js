@@ -5,6 +5,7 @@ const PORT = configs.server_config.port;
 const server = require('http').createServer();
 const items = require('./items.js'); //consider converting
 const zoneManager = require('./zone-manager.js')
+const invent = require('./inventory.js')
 const dbDisabled = true;
 
 global.io = require('socket.io')(server);
@@ -37,6 +38,11 @@ players = {
     }
 };
 
+inventories ={
+    0:[{id:0,quantity:1}]
+}
+
+
 
 class PlayerStats {
     constructor(health, experience) {
@@ -61,6 +67,7 @@ io.on('connect', function(client) {
     client.on('login',function(username,password){
         let playerStats = new PlayerStats(200,200);
         client.playerStats = playerStats;
+        client.playerInventory = new invent.Inventory(inventories[0]);
         tryLogin(client, username, password);
 
         client.on('joinzone',function(data) {
@@ -76,6 +83,10 @@ io.on('connect', function(client) {
 
             client.on('attack',function(data) {
                 client.player.attack();
+            });
+
+            client.on('pickup',function(id) {
+                client.zone.pickup(client, id);
             });
         });
     });
@@ -159,7 +170,7 @@ global.testZoneJoin =function(client, username, zoneid, position){
 global.killPlayer = function(client){
     let zoneid = client.playerStats.zone;
     let zone = ZONES[zoneid];
-    zone.killEntity(client.player.entityPos);
+    zone.physicsWorld.removeEntity(client.player.entityPos);
 
     let testRespawn = setTimeout(function() {
         global.respawn(client);
@@ -172,7 +183,6 @@ global.respawn = function(client){
     client.playerStats.health = client.playerStats.maxHealth;
     let zone = ZONES[zoneid];
     zone.join(client,{x:150,y:150});
-    console.log(Object.keys(zone.entities));
 }
 
 global.randomInteger = function(min, max) {
