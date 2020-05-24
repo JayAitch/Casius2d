@@ -113,6 +113,7 @@ class AIComponent{
         this.velocity = velocity;
         this.firstAction = 10;
     }
+    remove(){delete this;};
     update(entity){
         this.tick++;
         switch (this.tick % this.firstAction) {
