@@ -43,7 +43,7 @@ class MovingGameObject{
             y = Math.pow(0.8,(mX * mX) + (mY *mY)) * ySign;
         }
         this.velocity = {x: x * this.moveSpeed, y:  y * this.moveSpeed};
-        this.animationComponent.facing = this.velocity;
+        this.animationComponent.facing = this.velocity; //temp
     }
 
     get direction(){

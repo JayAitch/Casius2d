@@ -1,6 +1,6 @@
 class Inventory{
     constructor(invent) {
-        this.inventoryItems = invent;
+        this.inventoryItems = JSON.parse(JSON.stringify(invent));
     }
 
     addItem(item){
