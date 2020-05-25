@@ -45,10 +45,12 @@ const databaseConnection = {
         })
     },
 
+    //###### Account based methods #######
+
     createAccount: function(username, login) {
         console.log(login)
         return new Promise((resolve) => {
-            this.establishSession().then(function(session) {
+            this.establishSession().then(session => {
                 var col = session.getCollection(user_collection);
                 col
                     .add({
@@ -66,7 +68,7 @@ const databaseConnection = {
                         return resolve(true);
                     })
                 })
-                .catch(function(err){
+                .catch(err => {
                     // Session not established
                     return resolve(false);
                 })
@@ -120,6 +122,8 @@ const databaseConnection = {
             })
         })
     },
+    
+    //###### Character based methods #######
 
     createCharacter: function(username,character) {
         return new Promise((resolve) =>{
@@ -170,6 +174,26 @@ const databaseConnection = {
                     })
             })
         })
+    },
+
+    updateCharacter: function(username,character){
+        return new Promise((resolve) =>{
+            this.establishSession().then(session =>{
+                var col = session.getCollection(character_collection);
+                col
+                    .modify('username = :username')
+                    .set('character',character)
+                    .bind('username',username)
+                    .execute()
+                    .then(res =>{
+                        return resolve(res.getAffectedItemsCount() == 1)
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        return resolve(false)
+                    })
+            })
+        });
     }
 
 }
