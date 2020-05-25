@@ -19,6 +19,7 @@ class MovingGameObject{
         this.animationComponent = new characterComponents.AnimationComponent(animLayers);
         this.components = [];
         this.isAttacking = false;//temp
+        this.attackingInc = 0//temp;
         this.isDelete = false;
     }
 
@@ -58,15 +59,23 @@ class MovingGameObject{
         this.pos.x = this.previousePos.x + this.velocity.x;
         this.pos.y = this.previousePos.y + this.velocity.y;
     }
+
+    // temp method!!!! move to animation component
     tempAnimationStateManager(){
-        let attackTick = 0;
-        let attackingCount = 100//temp
+
+        let attackingCount = 10//temp when moved change to be based off delta time
         if(this.isAttacking){
             this.animationComponent.currentState = states.THRUST;
-            attackTick++;
-            if(attackingCount < attackTick) this.isAttacking = false;
+            this.attackingInc++;
+            if(attackingCount < this.attackingInc){
+                this.attackingInc = 0;
+                this.isAttacking = false;
+            }
+
+            console.log((attackingCount < this.attackingInc) + this.attackingInc);
         }
         else {
+            console.log("we got to else" + this.attackingInc);
             if(this.velocity.x === 0 && this.velocity.y === 0){
                 this.animationComponent.currentState = states.STOP;
             }else{
@@ -74,6 +83,10 @@ class MovingGameObject{
             }
         }
     }
+
+
+
+
     update(){
         this.move();
         this.tempAnimationStateManager();

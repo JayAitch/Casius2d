@@ -96,7 +96,7 @@ class Zone{
         this.zoneID = zoneid;
 
         systems.addToUpdate(this);
-        this.testCreateMobLots(15);
+        //this.testCreateMobLots(15);
     }
 
     testCreateMobLots(times){
