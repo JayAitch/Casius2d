@@ -7,7 +7,7 @@ const server = require('http').createServer();
 const items = require('./items.js'); //consider converting
 const zoneManager = require('./zone-manager.js')
 const invent = require('./inventory.js')
-const dbDisabled = false;
+const dbDisabled = true;
 
 global.io = require('socket.io')(server);
 io = global.io;
@@ -17,6 +17,7 @@ const xDbManager = require('./persistance-manager.js')
 // xDbManager.databaseConnection.createAccount("user2","somesionms").then(done =>{
 //     console.log("I dided it?: " + done)
 // })
+
 
 players = {
     0:{
@@ -68,49 +69,50 @@ let secondZone = new zoneManager.Zone(1);
 const ZONES = {0:firstZone,1:secondZone}
 
 io.on('connect', function(client) {
+
+    let curr_username;
+
     client.on('login',function(username,password){
+        curr_username = username
         let playerStats = new PlayerStats(200,200);
         client.playerStats = playerStats;
         client.playerInventory = new invent.Inventory(inventories[0]);
-        tryLogin(client, username, password);
+        tryLogin(client, username, password); 
+    });
 
-        client.on('joinzone',function(data) {
-            tryJoinZone(client, username, 0,{x:250,y:250});
+    client.on('joinzone',function(data) {
+        tryJoinZone(client, curr_username, 0,{x:250,y:250});
 
-            client.on('stop',function() {
-                client.player.stop();
-            });
+        client.on('stop',function() {
+            client.player.stop();
+        });
 
-            client.on('move',function(data) {
-                client.player.addMovement({x:data.x, y:data.y});
-            });
+        client.on('move',function(data) {
+            client.player.addMovement({x:data.x, y:data.y});
+        });
 
-            client.on('attack',function(data) {
-                client.player.attack();
-            });
+        client.on('attack',function(data) {
+            client.player.attack();
+        });
 
-            client.on('pickup',function(id) {
-                client.zone.pickup(client, id);
-            });
+        client.on('pickup',function(id) {
+            client.zone.pickup(client, id);
         });
     });
 
     client.on('createaccount', function(username,password){
-        xDbManager.databaseConnection.createAccount(username,password).then(function(accountExists){
-            console.log(accountExists);
-            if(!accountExists){
+        xDbManager.databaseConnection.createAccount(username,password).then(accountCreated => {
+            console.log(accountCreated);
+            if(accountCreated){
                 console.log("Account created!")
             }else{
                 console.log("Account already exists!")
             }
 
-
         });
     });
-
-
-    client.on('disconnect', function(){
-    });
+    //TODO - on disconnect
+    client.on('disconnect', function(){});
 
 });
 
@@ -119,36 +121,70 @@ server.listen(PORT, function(){
 });
 
 function tryLogin(client, username, password){
+    /* If DB is disabled just emit login */
     if(!dbDisabled){
-        let loginPromise = xDbManager.databaseConnection.requestLogin(username,password);
+        let loginPromise = xDbManager.databaseConnection.checkLogin(username,password);
         loginPromise.then((doesExist) => {
             if(doesExist){
-                client.emit('loggedIn');
+                setupCharacter(client,username).then(suceeded =>{
+                    if(suceeded){
+                        client.emit('loggedIn');
+                    }
+                });
             }
         })
     }
     else{
-        client.emit('loggedIn');
+        setupCharacter(client,username).then(suceeded =>{
+            client.emit('loggedIn');
+            
+        });
     }
 }
 
-function tryJoinZone(client, username, zoneid, position){
-    if(!dbDisabled){
-        // let characterPromise = dbManager.databaseConnection.createOrReturnCharacter(username,1,1,0);`
-        characterPromise.then(function (character) {
+function setupCharacter(client,username){
+    return new Promise((resolve) => {
+        if(!dbDisabled){
+            let characterPromise = xDbManager.databaseConnection.getAllCharactersForUser(username);
 
-            if(client.zone)client.zone.leave(client);
-            let zone = ZONES[zoneid];
-            zone.join(client,position);
-        }).catch((err)=>{
-            console.log(err);
-        })
-    }
-    else{
-        if(client.zone)client.zone.leave(client);
-        let zone = ZONES[zoneid];
-        zone.join(client,position);
-    }
+            characterPromise.then((chars) => {
+                if(chars == undefined){
+                    //* If no characters exist for this account then make one. 
+                    xDbManager.databaseConnection.createCharacter(username,players[0]).then((succeeded) =>{
+                        if(succeeded){
+                            //* Creation succeeded - go ahead and re-query and assign DB properties to character
+                            let characterPromise2 = xDbManager.databaseConnection.getAllCharactersForUser(username);
+                            characterPromise2.then((chars2) => {
+                                //Do something with chars2
+                                console.log("Character made!");
+                                client.character = chars2[0].character
+                                return resolve(true);
+                            })
+                        }else{
+                            console.log("Something went horribly wrong when creating character")
+                            return resolve(false);
+
+                        }
+                    })
+                }else{
+                    client.character = char[0].character
+                    return resolve(true)
+                }
+            })
+        }else{
+            client.character = players[0]
+            console.log(client.character)
+            return resolve(true)
+        }
+
+    });
+}
+
+function tryJoinZone(client, username, zoneid, position){
+    console.log("Try join attempted")
+    if(client.zone)client.zone.leave(client);
+    let zone = ZONES[zoneid];
+    zone.join(client,position);                      
 }
 
 global.testZoneJoin =function(client, username, zoneid, position){
