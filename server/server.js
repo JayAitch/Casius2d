@@ -7,12 +7,10 @@ const server = require('http').createServer();
 const items = require('./items.js'); //consider converting
 const zoneManager = require('./zone-manager.js')
 const invent = require('./inventory.js')
-const dbDisabled = true;
+const dbDisabled = false;
 
 global.io = require('socket.io')(server);
 io = global.io;
-
-// const dbManager = require('./db-connection.js')
 
 const xDbManager = require('./persistance-manager.js')
 
@@ -70,7 +68,6 @@ let secondZone = new zoneManager.Zone(1);
 const ZONES = {0:firstZone,1:secondZone}
 
 io.on('connect', function(client) {
-
     client.on('login',function(username,password){
         let playerStats = new PlayerStats(200,200);
         client.playerStats = playerStats;
@@ -117,26 +114,12 @@ io.on('connect', function(client) {
 
 });
 
-
-
-
 server.listen(PORT, function(){
     console.log('Listening on ' + server.address().port);
 });
 
-
-
-
-
-
-
-
-
-
-
 function tryLogin(client, username, password){
     if(!dbDisabled){
-
         let loginPromise = xDbManager.databaseConnection.requestLogin(username,password);
         loginPromise.then((doesExist) => {
             if(doesExist){
@@ -149,11 +132,9 @@ function tryLogin(client, username, password){
     }
 }
 
-
-
 function tryJoinZone(client, username, zoneid, position){
     if(!dbDisabled){
-        // let characterPromise = dbManager.databaseConnection.createOrReturnCharacter(username,1,1,0);
+        // let characterPromise = dbManager.databaseConnection.createOrReturnCharacter(username,1,1,0);`
         characterPromise.then(function (character) {
 
             if(client.zone)client.zone.leave(client);
