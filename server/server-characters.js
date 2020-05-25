@@ -19,6 +19,7 @@ class MovingGameObject{
         this.animationComponent = new characterComponents.AnimationComponent(animLayers);
         this.components = [];
         this.isAttacking = false;//temp
+        this.attackingInc = 0//temp;
         this.isDelete = false;
     }
 
@@ -58,13 +59,23 @@ class MovingGameObject{
         this.pos.x = this.previousePos.x + this.velocity.x;
         this.pos.y = this.previousePos.y + this.velocity.y;
     }
+
+    // temp method!!!! move to animation component
     tempAnimationStateManager(){
-        let attackTick = 0;
-        let attackingCount = 100//temp
+
+        let attackingCount = 10//temp when moved change to be based off delta time
         if(this.isAttacking){
             this.animationComponent.currentState = states.THRUST;
-            attackTick++;
-            if(attackingCount < attackTick) this.isAttacking = false;
+            this.attackingInc++;
+            let callbackTime = this.attackCallBack.count;
+
+            if(callbackTime == this.attackingInc){
+                this.attackCallBack.callback();
+            }
+            if(attackingCount < this.attackingInc){
+                this.attackingInc = 0;
+                this.isAttacking = false;
+            }
         }
         else {
             if(this.velocity.x === 0 && this.velocity.y === 0){
@@ -74,6 +85,13 @@ class MovingGameObject{
             }
         }
     }
+
+    setIsAttacking(callback){
+        this.isAttacking = true;
+        this.attackCallBack = callback;
+    }
+
+
     update(){
         this.move();
         this.tempAnimationStateManager();
@@ -142,10 +160,12 @@ class ZonePortal{
     collisionCallback(other){
     }
 }
+
+
 // make damaging character seperate from MGO
 class DamageableCharacter extends MovingGameObject {
     constructor(pos, animLayers, stats) {
-    super(pos, animLayers);
+        super(pos, animLayers);
         this.stats = stats;
     }
 
@@ -180,6 +200,7 @@ class BasicMob extends  DamageableCharacter{
         super(pos, layers, stats);
         this.width = 32; // temp
         this.height = 32; // temp
+        this.moveSpeed = 3;
         this.deathCallbackTest = test;
         this.createCollider(collisionManager);
         this.components.push(new characterComponents.AIComponent(this.pos, this.velocity));
@@ -193,7 +214,7 @@ class BasicMob extends  DamageableCharacter{
             this.height,
             pos: this.pos,
             layer:2,
-          //  interacts:[0,1,3,4],
+            //  interacts:[0,1,3,4],
             interacts:[0],
             callback: (other)=>{
                 return this.collisionCallback(other);
@@ -263,7 +284,7 @@ class ServerPlayer extends DamageableCharacter{
             this.animationComponent,//wrong
             collider.collisionRegistration, // wrong this may change
             playerStats
-            );
+        );
         this.client = client; // remove??
         this.entityPos = entityPos; // remove
         this.playerStats = playerStats;
@@ -288,14 +309,29 @@ class ServerPlayer extends DamageableCharacter{
 
 
     attack(){
-        let reward = this.attackingComponent.attack();
-        this.playerStats.experience += reward;
-        this.isAttacking = true;
+        // temp move to attacking compont
+        if(!this.isAttacking){
+            this.setIsAttacking(
+                {
+                    count: 5,
+                    callback:()=>{
+                        let reward = this.attackingComponent.attack();
+                        this.playerStats.experience += reward;
+                    }
+                });
+        }
     }
 
+
+    //temp
+    move(){
+        if(!this.isAttacking){
+            super.move();
+        }
+    }
     kill() {
         // try change to is delete!!
-       // global.killPlayer(this.client);
+        // global.killPlayer(this.client);
         this.isDelete = true;
         this.removeComponents();
     }
@@ -303,8 +339,8 @@ class ServerPlayer extends DamageableCharacter{
     collisionCallback(other){
         switch(other.type){
             case colliderTypes.NONPASSIBLE:
-               this.backStep();
-               break;
+                this.backStep();
+                break;
             case colliderTypes.PLAYER:
                 break;
             case colliderTypes.TRIGGER:

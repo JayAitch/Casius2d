@@ -1,23 +1,28 @@
 class HealthBar {
 
-    constructor (scene, x, y,width, height, max, value)
+    constructor (scene, x, y,width, height, max, value, yOffset)
     {
         this.bar = new Phaser.GameObjects.Graphics(scene);
-
-        this.x = x;
+        this.bar.depth = UILayer;
+        this.yOffset = yOffset
+        this.x = x - width/2;
         this.y = y;
         this.value = value;
         this.maxValue = max;
         this.width = width;
         this.height = height;
-        this.draw();
 
+        this.draw();
         scene.add.existing(this.bar);
+
     }
+
+
     destroy(){
         this.bar.destroy();
 
     }
+
     decrease (amount)
     {
         this.value -= amount;
@@ -51,15 +56,20 @@ class HealthBar {
 
     draw ()
     {
+        if(this.value === this.maxValue){
+            this.bar.alpha = 0;
+            return;
+        }
+        this.bar.alpha = 0.3;
         this.bar.clear();
         let border = 4;
         //  BG
         this.bar.fillStyle(0x000000);
-        this.bar.fillRect(this.x, this.y, this.width + border, this.height + border);
+        this.bar.fillRect(this.x  - this.width/2, this.y + this.yOffset, this.width + border, this.height + border);
 
         //  Health
         this.bar.fillStyle(0xffffff);
-        this.bar.fillRect(this.x + 2, this.y + 2, this.width, this.height);
+        this.bar.fillRect(this.x + 2 - this.width/2, this.y + 2 + this.yOffset, this.width, this.height);
 
         if (this.value < 30)
         {
@@ -72,7 +82,7 @@ class HealthBar {
 
         var d = Math.floor((this.value/ this.maxValue) * this.width);
 
-        this.bar.fillRect(this.x + 2, this.y + 2, d, this.height);
+        this.bar.fillRect(this.x + 2 - this.width/2, this.y + 2 + this.yOffset, d, this.height);
     }
 
 }
@@ -81,6 +91,7 @@ class MovingSprite{
     constructor(scene, pos, animationLookup){
         this.pos = pos;
         this.sprite = scene.add.sprite(pos.x, pos.y, animationLookup);
+        this.sprite.depth = tempCharacterLayer;
         this.newPosition = pos;
         this.lastAnim = "";
         this.animationLookup = animationLookup;
@@ -98,8 +109,9 @@ class MovingSprite{
     }
 
     setPosition(x, y){
-            this.sprite.x = x;
-            this.sprite.y = y;
+        this.sprite.x = x;
+        this.sprite.y = y;
+        this.sprite.depth = tempCharacterLayer + y;
     }
 
     set animation(animKey){
@@ -110,7 +122,7 @@ class MovingSprite{
 
     destroy() {
         this.sprite.destroy();
-        delete this;
+       // delete this;
     }
 
     testAnimWalk(){
@@ -181,6 +193,7 @@ class MovingMultiSprite extends MovingSprite{
         layers.forEach((elem)=>{
             let sprite = scene.add.sprite(pos.x, pos.y);
             this.spriteList[elem.base] = sprite;
+            sprite.z = tempCharacterLayer +1;
             addSpriteEffect(sprite,scene, elem.effect); //temp
         })
 
@@ -212,6 +225,7 @@ class MovingMultiSprite extends MovingSprite{
             let sprite = this.spriteList[key];
             sprite.x = x;
             sprite.y = y;
+            sprite.depth = tempCharacterLayer + y;
         })
     }
 }
@@ -220,7 +234,7 @@ class MovingMultiSprite extends MovingSprite{
 class TestMonster extends MovingSprite{
     constructor(scene, pos, base, health, mHealth){
         super(scene, pos, base);
-        this.healthBar = new HealthBar(scene,pos.x,pos.y,100,12, health, mHealth)
+        this.healthBar = new HealthBar(scene,pos.x,pos.y,60,8, health, mHealth,-30)
     }
     set health(val){
         this.healthBar.health = val;
@@ -247,7 +261,7 @@ class TestMonster extends MovingSprite{
 class Player extends MovingMultiSprite{
     constructor(scene, pos, facing, state, base, layers, health, mHealth){
         super(scene, pos, base, layers);
-        this.healthBar = new HealthBar(scene,pos.x,pos.y,100,12, health, mHealth)
+        this.healthBar = new HealthBar(scene,pos.x,pos.y,60,8, health, mHealth ,- 30)
     }
     set health(val){
         this.healthBar.health = val;

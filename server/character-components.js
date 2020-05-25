@@ -42,9 +42,9 @@ class AttackingComponent{
 
     attack(){
         let direction = directionAsVector(this.directionObject.direction);
-        let x = (direction.x * 30) + this.origin.x;
-        let y = (direction.y * 30) + this.origin.y;
-        let hitEntities = this.scanForEntities(x,y,150,150);
+        let x = (direction.x * 40) + this.origin.x;
+        let y = (direction.y * 40) + this.origin.y;
+        let hitEntities = this.scanForEntities(x,y,50,50);
         let damageMessage = {type:colliderTypes.ATTACKSCAN};
         let reward = 0;
         hitEntities.forEach((entities)=>{
