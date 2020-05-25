@@ -81,6 +81,7 @@ class ItemWorld{
         delete this.floorItems[id];
         return item;
     }
+
     canPickup(id,position){
         let item = this.floorItems[id];
         return item;
@@ -125,7 +126,6 @@ class Zone{
         let hasPickedUp =  client.playerInventory.addItem({id:item.id,quantity:item.quantity});
 
         if(hasPickedUp){
-
             let item = this.itemWorld.removeItem(id);
         }
     }
@@ -293,7 +293,8 @@ class PhysicsWorld{
         let entityPos = this.lastEntityId;
         let newPos = JSON.parse(JSON.stringify(pos));
         // need to remove client
-        let newPlayer = new characters.ServerPlayer(newPos, players[0], this.collisionManager, client, entityPos, client.playerStats);
+        console.log(client.character);
+        let newPlayer = new characters.ServerPlayer(newPos, client.character, this.collisionManager, client, entityPos, client.playerStats);
         this.entities[entityPos] = newPlayer;
         this.lastEntityId++
         return newPlayer;
