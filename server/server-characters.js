@@ -58,15 +58,25 @@ class MovingGameObject{
         this.pos.x = this.previousePos.x + this.velocity.x;
         this.pos.y = this.previousePos.y + this.velocity.y;
     }
-
+    tempAnimationStateManager(){
+        let attackTick = 0;
+        let attackingCount = 100//temp
+        if(this.isAttacking){
+            this.animationComponent.currentState = states.THRUST;
+            attackTick++;
+            if(attackingCount < attackTick) this.isAttacking = false;
+        }
+        else {
+            if(this.velocity.x === 0 && this.velocity.y === 0){
+                this.animationComponent.currentState = states.STOP;
+            }else{
+                this.animationComponent.currentState = states.WALK;
+            }
+        }
+    }
     update(){
         this.move();
-        if(this.velocity.x === 0 && this.velocity.y === 0){
-            this.animationComponent.currentState = states.STOP;
-        }else{
-            this.animationComponent.currentState = states.WALK;
-        }
-
+        this.tempAnimationStateManager();
         this.components.forEach(function (component) {
             component.update(this); // this should be done via pass by reference
         },this);
@@ -280,7 +290,7 @@ class ServerPlayer extends DamageableCharacter{
     attack(){
         let reward = this.attackingComponent.attack();
         this.playerStats.experience += reward;
-        //this.animat
+        this.isAttacking = true;
     }
 
     kill() {

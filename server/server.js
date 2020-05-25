@@ -7,7 +7,7 @@ const server = require('http').createServer();
 const items = require('./items.js'); //consider converting
 const zoneManager = require('./zone-manager.js')
 const invent = require('./inventory.js')
-const dbDisabled = false;
+const dbDisabled = true;
 
 global.io = require('socket.io')(server);
 io = global.io;
@@ -120,7 +120,7 @@ server.listen(PORT, function(){
 
 function tryLogin(client, username, password){
     if(!dbDisabled){
-        let loginPromise = xDbManager.databaseConnection.requestLogin(username,password);
+        let loginPromise = xDbManager.databaseConnection.checkLogin(username,password);
         loginPromise.then((doesExist) => {
             if(doesExist){
                 client.emit('loggedIn');
@@ -134,7 +134,7 @@ function tryLogin(client, username, password){
 
 function tryJoinZone(client, username, zoneid, position){
     if(!dbDisabled){
-        // let characterPromise = dbManager.databaseConnection.createOrReturnCharacter(username,1,1,0);`
+        let characterPromise = xDbManager.databaseConnection.createOrReturnCharacter(username,1,1,0);
         characterPromise.then(function (character) {
 
             if(client.zone)client.zone.leave(client);
