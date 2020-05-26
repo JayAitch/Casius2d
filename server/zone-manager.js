@@ -118,9 +118,9 @@ class Zone{
 
     leave(clientID){
         let client = this.zoneSender.room.clientLookup[clientID];
-        this.zoneSender.notifyEntityRemove(client.player.entityPos);
+        this.zoneSender.notifyEntityRemove(client.player.config.key);
         this.zoneSender.unsubscribe(client);
-        this.physicsWorld.removeEntity(client.player.entityPos);
+        this.physicsWorld.removeEntity(client.player.config.key);
         return client;
     }
 
@@ -141,8 +141,8 @@ class Zone{
         client.playerLocation.zone = this.zoneID;
         client.player = newPlayer;
 
-        this.zoneSender.notifyNewEntity(client, newPlayer, newPlayer.entityPos);
-        this.zoneSender.initMessage(client, this.physicsWorld.entities, this.itemWorld.floorItems, newPlayer.entityPos);
+        this.zoneSender.notifyNewEntity(client, newPlayer);
+        this.zoneSender.initMessage(client, this.physicsWorld.entities, this.itemWorld.floorItems, newPlayer.config.key);
     }
 
     update(){
@@ -178,7 +178,7 @@ class ZoneSender{
     initMessage(client, enities, items){
         client.emit("entityList", this.sendEntities(enities));
         client.emit("itemList", items);
-        client.emit("myPlayer", {id:client.player.entityPos});
+        client.emit("myPlayer", {id:client.player.config.key});
     }
 
     sendEntities(entites) {
@@ -202,9 +202,9 @@ class ZoneSender{
         return tempEntities;
     }
 
-    notifyNewEntity(client, entity, entityPos){
+    notifyNewEntity(client, entity){
         this.room.broadcastMessage(client,'newEntity', {
-            id:entityPos,
+            id:entity.entityPos,
             x:entity.pos.x,
             y:entity.pos.y,
             facing: entity.direction,
@@ -295,9 +295,18 @@ class PhysicsWorld{
     }
 
     addPlayerCharacter(client){
-        let entityPos = this.lastEntityId;
-        let newPlayer = new characters.ServerPlayer(client.character, this.collisionManager, entityPos, client.playerStats, client.playerLocation);
-        this.entities[entityPos] = newPlayer;
+        let entityKey = this.lastEntityId;
+        let playerConfig = {
+            appearance: client.character.appearance,
+            paperDoll: client.character.paperDoll,
+            key: entityKey,
+            stats: client.playerStats,
+            location: client.playerLocation,
+            _id: client.character._id
+        }
+
+        let newPlayer = new characters.ServerPlayer(playerConfig, this.collisionManager);
+        this.entities[entityKey] = newPlayer;
         this.lastEntityId++
         return newPlayer;
     }

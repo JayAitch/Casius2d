@@ -80,6 +80,7 @@ io.on('connect', function(client) {
     client.on('login',function(username,password){
         curr_username = username
         let playerStats = new PlayerStats(200,200, 0);
+        client.character = {};
         client.playerStats = playerStats;
         client.playerLocation = new PlayerLocation(0, {x:150,y:150})
         client.playerInventory = new invent.Inventory(inventories[0]);
@@ -167,7 +168,9 @@ function setupCharacter(client,username){
                             characterPromise2.then((chars2) => {
                                 //Do something with chars2
                                 console.log("Character made!");
-                                client.character = chars2[0].character
+                                //TODO: register appearance as animkey, plus/effect and base
+                                client.character.paperDoll = chars2[0].character.paperDoll;
+                                client.character.appearance = chars2[0].base // more in here later
                                 client.character._id = chars2[0]._id || randomInteger(0, 9999999); //temp
                                 return resolve(true);
                             })
@@ -178,13 +181,16 @@ function setupCharacter(client,username){
                         }
                     })
                 }else{
-                    client.character = char[0].character
+                    client.character.paperDoll = char[0].character.paperDoll;
+                    client.character.appearance = char[0].character.base;// more in here later
+                    // TODO: use as database doc key
                     client.character._id = char[0]._id || randomInteger(0, 9999999); //temp
                     return resolve(true)
                 }
             })
         }else{
-            client.character = players[0];
+            client.character.paperDoll = players[0].paperDoll;
+            client.character.appearance = players[0].base;// more in here later
             client.character._id =  randomInteger(0, 9999999); //temp
          //   console.log(client.character)
             return resolve(true)
@@ -215,7 +221,7 @@ global.testZoneJoin = function(clientID, playerLocation, zoneID, position){
 global.killPlayer = function(clientID, currentzoneID){
     let zone = ZONES[currentzoneID];
     let client = zone.zoneSender.clientLookup[clientID]
-    zone.physicsWorld.removeEntity(client.player.entityPos);
+    zone.physicsWorld.removeEntity(client.player.config.key);
 
     let testRespawn = setTimeout(function() {
         global.respawn(client);
