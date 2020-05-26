@@ -38,11 +38,12 @@ const roomManager = {
 class Room{
     constructor(roomID){
         this.id = roomID;
+        this.clientLookup = {};
     }
 
     join(client){
         client.join(this.id);
-        console.log("client joined room:" +this.id);
+        this.clientLookup[client.character._id] = client;
         this.notifyNewMember(client);
     }
 
@@ -50,6 +51,7 @@ class Room{
         client.leave(this.id, (client) =>{
             this.notifyMemberLeft(client)
         });
+        delete this.clientLookup[client.character._id];
     }
 
     broadcastMessage(client, hook, data){

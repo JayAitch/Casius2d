@@ -82,7 +82,7 @@ class GameScene extends Phaser.Scene {
         let myPlayer = this.mapEntities[this.playerID];
         console.log(myPlayer)
 
-         this.cameras.main.zoomTo(1.2,0);
+        this.cameras.main.zoomTo(1.2,0);
         this.cameras.main.startFollow(myPlayer.sprite);
 
         // set background color, so the sky is not black
@@ -98,13 +98,15 @@ class GameScene extends Phaser.Scene {
     }
 
 
-    loadMap(id){
+    loadMap(id) {
+        this.clearEnities();
         let key = MAPS[id];
-        const map = this.make.tilemap({ key: key });
+        const map = this.make.tilemap({key: key});
         const tileset = map.addTilesetImage("magecity", "tiles");
         const belowLayer = map.createStaticLayer("Ground Layer", tileset, 0, 0);
         const worldLayer = map.createStaticLayer("Below player", tileset, 0, 0);
         const aboveLayer = map.createStaticLayer("Above player", tileset, 0, 0);
+        aboveLayer.depth = tempAboveTileLayer;
     }
 
     getClosestItem(){
@@ -125,6 +127,7 @@ class GameScene extends Phaser.Scene {
 
     newItem(i,id,pos){
         let floorItem = this.add.sprite(pos.x, pos.y, "seeradish")
+        floorItem.z = itemLayer;
         this.floorItems[i] = floorItem;
         floorItem.anims.play(animations.seeradish.glint);
     }
@@ -146,13 +149,14 @@ class GameScene extends Phaser.Scene {
         }
     }
 
-    // clearEnities() {
-    //     let entityKeys = Object.keys(this.mapEntities);
-    //     entityKeys.forEach(function (entity) {
-    //         entity.destroy();
-    //     })
-    //     this.mapEntities = {};
-    // }
+    clearEnities() {
+        let entityKeys = Object.keys(this.mapEntities);
+        entityKeys.forEach( (entity)=> {
+            let mEntity = this.mapEntities[entity];
+            mEntity.destroy();
+        })
+        this.mapEntities = {};
+    }
 
     moveEntity(id, x, y, facing, state, health, mHealth){
         let entity = this.mapEntities[id];
@@ -170,13 +174,13 @@ class GameScene extends Phaser.Scene {
         let entity = this.mapEntities[id];
         if(entity) {
             entity.destroy();
-           // this.mapEntities.splice(id, 1);
+            // this.mapEntities.splice(id, 1);
             delete this.mapEntities[id];
         }
     }
 
     playerSpawn(id, x, y, facing, state, base, layers, health, mHealth){
-        this.newEntity(id, x, y, facing, state, base, layers, health, mHealt);
+        this.newEntity(id, x, y, facing, state, base, layers, health, mHealth);
     }
 
     update(){
@@ -197,7 +201,7 @@ class Controller{
         let rightKey = scene.input.keyboard.addKey("RIGHT");
         let upKey = scene.input.keyboard.addKey("UP");
         let downKey = scene.input.keyboard.addKey("DOWN");
-    //    let spaceKey = scene.input.keyboard.addKey("SPACE");
+        //    let spaceKey = scene.input.keyboard.addKey("SPACE");
         let spaceKey = scene.input.keyboard.addKey("SPACE");
         let ctrlKey = scene.input.keyboard.addKey("CTRL");
 
@@ -206,7 +210,7 @@ class Controller{
         ctrlKey.on('down', (event)=> {
             let itemID = scene.getClosestItem();
             if(itemID)
-            client.sender.pickupItem(itemID);
+                client.sender.pickupItem(itemID);
         });
 
         spaceKey.on('down', (event)=> {

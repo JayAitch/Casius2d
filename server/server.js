@@ -51,7 +51,7 @@ inventories ={
 
 
 class PlayerStats {
-    constructor(health, experience) {
+    constructor(health, experience, zone) {
         this.maxHealth = health;
         this.health = health;
         this.experience = experience;
@@ -59,14 +59,19 @@ class PlayerStats {
 
 }
 
-
+class PlayerLocation{
+    constructor(zone, pos){
+        this.zone = zone;
+        this.pos = pos;
+    }
+}
 
 
 
 let firstZone = new zoneManager.Zone(0);
 let secondZone = new zoneManager.Zone(1);
 
-const ZONES = {0:firstZone,1:secondZone}
+global.ZONES = {0:firstZone,1:secondZone}
 
 io.on('connect', function(client) {
 
@@ -74,14 +79,16 @@ io.on('connect', function(client) {
 
     client.on('login',function(username,password){
         curr_username = username
-        let playerStats = new PlayerStats(200,200);
+        let playerStats = new PlayerStats(200,200, 0);
+        client.character = {};
         client.playerStats = playerStats;
+        client.playerLocation = new PlayerLocation(0, {x:150,y:150})
         client.playerInventory = new invent.Inventory(inventories[0]);
         tryLogin(client, username, password); 
     });
 
     client.on('joinzone',function(data) {
-        tryJoinZone(client, curr_username, 0,{x:250,y:250});
+        firstJoin(client, curr_username, client.playerLocation);
 
         client.on('stop',function() {
             client.player.stop();
@@ -96,7 +103,8 @@ io.on('connect', function(client) {
         });
 
         client.on('pickup',function(id) {
-            client.zone.pickup(client, id);
+            let zone = ZONES[client.playerLocation.zone]
+            zone.pickup(client, id);
         });
     });
 
@@ -119,6 +127,9 @@ io.on('connect', function(client) {
 server.listen(PORT, function(){
     console.log('Listening on ' + server.address().port);
 });
+
+
+
 
 function tryLogin(client, username, password){
     /* If DB is disabled just emit login */
@@ -157,7 +168,10 @@ function setupCharacter(client,username){
                             characterPromise2.then((chars2) => {
                                 //Do something with chars2
                                 console.log("Character made!");
-                                client.character = chars2[0].character
+                                //TODO: register appearance as animkey, plus/effect and base
+                                client.character.paperDoll = chars2[0].character.paperDoll;
+                                client.character.appearance = chars2[0].base // more in here later
+                                client.character._id = chars2[0]._id || randomInteger(0, 9999999); //temp
                                 return resolve(true);
                             })
                         }else{
@@ -167,34 +181,47 @@ function setupCharacter(client,username){
                         }
                     })
                 }else{
-                    client.character = char[0].character
+                    client.character.paperDoll = char[0].character.paperDoll;
+                    client.character.appearance = char[0].character.base;// more in here later
+                    // TODO: use as database doc key
+                    client.character._id = char[0]._id || randomInteger(0, 9999999); //temp
                     return resolve(true)
                 }
             })
         }else{
-            client.character = players[0]
-            console.log(client.character)
+            client.character.paperDoll = players[0].paperDoll;
+            client.character.appearance = players[0].base;// more in here later
+            client.character._id =  randomInteger(0, 9999999); //temp
+         //   console.log(client.character)
             return resolve(true)
         }
 
     });
 }
 
-function tryJoinZone(client, username, zoneid, position){
+
+function firstJoin(client, username, playerLocation){
     console.log("Try join attempted")
-    if(client.zone)client.zone.leave(client);
-    let zone = ZONES[zoneid];
-    zone.join(client,position);                      
+    let zone = ZONES[playerLocation.zone];
+    zone.join(client, playerLocation.zone, undefined, client);
 }
 
-global.testZoneJoin =function(client, username, zoneid, position){
-    tryJoinZone(client, username, zoneid, position)
+
+
+function tryJoinZone(clientID, targetZoneID, playerLocation, position){
+    let zone = ZONES[targetZoneID];
+    zone.join(clientID, playerLocation, playerLocation.zone,undefined, position);
 }
 
-global.killPlayer = function(client){
-    let zoneid = client.playerStats.zone;
-    let zone = ZONES[zoneid];
-    zone.physicsWorld.removeEntity(client.player.entityPos);
+
+global.testZoneJoin = function(clientID, playerLocation, zoneID, position){
+    tryJoinZone(clientID, zoneID, playerLocation, position)
+}
+
+global.killPlayer = function(clientID, currentzoneID){
+    let zone = ZONES[currentzoneID];
+    let client = zone.zoneSender.clientLookup[clientID]
+    zone.physicsWorld.removeEntity(client.player.config.key);
 
     let testRespawn = setTimeout(function() {
         global.respawn(client);
