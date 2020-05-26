@@ -4,7 +4,7 @@ const PORT =process.env.SERVER_PORT;
 
 
 const server = require('http').createServer();
-const items = require('./items.js'); //consider converting
+const itms = require('./items.js'); //consider converting
 const zoneManager = require('./zone-manager.js')
 const invent = require('./inventory.js')
 const dbDisabled = true;
@@ -24,19 +24,19 @@ players = {
         base:"basecharacter",
         paperDoll:{
             HEAD: {
-                base: items.data.goldhelm,
+                base: items.goldhelm,
                 plus:6
             },
             BODY: {
-                base: items.data.jacket,
+                base: items.jacket,
                 plus:1
             },
             WEAPON: {
-                base: items.data.dspear,
+                base: items.dspear,
                 plus:1
             },
             OFFHAND: undefined,
-            LEGS: {base: items.data.goldlegs,
+            LEGS: {base: items.goldlegs,
                 plus: 1
             },
             BOOTS: undefined
@@ -45,7 +45,7 @@ players = {
 };
 
 inventories ={
-    0:[{id:0,quantity:1}]
+    0:[{id:items.seeradish.id,quantity:1}]
 }
 
 

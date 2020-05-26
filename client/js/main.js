@@ -12,7 +12,7 @@ const config = {
     dom: {
         createContainer: true
     },
-    scene: [BootScene, PreloadScene, LoginScene, GameScene, PaperDollScene],
+    scene: [BootScene, PreloadScene, LoginScene, GameScene, PaperDollScene,InventoryScene],
 };
 let game;
 const itemLayer = 5;

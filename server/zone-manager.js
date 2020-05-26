@@ -68,7 +68,8 @@ class ItemWorld{
     addItem(pos){
         let itemPos = this.lastItemId;
         let position = pos;
-        let newItem = {id:0,pos:position, quantity: 1};
+        //let newItem = {id:items.seeradish.id,pos:position, quantity: 1};//stubbed TODO: get this from the drop table
+        let newItem = {id:items.goldhelm.id,pos:position, quantity: 1, plus:5};//stubbed TODO: get this from the drop table
         this.floorItems[itemPos] = newItem;
 
         this.sender.notifyNewItem(itemPos, newItem);
@@ -129,10 +130,12 @@ class Zone{
         let item = this.itemWorld.canPickup(id, client.player.pos);
         if(!item) return;
 
-        let hasPickedUp =  client.playerInventory.addItem({id:item.id,quantity:item.quantity});
-
+        let hasPickedUp =  client.playerInventory.addItem(item);
+        // TODO: check pickup range serverrside (50)
         if(hasPickedUp){
-            let item = this.itemWorld.removeItem(id);
+            this.itemWorld.removeItem(id);
+            client.emit("myInventory", {inventory:client.playerInventory.inventoryItems,paperDoll: client.character.paperDoll });
+            console.log(client.playerInventory);
         }
     }
 
@@ -175,10 +178,11 @@ class ZoneSender{
         this.room.leave(client);
     }
 
-    initMessage(client, enities, items){
+    initMessage(client, enities, items) {
         client.emit("entityList", this.sendEntities(enities));
         client.emit("itemList", items);
-        client.emit("myPlayer", {id:client.player.config.key});
+        client.emit("myPlayer", {id: client.player.config.key});
+        client.emit("myInventory", {inventory:client.playerInventory.inventoryItems,paperDoll: client.character.paperDoll });
     }
 
     sendEntities(entites) {

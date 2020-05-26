@@ -36,6 +36,12 @@ class Receiver{
             this.gameScene.loadPlayerData(data.id);
         });
 
+
+        this.socket.on('myInventory',(data)=>{
+            this.gameScene.loadInventory(data);
+        });
+
+
         this.socket.on('entityList', (data)=>{
             // health is always blank here
             let keyList = Object.keys(data);
