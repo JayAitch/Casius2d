@@ -106,16 +106,22 @@ class Zone{
         }
     }
 
-    join(client, pos){
+    join(clientID, playerLocation, previousZoneID, client, newPosition){
+        if(previousZoneID != undefined){
+            let previousZone = ZONES[previousZoneID];
+            client = previousZone.leave(clientID);
+            playerLocation.pos = Object.assign({}, newPosition);
+        }
         this.zoneSender.subscribe(client);
-        client.zone = this;
-        this.addPlayerCharacter(client, pos);
+        this.addPlayerCharacter(client, playerLocation);
     }
 
-    leave(client){
+    leave(clientID){
+        let client = this.zoneSender.room.clientLookup[clientID];
         this.zoneSender.notifyEntityRemove(client.player.entityPos);
         this.zoneSender.unsubscribe(client);
-        this.physicsWorld.removeEntity(client.player.entityPos)
+        this.physicsWorld.removeEntity(client.player.entityPos);
+        return client;
     }
 
     pickup(client, id){
@@ -130,10 +136,9 @@ class Zone{
         }
     }
 
-    addPlayerCharacter(client, pos){
-        let newPlayer = this.physicsWorld.addPlayerCharacter(client, pos)
-
-        client.playerStats.zone = this.zoneID;
+    addPlayerCharacter(client, playerLocation){
+        let newPlayer = this.physicsWorld.addPlayerCharacter(client, playerLocation.pos)
+        client.playerLocation.zone = this.zoneID;
         client.player = newPlayer;
 
         this.zoneSender.notifyNewEntity(client, newPlayer, newPlayer.entityPos);
@@ -289,12 +294,9 @@ class PhysicsWorld{
 
     }
 
-    addPlayerCharacter(client, pos){
+    addPlayerCharacter(client){
         let entityPos = this.lastEntityId;
-        let newPos = JSON.parse(JSON.stringify(pos));
-        // need to remove client
-        console.log(client.character);
-        let newPlayer = new characters.ServerPlayer(newPos, client.character, this.collisionManager, client, entityPos, client.playerStats);
+        let newPlayer = new characters.ServerPlayer(client.character, this.collisionManager, entityPos, client.playerStats, client.playerLocation);
         this.entities[entityPos] = newPlayer;
         this.lastEntityId++
         return newPlayer;

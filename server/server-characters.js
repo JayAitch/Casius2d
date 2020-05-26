@@ -228,7 +228,7 @@ class BasicMob extends  DamageableCharacter{
 
 
 class ServerPlayer extends DamageableCharacter{
-    constructor(pos, playerConfig, collisionManager, client, entityPos, playerStats){
+    constructor(playerConfig, collisionManager, entityPos, playerStats, playerLocation){
         let animLayers = {base:playerConfig.base};
         let paperDoll = playerConfig.paperDoll;
         let layers = [];
@@ -253,7 +253,7 @@ class ServerPlayer extends DamageableCharacter{
 
         animLayers.layers = layers;
 
-        super(pos, animLayers, playerStats);
+        super(playerLocation.pos, animLayers, playerStats);
         this.width = 32;
         this.height = 32;
         let collider = this.createCollider(collisionManager);
@@ -264,9 +264,10 @@ class ServerPlayer extends DamageableCharacter{
             collider.collisionRegistration, // wrong this may change
             playerStats
             );
-        this.client = client; // remove??
-        this.entityPos = entityPos; // remove
+        this.clientID = playerConfig._id;
+        this.entityPos = entityPos;
         this.playerStats = playerStats;
+        this.playerLocation = playerLocation;
     }
 
     createCollider(collisionManager){
@@ -295,7 +296,7 @@ class ServerPlayer extends DamageableCharacter{
 
     kill() {
         // try change to is delete!!
-       // global.killPlayer(this.client);
+        //global.killPlayer(this.clientID, this.playerLocation.zone);
         this.isDelete = true;
         this.removeComponents();
     }
@@ -313,7 +314,7 @@ class ServerPlayer extends DamageableCharacter{
                 this.removeComponents();
                 let zoneTarget = other.zoneTarget;
                 let posTarget = other.posTarget;
-                global.testZoneJoin(this.client,"", zoneTarget, posTarget);
+                global.testZoneJoin(this.clientID, this.playerLocation, zoneTarget, posTarget);
                 break;
             case colliderTypes.ATTACKSCAN:
                 return this.takeDamage();
