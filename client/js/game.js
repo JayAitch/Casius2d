@@ -65,8 +65,8 @@ class GameScene extends Phaser.Scene {
     }
 
     create(){
-        this.scene.launch("paperdoll");
-        this.scene.launch("inventory");
+        this.scene.launch("paperdoll", this.client.sender);
+        this.scene.launch("inventory", this.client.sender);
         items = this.cache.json.get('items');
         this.controller = new Controller(this,this.client);
     }
@@ -165,7 +165,8 @@ class GameScene extends Phaser.Scene {
     loadInventory(items){
         let inv = this.scene.get("inventory")
         inv.items = items.inventory;
-        //pD.iems = items.paperDoll;
+        let pD = this.scene.get("paperdoll")
+        pD.items = items.paperDoll;
     }
 
 }

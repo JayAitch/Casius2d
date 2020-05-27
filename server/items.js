@@ -2,7 +2,7 @@ global.items  = {
     "goldhelm": {
         "id":"goldhelm",
         "animString" : "goldhelm",
-        "inventoryIcon": "goldHelm",
+        "inventoryIcon": "goldhelm",
         "slot": "HEAD"
     },
     "bronzehelm": {

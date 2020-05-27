@@ -119,6 +119,13 @@ class Sender{
     pickupItem(id){
         this.socket.emit('pickup', id);
     }
+
+    clickPaperDollSlot(slot){
+        this.socket.emit('clickPaperDoll', slot);
+    }
+    clickInventorySlot(slot){
+        this.socket.emit('clickInventorySlot', slot);
+    }
 }
 
 

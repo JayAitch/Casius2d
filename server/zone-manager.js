@@ -65,12 +65,22 @@ class ItemWorld{
         this.lastItemId = 0;
     }
 
-    addItem(pos){
+    addItem(pos,item){
         let itemPos = this.lastItemId;
         let position = pos;
-        //let newItem = {id:items.seeradish.id,pos:position, quantity: 1};//stubbed TODO: get this from the drop table
-        let newItem = {id:items.goldhelm.id,pos:position, quantity: 1, plus:5};//stubbed TODO: get this from the drop table
+        //
+         let newItem = {id:items.goldhelm.id,pos:position, quantity: 1, plus:5};//stubbed TODO: get this from the drop table
+        //
+
+        if(item){
+            newItem = JSON.parse(JSON.stringify(item));//stubbed TODO: get this from the drop table
+            newItem.pos = JSON.parse(JSON.stringify(pos));
+        }
+
         this.floorItems[itemPos] = newItem;
+        //let newItem = {id:items.seeradish.id,pos:position, quantity: 1};//stubbed TODO: get this from the drop table
+
+
 
         this.sender.notifyNewItem(itemPos, newItem);
         this.lastItemId++

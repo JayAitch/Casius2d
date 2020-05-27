@@ -44,10 +44,29 @@ players = {
     }
 };
 
+// inventories ={
+//     0:[{id:items.seeradish.id,quantity:1}]
+// }
 inventories ={
-    0:[{id:items.seeradish.id,quantity:1}]
+    0:[{id:items.seeradish.id,quantity:1},
+        {id:items.seeradish.id,quantity:1},
+        {id:items.seeradish.id,quantity:1},
+        {id:items.seeradish.id,quantity:1},
+        {id:items.seeradish.id,quantity:1},
+        {id:items.seeradish.id,quantity:1},
+        {id:items.seeradish.id,quantity:1},
+        {id:items.seeradish.id,quantity:1},
+        {id:items.seeradish.id,quantity:1},
+        {id:items.seeradish.id,quantity:1},
+        {id:items.seeradish.id,quantity:1},
+        {id:items.seeradish.id,quantity:1},
+        {id:items.seeradish.id,quantity:1},
+        {id:items.seeradish.id,quantity:1},
+        {id:items.seeradish.id,quantity:1},
+        {id:items.seeradish.id,quantity:1},
+        {id:items.seeradish.id,quantity:1},
+        {id:items.seeradish.id,quantity:1}]
 }
-
 
 
 class PlayerStats {
@@ -105,6 +124,40 @@ io.on('connect', function(client) {
         client.on('pickup',function(id) {
             let zone = ZONES[client.playerLocation.zone]
             zone.pickup(client, id);
+        });
+
+        client.on('clickPaperDoll',function(slot) {
+            //TEMP/////
+            let slotItem = client.character.paperDoll[slot];
+            let item;
+            if(slotItem){
+                let item = {id:slotItem.base.id , plus:slotItem.base.plus}
+
+                if(item){
+                    let didAdd = client.playerInventory.addItem(item);
+                    if(didAdd) client.character.paperDoll[slot] = undefined;//temp
+                }
+
+
+                console.log("removing" + slot);
+                client.emit("myInventory", {inventory:client.playerInventory.inventoryItems,paperDoll: client.character.paperDoll });//temp
+            }
+
+        });
+
+        client.on('clickInventorySlot',function(slot) {
+            //TEMP/////
+            console.log("removing" + slot);
+            let item = client.playerInventory.removeItem(slot); //temp
+
+
+            // TODO: item in inventory doesnt have a slot!!
+            console.log(item.base);
+            client.emit("myInventory", {inventory:client.playerInventory.inventoryItems,paperDoll: client.character.paperDoll });//temp
+            let zone = ZONES[client.playerLocation.zone];
+
+            console.log(item)
+            zone.itemWorld.addItem(client.playerLocation.pos, item);
         });
     });
 
