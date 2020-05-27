@@ -1,3 +1,8 @@
+
+global.slotActions = {"EQUIPT":"EQUIPT","DROP":"DROP","CLICK":"CLICK"}
+
+
+
 class Inventory{
     constructor(invent) {
         this.inventoryItems = JSON.parse(JSON.stringify(invent));
@@ -7,17 +12,152 @@ class Inventory{
     addItem(item){
         if(this.inventoryItems.length >= this.maxSize) return false;
         this.inventoryItems.push(item);
-        console.log(item);
         delete item.pos
 
         return true;
     }
     removeItem(pos){
-        //let item = this.inventoryItems.splice(pos, 1); //temp
         let item = this.inventoryItems[pos];
-        //console.log(this.inventoryItems)
+        this.inventoryItems.splice(pos, 1);
         return item;
+    }
+    getItem(slot){
+        return this.inventoryItems[slot];
     }
 }
 
-module.exports = {Inventory};
+class PaperDoll{
+
+    constructor(paperDoll) {
+        this.equipment = JSON.parse(JSON.stringify(paperDoll));
+    }
+
+    addItem(key, item){
+        //TODO: check requirements
+        let oldItem = this.equipment[key];
+        let newItem = items[item.id];
+
+        //TODO:generalise these, this will be wrong for drops!!
+        let equipmentItem = {
+            base:{
+                id: newItem.id,
+                animString: newItem.animString,
+                inventoryIcon: newItem.inventoryIcon,
+                slot: newItem.slot
+            },
+            plus: item.plus
+        }
+        this.equipment[key] = equipmentItem;
+        delete item.pos
+
+        return oldItem;
+    }
+
+    removeItem(key){
+        //let item = this.inventoryItems.splice(pos, 1); //temp
+        let item = this.equipment[key];
+        delete this.equipment[key];
+        return item;
+    }
+    //
+    // actOnSlot(action, key, item){
+    //     switch (action) {
+    //         case slotActions.REMOVE:
+    //             return this.removeItem(key);
+    //             break;
+    //         case slotActions.ADD:
+    //             return this.addItem(key, item);
+    //             break;
+    //     }
+    //
+    // }
+}
+
+class InventoryManager{
+    constructor(inventory, paperDoll){
+        this.inv = new Inventory(inventory);
+        this.ppD = new PaperDoll(paperDoll);;
+    }
+
+    get paperDoll(){
+        return this.ppD.equipment;
+    }
+
+    get inventory(){
+        return this.inv.inventoryItems;
+    }
+    get message(){
+        return {inventory: this.inventory, paperDoll: this.paperDoll};
+    }
+
+    equiptItem(key, item){
+        // todo: check item key
+
+        let removedItem = this.ppD.removeItem(key);
+        if(removedItem){
+            let inventVersion = {
+                id:removedItem.base.id,
+                slot: removedItem.base.slot,
+                plus: removedItem.plus
+            }
+            // doesnt check invent space!!
+            this.inv.addItem(inventVersion);
+        }
+        this.ppD.addItem(key, item);
+        return removedItem;
+    }
+
+    unequiptItem(key){
+        let removedItem = this.ppD.removeItem(key);
+        if(removedItem){
+            // this needs fixing - potentially change to a lookup clientside
+            let inventVersion = {
+                id:removedItem.base.id,
+                slot: removedItem.base.slot,
+                plus: removedItem.plus
+            }
+            // doesnt check invent space!!
+            this.inv.addItem(inventVersion);
+            this.ppD.removeItem(key);
+        }
+        return removedItem;
+    }
+
+    dropItem(slot){
+        let item = this.inv.removeItem(slot);
+        return item;//this needs adding to item world
+    }
+
+
+
+    actOnPaperDollSlot(action, key, item) {
+        switch (action) {
+            case slotActions.CLICK:
+                this.unequiptItem(key);
+                break;
+        }
+    }
+
+
+
+    actOnInventorySlot(action, slot) {
+        switch (action) {
+            case slotActions.EQUIPT:
+                let clickedItem = this.inv.getItem(slot);
+                if(clickedItem && clickedItem.slot) {
+                    this.equiptItem(clickedItem.slot, clickedItem);
+                    this.inv.removeItem(slot);
+                }
+                break;
+            case slotActions.DROP:
+                let dropItem = this.inv.getItem(slot)
+                if(dropItem) {
+                    this.inv.removeItem(slot);
+                    // add to world somehow
+                }
+                break;
+        }
+    }
+
+}
+module.exports = {InventoryManager};

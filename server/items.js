@@ -49,7 +49,8 @@ global.items  = {
     },
     "seeradish": {
         "id":"seeradish",
-        "inventoryIcon": "seeradish"
+        "inventoryIcon": "seeradish",
+        "stack-size": 999
     }
 };
 

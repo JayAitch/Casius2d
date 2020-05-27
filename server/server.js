@@ -24,8 +24,8 @@ players = {
         base:"basecharacter",
         paperDoll:{
             HEAD: {
-                base: items.goldhelm,
-                plus:6
+                base: items.bronzehelm,
+                plus:0
             },
             BODY: {
                 base: items.jacket,
@@ -49,23 +49,8 @@ players = {
 // }
 inventories ={
     0:[{id:items.seeradish.id,quantity:1},
-        {id:items.seeradish.id,quantity:1},
-        {id:items.seeradish.id,quantity:1},
-        {id:items.seeradish.id,quantity:1},
-        {id:items.seeradish.id,quantity:1},
-        {id:items.seeradish.id,quantity:1},
-        {id:items.seeradish.id,quantity:1},
-        {id:items.seeradish.id,quantity:1},
-        {id:items.seeradish.id,quantity:1},
-        {id:items.seeradish.id,quantity:1},
-        {id:items.seeradish.id,quantity:1},
-        {id:items.seeradish.id,quantity:1},
-        {id:items.seeradish.id,quantity:1},
-        {id:items.seeradish.id,quantity:1},
-        {id:items.seeradish.id,quantity:1},
-        {id:items.seeradish.id,quantity:1},
-        {id:items.seeradish.id,quantity:1},
-        {id:items.seeradish.id,quantity:1}]
+        {id:items.goldhelm.id,quantity:1, plus:6, slot:"HEAD"}
+ ]
 }
 
 
@@ -102,7 +87,7 @@ io.on('connect', function(client) {
         client.character = {};
         client.playerStats = playerStats;
         client.playerLocation = new PlayerLocation(0, {x:150,y:150})
-        client.playerInventory = new invent.Inventory(inventories[0]);
+        client.character.invent = {};
         tryLogin(client, username, password); 
     });
 
@@ -126,38 +111,48 @@ io.on('connect', function(client) {
             zone.pickup(client, id);
         });
 
-        client.on('clickPaperDoll',function(slot) {
-            //TEMP/////
-            let slotItem = client.character.paperDoll[slot];
-            let item;
-            if(slotItem){
-                let item = {id:slotItem.base.id , plus:slotItem.base.plus}
-
-                if(item){
-                    let didAdd = client.playerInventory.addItem(item);
-                    if(didAdd) client.character.paperDoll[slot] = undefined;//temp
-                }
-
-
-                console.log("removing" + slot);
-                client.emit("myInventory", {inventory:client.playerInventory.inventoryItems,paperDoll: client.character.paperDoll });//temp
-            }
+        client.on('clickPaperDoll',function(data) {
+            let slot = data.slot;
+            let action = data.action;
+            client.character.invent.actOnPaperDollSlot(slotActions.CLICK, slot);
+            client.emit("myInventory", client.character.invent.message);
+            // client.character.invent
+            // //TEMP/////
+            // let slotItem = client.character.paperDoll.equipment[slot];
+            // let item;
+            // if(slotItem){
+            //     let item = {id:slotItem.base.id , plus:slotItem.plus}
+            //
+            //     if(item){
+            //         let didAdd = client.playerInventory.addItem(item);
+            //         if(didAdd) client.character.paperDoll.equipment[slot] = undefined;//temp
+            //     }
+            //
+            //
+            //     console.log("removing" + slot);
+            //     client.emit("myInventory", {inventory:client.character.invent.inventory, paperDoll: client.character.invent.paperDoll});//temp
+            //     console.log(client.playerInventory);
+            // }
 
         });
 
-        client.on('clickInventorySlot',function(slot) {
-            //TEMP/////
-            console.log("removing" + slot);
-            let item = client.playerInventory.removeItem(slot); //temp
-
-
-            // TODO: item in inventory doesnt have a slot!!
-            console.log(item.base);
-            client.emit("myInventory", {inventory:client.playerInventory.inventoryItems,paperDoll: client.character.paperDoll });//temp
-            let zone = ZONES[client.playerLocation.zone];
-
-            console.log(item)
-            zone.itemWorld.addItem(client.playerLocation.pos, item);
+        client.on('clickInventorySlot',function(data) {
+            let slot = data.slot;
+            let action = slotActions[data.action];
+            client.character.invent.actOnInventorySlot(action, slot);
+            client.emit("myInventory", client.character.invent.message);
+            // //TEMP/////
+            // console.log("removing" + slot);
+            // let item = client.playerInventory.removeItem(slot); //temp
+            //
+            //
+            // // TODO: item in inventory doesnt have a slot!!
+            // console.log(item.base);
+            // client.emit("myInventory", {inventory:client.character.invent.inventory, paperDoll: client.character.invent.paperDoll});//temp
+            // let zone = ZONES[client.playerLocation.zone];
+            //
+            // console.log(item)
+            // zone.itemWorld.addItem(client.playerLocation.pos, item);
         });
     });
 
@@ -222,7 +217,7 @@ function setupCharacter(client,username){
                                 //Do something with chars2
                                 console.log("Character made!");
                                 //TODO: register appearance as animkey, plus/effect and base
-                                client.character.paperDoll = chars2[0].character.paperDoll;
+                                //client.character.paperDoll = new invent.paperDoll(chars2[0].character.paperDoll);
                                 client.character.appearance = chars2[0].base // more in here later
                                 client.character._id = chars2[0]._id || randomInteger(0, 9999999); //temp
                                 return resolve(true);
@@ -234,7 +229,7 @@ function setupCharacter(client,username){
                         }
                     })
                 }else{
-                    client.character.paperDoll = char[0].character.paperDoll;
+                    //client.character.paperDoll = new invent.paperDoll(char[0].character.paperDoll);
                     client.character.appearance = char[0].character.base;// more in here later
                     // TODO: use as database doc key
                     client.character._id = char[0]._id || randomInteger(0, 9999999); //temp
@@ -242,7 +237,10 @@ function setupCharacter(client,username){
                 }
             })
         }else{
-            client.character.paperDoll = players[0].paperDoll;
+
+            let invManager = new invent.InventoryManager(inventories[0], players[0].paperDoll);
+
+            client.character.invent = invManager; //paperDoll = new invent.PaperDoll(players[0].paperDoll);
             client.character.appearance = players[0].base;// more in here later
             client.character._id =  randomInteger(0, 9999999); //temp
          //   console.log(client.character)

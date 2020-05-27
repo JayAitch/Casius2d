@@ -120,11 +120,11 @@ class Sender{
         this.socket.emit('pickup', id);
     }
 
-    clickPaperDollSlot(slot){
-        this.socket.emit('clickPaperDoll', slot);
+    clickPaperDollSlot(slot,action){
+        this.socket.emit('clickPaperDoll', {slot: slot, action: action});
     }
-    clickInventorySlot(slot){
-        this.socket.emit('clickInventorySlot', slot);
+    clickInventorySlot(slot, action){
+        this.socket.emit('clickInventorySlot', {slot: slot, action: action});
     }
 }
 

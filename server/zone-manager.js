@@ -144,7 +144,7 @@ class Zone{
         // TODO: check pickup range serverrside (50)
         if(hasPickedUp){
             this.itemWorld.removeItem(id);
-            client.emit("myInventory", {inventory:client.playerInventory.inventoryItems,paperDoll: client.character.paperDoll });
+            client.emit("myInventory", {inventory:client.character.invent.inventory, paperDoll: client.character.invent.paperDoll})
             console.log(client.playerInventory);
         }
     }
@@ -192,7 +192,7 @@ class ZoneSender{
         client.emit("entityList", this.sendEntities(enities));
         client.emit("itemList", items);
         client.emit("myPlayer", {id: client.player.config.key});
-        client.emit("myInventory", {inventory:client.playerInventory.inventoryItems,paperDoll: client.character.paperDoll });
+        client.emit("myInventory", {inventory:client.character.invent.inventory,paperDoll: client.character.invent.paperDoll });
     }
 
     sendEntities(entites) {
@@ -312,7 +312,7 @@ class PhysicsWorld{
         let entityKey = this.lastEntityId;
         let playerConfig = {
             appearance: client.character.appearance,
-            paperDoll: client.character.paperDoll,
+            paperDoll: client.character.invent.paperDoll,
             key: entityKey,
             stats: client.playerStats,
             location: client.playerLocation,

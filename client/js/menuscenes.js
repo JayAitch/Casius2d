@@ -36,7 +36,6 @@ class LoginScene extends  Phaser.Scene {
 
 
     loggedIn(data){
-        console.log("logged in" + data);
         let mainGameScene = this.scene.start('maingame',{ socket: this.client.socket });
     }
 }
@@ -83,6 +82,7 @@ class PaperDoll{
         this.slotX = x;
         this.startX = x;
         this.createRow(this.slotKeys);
+
     }
 
     set items(items) {
@@ -91,7 +91,6 @@ class PaperDoll{
         let ppdKeys = Object.keys(this.paperDollSlots);
         ppdKeys.forEach(ppdKey => {
             let item = items[ppdKey];
-            console.log(item);
             let slot = this.paperDollSlots[ppdKey]
             slot.item = item;
             slotInc++;
@@ -111,35 +110,137 @@ class PaperDoll{
 }
 
 
+class ActionsList{
+    constructor(scene) {
+        this.slotWidth = 100
+        this.slotHeight = 50;
+        this.exSize = 30;
+        this.x = 400;
+        this.y =400;
+        this.itemOffset = 0;
+        this.scene = scene;
+        this.zones = [];
+        this.graphics = [];
+
+        //gameObject.disableInteractive();
+    }
+
+    set actions(actionsList){
+        this.cleanUp();
+
+        let ex = new Phaser.Geom.Rectangle(
+            this.x - this.exSize,
+            this.y - this.exSize,
+            this.exSize,
+            this.exSize
+        );
+
+        let graphics = this.scene.add.graphics({ fillStyle: { color: 0xffffff,alpha:0.5 } });
+        let exZone = this.scene.add.zone(
+            this.x - this.exSize/2,
+            this.y- this.exSize/2,
+            this.exSize,
+            this.exSize
+        );
+
+        this.zones.push(exZone);
+        this.graphics.push(graphics);
+        this.itemOffset += this.slotHeight + 2
+        graphics.fillRectShape(ex);
+        exZone.setInteractive().on('pointerdown', ()=>{
+            this.closeActionList();
+        })
+
+
+        actionsList.forEach((action)=>{
+
+            let rect = new Phaser.Geom.Rectangle(
+                this.x - this.slotWidth/2,
+                this.y - this.slotHeight/2 + this.itemOffset,
+                this.slotWidth,
+                this.slotHeight
+            );
+
+            let graphics = this.scene.add.graphics({ fillStyle: { color: 0xffffff,alpha:0.5 } });
+            let zone = this.scene.add.zone(
+                this.x,
+                this.y + this.itemOffset,
+                this.slotWidth,
+                this.slotHeight
+            );
+            this.zones.push(zone);
+            this.graphics.push(graphics);
+            this.itemOffset += this.slotHeight + 2
+            graphics.fillRectShape(rect);
+            zone.setInteractive().on('pointerdown', ()=>{
+                this.handleAction(action);
+            })
+        })
+    }
+    closeActionList(){
+        this.cleanUp();
+    }
+    cleanUp(){
+        this.graphics.forEach((graphic)=>{
+            graphic.clear();
+            //zone.disableInteractive();
+        })
+
+
+        this.zones.forEach((zone)=>{
+            zone.removeInteractive();
+            //zone.disableInteractive();
+        })
+        this.itemOffset = 0;
+    }
+
+    setCallBack(callback){
+        this.clickTarget = callback;
+        console.log(callback);
+    }
+
+
+    set callBack(val){
+        this.clickTarget = val;
+        console.log(this.clickTarget);
+    }
+
+    handleAction(action){
+        this.clickTarget(action);
+    }
+}
+
 let slotSize = 45;
 let slotMargin = 3
 
 class InventorySlot{
-    constructor(scene,inventory,slot, x,y, clickHandler){
+    constructor(scene,inventory,slot, x,y, clickHandler) {
         this.scene = scene;
         this.slot = slot;
-        this.inventory =  inventory;
-        this.sprite = scene.add.image(x,y);
+        this.inventory = inventory;
+        this.sprite = scene.add.image(x, y);
         this.sprite.depth = UILayer
         this.clickHandler = clickHandler;
-        let rect = new Phaser.Geom.Rectangle(x -slotSize/2, y - slotSize/2, slotSize, slotSize);
+        let rect = new Phaser.Geom.Rectangle(x - slotSize / 2, y - slotSize / 2, slotSize, slotSize);
 
-        let graphics = scene.add.graphics({ fillStyle: { color: 0xffffff,alpha:0.5 } });
+        let graphics = scene.add.graphics({fillStyle: {color: 0xffffff, alpha: 0.5}});
         let zone = scene.add.zone(x, y, slotSize, slotSize);
         graphics.fillRectShape(rect);
-        zone.setInteractive().on('pointerdown', ()=>{this.clickSlot()})
-
+        zone.setInteractive().on('pointerdown', () => {
+            this.clickSlot();
+        })
     }
+
     set amount(val){
      //   console.log(val);
     }
     set item(val){
+        this.slottedItem = val;
         if(val === undefined){
             this.sprite.setTexture();
         }else{
             this.sprite.setTexture(val.id ||val.base.inventoryIcon);
         }
-
     }
     clickSlot(param){
         this.clickHandler(this.slot);
@@ -159,6 +260,7 @@ class ClientInventory{
         this.slotCount = 0;
         this.scene = scene;
         this.slotClickHandler = slotClickHandler;
+
         for(let i = 0; i < row; i++){
             let columnCount = slots / row;
             this.createRow(columnCount);
@@ -211,6 +313,7 @@ class ClientInventory{
 class InventoryScene extends  Phaser.Scene {
     constructor() {
         super({key: 'inventory'});
+        this.actionsList = new ActionsList(this);
 
     }
 
@@ -228,6 +331,12 @@ class InventoryScene extends  Phaser.Scene {
     }
 
     clickSlot(slot){
-        this.sender.clickInventorySlot(slot);
+        this.actionsList.actions = ["EQUIPT", "DROP"];
+        // maybe get actions from item?
+        this.actionsList.setCallBack((action)=>{
+            this.sender.clickInventorySlot(slot, action);
+            this.actionsList.cleanUp();
+        });
+
     }
 }
