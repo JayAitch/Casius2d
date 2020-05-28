@@ -91,6 +91,7 @@ class GameScene extends Phaser.Scene {
         itemkeys.forEach((key)=>{
             let item = this.floorItems[key]
             let distance = Phaser.Math.Distance.Between(item.x,item.y,myPlayer.pos.x,myPlayer.pos.y);
+            // soft check, this is also done serverside
             if(distance < pickupRange){
                 itemKey = key;
             }
@@ -99,9 +100,9 @@ class GameScene extends Phaser.Scene {
     }
 
 
-    newItem(i,id,pos){
-        let floorItem = this.add.sprite(pos.x, pos.y, id)
-        floorItem.z = itemLayer;
+    newItem(i,item,pos){
+        let floorItem = this.add.sprite(pos.x, pos.y, item.id)
+        floorItem.depth = itemLayer;
         this.floorItems[i] = floorItem;
     }
 

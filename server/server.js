@@ -44,15 +44,11 @@ players = {
     }
 };
 
-// inventories ={
-//     0:[{id:items.seeradish.id,quantity:1}]
-// }
 inventories ={
-    0:[{id:items.seeradish.id,quantity:1},
-        {id:items.goldhelm.id,quantity:1, plus:6, slot:"HEAD"}
- ]
+    0:[{base:items.seeradish,quantity:1, plus:0},
+        {base:items.goldhelm,quantity:1, plus:6}
+    ]
 }
-
 
 class PlayerStats {
     constructor(health, experience, zone) {
@@ -107,52 +103,24 @@ io.on('connect', function(client) {
         });
 
         client.on('pickup',function(id) {
-            let zone = ZONES[client.playerLocation.zone]
+            let zone = ZONES[client.playerLocation.zone];
             zone.pickup(client, id);
         });
 
         client.on('clickPaperDoll',function(data) {
             let slot = data.slot;
-            let action = data.action;
+            let action = data.action; //TODO: use messaging action
             client.character.invent.actOnPaperDollSlot(slotActions.CLICK, slot);
             client.emit("myInventory", client.character.invent.message);
-            // client.character.invent
-            // //TEMP/////
-            // let slotItem = client.character.paperDoll.equipment[slot];
-            // let item;
-            // if(slotItem){
-            //     let item = {id:slotItem.base.id , plus:slotItem.plus}
-            //
-            //     if(item){
-            //         let didAdd = client.playerInventory.addItem(item);
-            //         if(didAdd) client.character.paperDoll.equipment[slot] = undefined;//temp
-            //     }
-            //
-            //
-            //     console.log("removing" + slot);
-            //     client.emit("myInventory", {inventory:client.character.invent.inventory, paperDoll: client.character.invent.paperDoll});//temp
-            //     console.log(client.playerInventory);
-            // }
-
         });
 
         client.on('clickInventorySlot',function(data) {
             let slot = data.slot;
             let action = slotActions[data.action];
-            client.character.invent.actOnInventorySlot(action, slot);
+            let zone = ZONES[client.playerLocation.zone];
+            let playerPos = client.playerLocation.pos;
+            client.character.invent.actOnInventorySlot(action, slot, zone, playerPos);
             client.emit("myInventory", client.character.invent.message);
-            // //TEMP/////
-            // console.log("removing" + slot);
-            // let item = client.playerInventory.removeItem(slot); //temp
-            //
-            //
-            // // TODO: item in inventory doesnt have a slot!!
-            // console.log(item.base);
-            // client.emit("myInventory", {inventory:client.character.invent.inventory, paperDoll: client.character.invent.paperDoll});//temp
-            // let zone = ZONES[client.playerLocation.zone];
-            //
-            // console.log(item)
-            // zone.itemWorld.addItem(client.playerLocation.pos, item);
         });
     });
 
@@ -289,4 +257,12 @@ global.respawn = function(client){
 
 global.randomInteger = function(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+global.distance = function(pointA, pointB){
+    let a = pointA.x - pointB.x;
+    let b = pointA.y - pointB.y;
+
+    let c = Math.sqrt( a*a + b*b );
+    return c;
 }

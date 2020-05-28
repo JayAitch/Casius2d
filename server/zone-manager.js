@@ -68,9 +68,7 @@ class ItemWorld{
     addItem(pos,item){
         let itemPos = this.lastItemId;
         let position = pos;
-        //
-         let newItem = {id:items.goldhelm.id,pos:position, quantity: 1, plus:5};//stubbed TODO: get this from the drop table
-        //
+        let newItem = {base:items.goldhelm, pos:position, quantity: 1, plus:5};//stubbed TODO: get this from the drop table
 
         if(item){
             newItem = JSON.parse(JSON.stringify(item));//stubbed TODO: get this from the drop table
@@ -79,8 +77,6 @@ class ItemWorld{
 
         this.floorItems[itemPos] = newItem;
         //let newItem = {id:items.seeradish.id,pos:position, quantity: 1};//stubbed TODO: get this from the drop table
-
-
 
         this.sender.notifyNewItem(itemPos, newItem);
         this.lastItemId++
@@ -95,7 +91,12 @@ class ItemWorld{
 
     canPickup(id,position){
         let item = this.floorItems[id];
-        return item;
+        if(item){
+            let itemDistance = distance(item.pos, position);
+            if(itemDistance < 50) return item;
+
+        }
+
     }
 }
 
@@ -140,12 +141,11 @@ class Zone{
         let item = this.itemWorld.canPickup(id, client.player.pos);
         if(!item) return;
 
-        let hasPickedUp =  client.playerInventory.addItem(item);
+        let hasPickedUp =  client.character.invent.pickupItem(item);
         // TODO: check pickup range serverrside (50)
         if(hasPickedUp){
             this.itemWorld.removeItem(id);
-            client.emit("myInventory", {inventory:client.character.invent.inventory, paperDoll: client.character.invent.paperDoll})
-            console.log(client.playerInventory);
+            client.emit("myInventory",client.character.invent.message)
         }
     }
 
@@ -175,8 +175,7 @@ class ZoneSender{
     }
 
     notifyNewItem(key,newItem){
-        let nItem = {key:key, id:newItem.id, pos: newItem.pos, quantity:1}
-        this.room.roomMessage('newItem', nItem);
+        this.room.roomMessage('newItem', {key:key,item:newItem});
     }
 
     subscribe(client){

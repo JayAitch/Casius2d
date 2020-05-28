@@ -35,19 +35,7 @@ class PaperDoll{
     addItem(key, item){
         //TODO: check requirements
         let oldItem = this.equipment[key];
-        let newItem = items[item.id];
-
-        //TODO:generalise these, this will be wrong for drops!!
-        let equipmentItem = {
-            base:{
-                id: newItem.id,
-                animString: newItem.animString,
-                inventoryIcon: newItem.inventoryIcon,
-                slot: newItem.slot
-            },
-            plus: item.plus
-        }
-        this.equipment[key] = equipmentItem;
+        this.equipment[key] = item;
         delete item.pos
 
         return oldItem;
@@ -84,24 +72,31 @@ class InventoryManager{
     }
 
     get inventory(){
+
         return this.inv.inventoryItems;
     }
     get message(){
         return {inventory: this.inventory, paperDoll: this.paperDoll};
     }
+    pickupItem(item){
 
+        // let invItem = {
+        //     base: items[item.id],
+        //     plus: item.plus,
+        //     quantity: item.quantity
+        // }
+        // TODO: add to paperdoll first
+        return this.inv.addItem(item);
+    }
     equiptItem(key, item){
         // todo: check item key
 
         let removedItem = this.ppD.removeItem(key);
+        console.log(removedItem);
         if(removedItem){
-            let inventVersion = {
-                id:removedItem.base.id,
-                slot: removedItem.base.slot,
-                plus: removedItem.plus
-            }
+            //todo:
             // doesnt check invent space!!
-            this.inv.addItem(inventVersion);
+            this.inv.addItem(removedItem);
         }
         this.ppD.addItem(key, item);
         return removedItem;
@@ -110,14 +105,8 @@ class InventoryManager{
     unequiptItem(key){
         let removedItem = this.ppD.removeItem(key);
         if(removedItem){
-            // this needs fixing - potentially change to a lookup clientside
-            let inventVersion = {
-                id:removedItem.base.id,
-                slot: removedItem.base.slot,
-                plus: removedItem.plus
-            }
             // doesnt check invent space!!
-            this.inv.addItem(inventVersion);
+            this.inv.addItem(removedItem);
             this.ppD.removeItem(key);
         }
         return removedItem;
@@ -140,20 +129,21 @@ class InventoryManager{
 
 
 
-    actOnInventorySlot(action, slot) {
+    actOnInventorySlot(action, slot, zone, pos) {
         switch (action) {
             case slotActions.EQUIPT:
                 let clickedItem = this.inv.getItem(slot);
-                if(clickedItem && clickedItem.slot) {
-                    this.equiptItem(clickedItem.slot, clickedItem);
+                console.log(clickedItem);
+                if(clickedItem && clickedItem.base.slot) {
+                    this.equiptItem(clickedItem.base.slot, clickedItem);
                     this.inv.removeItem(slot);
                 }
                 break;
             case slotActions.DROP:
                 let dropItem = this.inv.getItem(slot)
                 if(dropItem) {
-                    this.inv.removeItem(slot);
-                    // add to world somehow
+                    let item = this.inv.removeItem(slot);
+                    zone.itemWorld.addItem(pos, item);
                 }
                 break;
         }
