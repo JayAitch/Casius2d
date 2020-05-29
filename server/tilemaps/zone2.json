@@ -4,7 +4,7 @@
   "name":"World Objects",
   "objects":[
     {
-      "height":111.333333333333,
+      "height":101.999666666667,
       "id":16,
       "name":"",
       "properties":[
@@ -16,7 +16,7 @@
         {
           "name":"y",
           "type":"int",
-          "value":400
+          "value":486
         },
         {
           "name":"zone",
@@ -26,9 +26,9 @@
       "rotation":0,
       "type":"TRIGGER_ZONE_CHANGE",
       "visible":true,
-      "width":90,
-      "x":925.635,
-      "y":464.294
+      "width":47.3333333333334,
+      "x":897.635,
+      "y":461.627333333333
     },
     {
       "height":0,
@@ -174,17 +174,6 @@
 "name":"Boundry Object",
 "objects":[
 {
-"height":426,
-"id":1,
-"name":"",
-"rotation":0,
-"type":"NONPASSIBLE",
-"visible":true,
-"width":54,
-"x":926.762,
-"y":556.294
-},
-{
 "height":34,
 "id":2,
 "name":"",
@@ -218,15 +207,15 @@
 "y":-34
 },
 {
-"height":494,
+"height":1002,
 "id":5,
 "name":"",
 "rotation":0,
 "type":"NONPASSIBLE",
 "visible":true,
-"width":56,
-"x":925.341,
-"y":-10.5687
+"width":132,
+"x":945.341,
+"y":-35.9020333333333
 }],
 "opacity":1,
 "type":"objectgroup",

@@ -15,7 +15,7 @@ function getZoneData(zone){
 }
 
 
-ZONEMAPS= {0:"zone1.json",1:"zone2.json"}
+ZONEMAPS= {0:"zone1.json",1:"zone2.json", 2:"zone3.json"}
 
 function getWorldObjects(id){
     let worldData = getZoneData(id);

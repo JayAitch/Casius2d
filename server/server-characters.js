@@ -258,7 +258,7 @@ class ServerPlayer extends DamageableCharacter{
 
         this.config = playerConfig;
         this.width = 32;
-        this.height = 32;
+        this.height = 48;
         let collider = this.createCollider(collisionManager);
         // may need stats to calculate damage etc
         this.attackingComponent = new characterComponents.AttackingComponent(collisionManager,
@@ -269,9 +269,13 @@ class ServerPlayer extends DamageableCharacter{
             );
 
     }
+
+
     get entityPos(){
         return this.config.key;
     }
+
+
     createCollider(collisionManager){
         let colliderConfig = {
             width:this.width,
@@ -282,7 +286,8 @@ class ServerPlayer extends DamageableCharacter{
             callback: (other)=>{
                 return this.collisionCallback(other);
             },
-            type: colliderTypes.PLAYER
+            type: colliderTypes.PLAYER,
+            yOffset: 15
         }
         let collider = new characterComponents.ColliderComponent(collisionManager, colliderConfig)
         this.components.push(collider);

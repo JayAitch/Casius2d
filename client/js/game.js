@@ -19,20 +19,10 @@ class EquiptableItem extends Item{
         this.slot = slot
     }
 }
-let item = new EquiptableItem()
-equiptableItems = [];
-equiptableItems[0] = new EquiptableItem("goldhelm", "", "");
-equiptableItems[1] = new EquiptableItem("goldlegs");
-equiptableItems[2] = new EquiptableItem("leatherbelt");
-equiptableItems[3] = new EquiptableItem("jacket");
-equiptableItems[4] = new EquiptableItem("spear");
-equiptableItems[5] = new EquiptableItem("shield");
-equiptableItems[6] = new EquiptableItem("tspear");
-
 
 
 let items;
-let MAPS = {0:"map",1:"map2"}
+let MAPS = {0:"map",1:"map2", 2:"map3"}
 class GameScene extends Phaser.Scene {
     constructor() {
         super({key: 'maingame'});
@@ -53,7 +43,6 @@ class GameScene extends Phaser.Scene {
     loadPlayerData(id){
         this.playerID = id;
         let myPlayer = this.mapEntities[this.playerID];
-        console.log(myPlayer)
 
         this.cameras.main.zoomTo(1.2,0);
         this.cameras.main.startFollow(myPlayer.sprite);
@@ -74,13 +63,50 @@ class GameScene extends Phaser.Scene {
 
     loadMap(id) {
         this.clearEnities();
+        this.removeCurrentMap();
         let key = MAPS[id];
-        const map = this.make.tilemap({key: key});
+        let map = this.make.tilemap({key: key});
+        this.currentMap = map;
+
         const tileset = map.addTilesetImage("magecity", "tiles");
-        const belowLayer = map.createStaticLayer("Ground Layer", tileset, 0, 0);
-        const worldLayer = map.createStaticLayer("Below player", tileset, 0, 0);
-        const aboveLayer = map.createStaticLayer("Above player", tileset, 0, 0);
-        aboveLayer.depth = tempAboveTileLayer;
+        //TODO: cleanup layers
+        const groundLayer1 = map.createStaticLayer("ground_layer_1", tileset, 0, 0);
+        const groundLayer2 = map.createStaticLayer("ground_layer_2", tileset, 0, 0);
+        const groundLayer3 = map.createStaticLayer("ground_layer_3", tileset, 0, 0);
+
+        const belowLayer1 = map.createStaticLayer("below_player_1", tileset, 0, 0);
+        const belowLayer2 = map.createStaticLayer("below_player_2", tileset, 0, 0);
+
+        const aboveLayer1 = map.createStaticLayer("above_player_1", tileset, 0, 0);
+        const aboveLayer2 = map.createStaticLayer("above_player_2", tileset, 0, 0);
+        const aboveLayer3 = map.createStaticLayer("above_player_3", tileset, 0, 0);
+
+        // preserve for moving to dynamic layers if appropriote
+        // this.mapLayers["ground_layer_1"] = groundLayer1;
+        // this.mapLayers["ground_layer_2"] = groundLayer2;
+        // this.mapLayers["ground_layer_3"] = groundLayer3;
+        //
+        // this.mapLayers["below_player_1"] = belowLayer1;
+        // this.mapLayers["below_player_2"] = belowLayer2;
+        // this.mapLayers["below_player_3"] = belowLayer3;
+        //
+        // this.mapLayers["above_player_1"] = aboveLayer1;
+        // this.mapLayers["above_player_2"] = aboveLayer2;
+        // this.mapLayers["above_player_3"] = aboveLayer3;
+
+
+            //  const worldLayer = map.createStaticLayer("Below player", tileset, 0, 0);
+     //   const aboveLayer = map.createStaticLayer("Above player", tileset, 0, 0);
+
+
+        aboveLayer1.depth = tempAboveTileLayer;
+        aboveLayer2.depth = tempAboveTileLayer + 1;
+        aboveLayer3.depth = tempAboveTileLayer + 2;
+    }
+
+    removeCurrentMap() {
+        if(this.currentMap)
+            this.currentMap.destroy();
     }
 
     getClosestItem(){
@@ -113,7 +139,6 @@ class GameScene extends Phaser.Scene {
     }
 
 
-// change to json!!
     newEntity(id, x, y, facing, state, base, layers, health, mHealth){
         if(layers) {
             this.mapEntities[id] = new Player(this, {x: x, y: y}, facing, state, base, layers, health, mHealth);

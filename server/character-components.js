@@ -77,21 +77,20 @@ class ColliderComponent{
         this.collisionCallback = colliderConfig.callback;
         this.width = colliderConfig.width;
         this.height = colliderConfig.height;
-        this.pos = colliderConfig.pos;
+        this.basePos = colliderConfig.pos;
+        this.yOffset = colliderConfig.yOffset;
         this.type = colliderConfig.type;
         this.collisionRegistration = collisionManager.addCollider(colliderConfig.layer,this);
         this.interacts = colliderConfig.interacts;
         this.isDelete = false;
-        // this.remove = ()=>{
-        //     collisionManager.removeCollider(this.collisionRegistration);
-        // }
     }
 
     get x(){
-        return this.pos.x;
+        return this.basePos.x;
     }
     get y(){
-        return this.pos.y;
+        let offset = this.yOffset || 0;
+        return this.basePos.y + offset;
     }
 
     remove(){
@@ -102,7 +101,7 @@ class ColliderComponent{
         return this.collisionCallback(otherObj);
     }
     update(parent){
-        this.pos = parent.pos;//wrong
+        this.basePos = parent.pos;//wrong
     }
 }
 
