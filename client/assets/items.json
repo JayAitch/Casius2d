@@ -1,7 +1,7 @@
 {
   "goldhelm": {
     "animString" : "goldhelm",
-    "inventoryIcon": "goldHelm",
+    "inventoryIcon": "goldhelm",
     "slot": "HEAD"
   },
   "dspear": {
@@ -33,5 +33,9 @@
     "animString" : "spear",
     "inventoryIcon": "spear",
     "slot": "WEAPON"
+  },
+  "seeradish": {
+    "id":"seeradish",
+    "inventoryIcon": "seeradish"
   }
 }

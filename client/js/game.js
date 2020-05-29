@@ -30,33 +30,6 @@ equiptableItems[5] = new EquiptableItem("shield");
 equiptableItems[6] = new EquiptableItem("tspear");
 
 
-class PaperDollScene extends  Phaser.Scene {
-    constructor() {
-        super({key: 'paperdoll'});
-        this.slots = {"HEAD":"HEAD","BODY":"BODY","BELT":"BELT","LEGS":"LEGS", "BOOTS":"BOOTS", "WEAPON":"WEAPON", "OFFHAND":"OFFHAND"}
-    }
-
-    preload(){
-    }
-
-    create() {
-        this.paperDoll = this.add.dom(100, 600).createFromCache('paperdoll');
-        let node = this.paperDoll.node
-
-        let slots = node.querySelectorAll(".inventory_slot");
-        slots.forEach((slot)=>{
-            slot.addEventListener('click', (event)=>{
-                let slotName = this.slots[slot.getAttribute("slot")];
-                this.clickSlot(slotName);
-            });
-        });
-
-    }
-
-    clickSlot(slot){
-        console.log(slot);
-    }
-}
 
 let items;
 let MAPS = {0:"map",1:"map2"}
@@ -92,7 +65,8 @@ class GameScene extends Phaser.Scene {
     }
 
     create(){
-        this.scene.launch("paperdoll");
+        this.scene.launch("paperdoll", this.client.sender);
+        this.scene.launch("inventory", this.client.sender);
         items = this.cache.json.get('items');
         this.controller = new Controller(this,this.client);
     }
@@ -117,6 +91,7 @@ class GameScene extends Phaser.Scene {
         itemkeys.forEach((key)=>{
             let item = this.floorItems[key]
             let distance = Phaser.Math.Distance.Between(item.x,item.y,myPlayer.pos.x,myPlayer.pos.y);
+            // soft check, this is also done serverside
             if(distance < pickupRange){
                 itemKey = key;
             }
@@ -125,11 +100,10 @@ class GameScene extends Phaser.Scene {
     }
 
 
-    newItem(i,id,pos){
-        let floorItem = this.add.sprite(pos.x, pos.y, "seeradish")
-        floorItem.z = itemLayer;
+    newItem(i,item,pos){
+        let floorItem = this.add.sprite(pos.x, pos.y, item.id)
+        floorItem.depth = itemLayer;
         this.floorItems[i] = floorItem;
-        floorItem.anims.play(animations.seeradish.glint);
     }
 
     removeItem(id){
@@ -189,6 +163,12 @@ class GameScene extends Phaser.Scene {
         });
     }
 
+    loadInventory(items){
+        let inv = this.scene.get("inventory")
+        inv.items = items.inventory;
+        let pD = this.scene.get("paperdoll")
+        pD.items = items.paperDoll;
+    }
 
 }
 

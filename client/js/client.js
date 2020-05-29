@@ -36,6 +36,12 @@ class Receiver{
             this.gameScene.loadPlayerData(data.id);
         });
 
+
+        this.socket.on('myInventory',(data)=>{
+            this.gameScene.loadInventory(data);
+        });
+
+
         this.socket.on('entityList', (data)=>{
             // health is always blank here
             let keyList = Object.keys(data);
@@ -112,6 +118,13 @@ class Sender{
     }
     pickupItem(id){
         this.socket.emit('pickup', id);
+    }
+
+    clickPaperDollSlot(slot,action){
+        this.socket.emit('clickPaperDoll', {slot: slot, action: action});
+    }
+    clickInventorySlot(slot, action){
+        this.socket.emit('clickInventorySlot', {slot: slot, action: action});
     }
 }
 
