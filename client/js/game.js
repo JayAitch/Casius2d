@@ -69,7 +69,7 @@ class GameScene extends Phaser.Scene {
         let map = this.make.tilemap({key: key});
         this.currentMap = map;
 
-        const tileset = map.addTilesetImage("magecity", "tiles");
+        const tileset = map.addTilesetImage("magecity", "tiles-extruded",32,32,1,2);
         //TODO: cleanup layers
         const groundLayer1 = map.createStaticLayer("ground_layer_1", tileset, 0, 0);
         const groundLayer2 = map.createStaticLayer("ground_layer_2", tileset, 0, 0);

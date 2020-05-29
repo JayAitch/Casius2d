@@ -173,11 +173,11 @@ class DamageableCharacter extends MovingGameObject {
 class BasicMob extends  DamageableCharacter{
 
     constructor(collisionManager, test) {
-        let layers = {base: "basecharacter"};
+        let layers = {base: "pig"};
         let pos = {x: 150, y: 150};
         let stats = { health: 100, maxHealth:100 };
-
         super(pos, layers, stats);
+        this.moveSpeed = 3;
         this.width = 32; // temp
         this.height = 32; // temp
         this.deathCallbackTest = test;

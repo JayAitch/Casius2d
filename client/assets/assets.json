@@ -9,7 +9,8 @@
       "items": "assets/items.json"
     },
     "image": {
-        "tiles": "assets/tilesets/magecity.png"
+        "tiles": "assets/tilesets/magecity.png",
+        "tiles-extruded": "assets/tilesets/magecity-extruded.png"
     },
     "tilemapTiledJSON": {
         "map": "assets/tilemaps/testmap.json",
@@ -17,6 +18,14 @@
         "map3": "assets/tilemaps/testmap3.json"
     },
     "spritesheet":{
+                "boar": {
+                  "path":"assets/character/boar.png",
+                  "options":{"frameWidth":64,"frameHeight":64}
+                },
+                "pig": {
+                  "path":"assets/character/pig.png",
+                  "options":{"frameWidth":64,"frameHeight":64}
+                },
                 "seeradish": {
                   "path":"assets/character/seeraddish.png",
                   "options":{"frameWidth":32,"frameHeight":32}

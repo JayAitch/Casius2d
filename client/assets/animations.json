@@ -6,6 +6,28 @@
          "repeat" : -1
        }
        },
+        "pig": {
+          "walkup" : {
+            "frames" : {"key": "pig","start" : 0, "end" : 2},
+            "frameRate" : 4,
+            "repeat" : -1
+          },
+          "walkleft" : {
+            "frames" : {"key": "pig","start" : 9, "end" : 11},
+            "frameRate" : 4,
+            "repeat" : -1
+          },
+          "walkright" : {
+            "frames" : {"key": "pig","start" : 3, "end" : 5},
+            "frameRate" : 4,
+            "repeat" : -1
+          },
+          "walkdown" : {
+            "frames" : {"key": "pig","start" : 6, "end" : 8},
+            "frameRate" : 4,
+            "repeat" : -1
+          }
+        },
         "basecharacter" : {
                     "castup" : {
                             "frames" : {"key": "basecharacter","start" : 0, "end" : 6},
