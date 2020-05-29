@@ -52,20 +52,19 @@ class Receiver{
         });
 
         this.socket.on('removeItem', (data)=>{
-            console.log(data);
             this.gameScene.removeItem(data.id);
         });
 
 
         this.socket.on('newItem', (data)=>{
-            this.gameScene.newItem(data.key,data.id, data.pos);
+            this.gameScene.newItem(data.key,data.item.base, data.item.pos);
         });
 
         this.socket.on('itemList', (data)=>{
             let keylist = Object.keys(data);
             keylist.forEach((key)=>{
                 let dataRow = data[key];
-                this.gameScene.newItem(key,dataRow.id, dataRow.pos);
+                this.gameScene.newItem(key,dataRow.base, dataRow.pos);
             })
 
         });
