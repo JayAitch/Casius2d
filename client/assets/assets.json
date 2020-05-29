@@ -13,7 +13,8 @@
     },
     "tilemapTiledJSON": {
         "map": "assets/tilemaps/testmap.json",
-        "map2": "assets/tilemaps/testmap2.json"
+        "map2": "assets/tilemaps/testmap2.json",
+        "map3": "assets/tilemaps/testmap3.json"
     },
     "spritesheet":{
                 "seeradish": {

@@ -70,8 +70,10 @@ class PlayerLocation{
 
 let firstZone = new zoneManager.Zone(0);
 let secondZone = new zoneManager.Zone(1);
+let thirdZone = new zoneManager.Zone(2);
 
-global.ZONES = {0:firstZone,1:secondZone}
+
+global.ZONES = {0:firstZone,1:secondZone, 2: thirdZone}
 
 io.on('connect', function(client) {
 

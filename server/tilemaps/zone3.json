@@ -1,0 +1,137 @@
+[{
+  "draworder":"topdown",
+  "id":5,
+  "name":"World Objects",
+  "objects":[
+    {
+      "height":45.0787495053423,
+      "id":16,
+      "name":"",
+      "properties":[
+        {
+          "name":"x",
+          "type":"int",
+          "value":1280
+        },
+        {
+          "name":"y",
+          "type":"int",
+          "value":800
+        },
+        {
+          "name":"zone",
+          "type":"int",
+          "value":0
+        }],
+      "rotation":0,
+      "type":"TRIGGER_ZONE_CHANGE",
+      "visible":true,
+      "width":127.808171388999,
+      "x":414.785771666007,
+      "y":1055.80530273051
+    },
+    {
+      "height":39.3333333333333,
+      "id":36,
+      "name":"",
+      "rotation":0,
+      "type":"NONPASSIBLE",
+      "visible":true,
+      "width":92.6666666666666,
+      "x":480.666666666667,
+      "y":788
+    },
+    {
+      "height":45.3333333333334,
+      "id":37,
+      "name":"",
+      "rotation":0,
+      "type":"NONPASSIBLE",
+      "visible":true,
+      "width":94,
+      "x":640,
+      "y":784.666666666667
+    },
+    {
+      "height":22.6666666666667,
+      "id":38,
+      "name":"",
+      "rotation":0,
+      "type":"NONPASSIBLE",
+      "visible":true,
+      "width":29.3333333333333,
+      "x":578,
+      "y":805.333333333333
+    },
+    {
+      "height":23.3333333333334,
+      "id":39,
+      "name":"",
+      "rotation":0,
+      "type":"NONPASSIBLE",
+      "visible":true,
+      "width":15.3333333333334,
+      "x":625.333333333333,
+      "y":805.333333333333
+    }],
+  "opacity":1,
+  "type":"objectgroup",
+  "visible":true,
+  "x":0,
+  "y":0
+},
+{
+"draworder":"topdown",
+"id":2,
+"name":"Boundry Object",
+"objects":[
+{
+"height":120.363276612584,
+"id":2,
+"name":"",
+"rotation":0,
+"type":"NONPASSIBLE",
+"visible":true,
+"width":1030,
+"x":-32,
+"y":1104
+},
+{
+"height":980,
+"id":3,
+"name":"",
+"rotation":0,
+"type":"NONPASSIBLE",
+"visible":true,
+"width":167.87969924812,
+"x":-160.10239924812,
+"y":179.5487
+},
+{
+"height":185.507716660071,
+"id":4,
+"name":"",
+"rotation":0,
+"type":"NONPASSIBLE",
+"visible":true,
+"width":1040,
+"x":-58,
+"y":-5.50771666007125
+},
+{
+"height":1002,
+"id":5,
+"name":"",
+"rotation":0,
+"type":"NONPASSIBLE",
+"visible":true,
+"width":132,
+"x":945.341,
+"y":124.098
+}],
+"opacity":1,
+"type":"objectgroup",
+"visible":true,
+"x":0,
+"y":0
+}]
