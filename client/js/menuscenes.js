@@ -114,13 +114,14 @@ class ActionsList{
     constructor(scene) {
         this.slotWidth = 100
         this.slotHeight = 50;
-        this.exSize = 30;
+        this.exSize = 15;
         this.x = 400;
-        this.y =400;
+        this.y = 400;
         this.itemOffset = 0;
         this.scene = scene;
         this.zones = [];
         this.graphics = [];
+        this.texts =[];
 
         //gameObject.disableInteractive();
     }
@@ -143,8 +144,16 @@ class ActionsList{
             this.exSize
         );
 
+        let exText = this.scene.add.text(
+            this.x - this.exSize/2,
+            this.y- this.exSize/2,'X'
+        );
+        offsetByWidth(exText);
+
+
         this.zones.push(exZone);
         this.graphics.push(graphics);
+        this.texts.push(exText);
         this.itemOffset += this.slotHeight + 2
         graphics.fillRectShape(ex);
         exZone.setInteractive().on('pointerdown', ()=>{
@@ -168,6 +177,10 @@ class ActionsList{
                 this.slotWidth,
                 this.slotHeight
             );
+
+            let actionText = this.scene.add.text(this.x,this.y + this.itemOffset,action);
+            offsetByWidth(actionText);
+            this.texts.push(actionText);
             this.zones.push(zone);
             this.graphics.push(graphics);
             this.itemOffset += this.slotHeight + 2
@@ -186,7 +199,10 @@ class ActionsList{
             //zone.disableInteractive();
         })
 
-
+        this.texts.forEach((text)=>{
+            text.destroy();
+            //zone.disableInteractive();
+        })
         this.zones.forEach((zone)=>{
             zone.removeInteractive();
             //zone.disableInteractive();
@@ -212,6 +228,15 @@ class ActionsList{
 
 let slotSize = 45;
 let slotMargin = 3
+
+
+
+
+function offsetByWidth(obj){
+    let offset = obj.width / 2;
+    obj.x = obj.x - offset;
+}
+
 
 class InventorySlot{
     constructor(scene,inventory,slot, x,y, clickHandler) {
