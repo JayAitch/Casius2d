@@ -5,8 +5,9 @@ const PORT =process.env.SERVER_PORT;
 
 const server = require('http').createServer();
 const itms = require('./items.js'); //consider converting
-const zoneManager = require('./zone-manager.js')
-const invent = require('./inventory.js')
+const zoneManager = require('./zone-manager.js');
+const invent = require('./inventory.js');
+
 const dbDisabled = true;
 
 global.io = require('socket.io')(server);

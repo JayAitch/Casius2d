@@ -2,6 +2,7 @@ const roomManager = require('./room-manager.js');
 const systems = require('./systems.js');
 const characters = require('./server-characters.js');
 const fs = require('fs');
+const dropManager = require('./drop-manager.js');
 systems.startUpdate();
 
 
@@ -114,7 +115,7 @@ class Zone{
 
     testCreateMobLots(times){
         for(let i = 0; i < times; i++){
-            this.physicsWorld.testCreateMob((pos)=>{this.itemWorld.addItem(pos)});
+            this.physicsWorld.testCreateMob((pos)=>{this.itemWorld.addItem(pos,dropManager.roleDrop(0))});
         }
     }
 
