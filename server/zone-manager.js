@@ -18,6 +18,9 @@ function getZoneData(zone){
 
 ZONEMAPS= {0:"zone1.json",1:"zone2.json", 2:"zone3.json"}
 
+SPAWNS= {0:{x:150,y:150},1:{x:400,y:400}, 2:{x:600,y:400}} //temp
+
+
 function getWorldObjects(id){
     let worldData = getZoneData(id);
     let worldObjects = [];
@@ -110,12 +113,20 @@ class Zone{
         this.zoneID = zoneid;
 
         systems.addToUpdate(this);
-        this.testCreateMobLots(15);
+        this.testCreateMobLots(5);
     }
 
     testCreateMobLots(times){
         for(let i = 0; i < times; i++){
-            this.physicsWorld.testCreateMob((pos)=>{this.itemWorld.addItem(pos,dropManager.roleDrop(0))});
+            let callBack = (pos)=>{
+                this.itemWorld.addItem(pos,dropManager.roleDrop(0));
+                let timedcallback = setTimeout(() => {
+                    this.testCreateMobLots(1);
+                    clearTimeout(timedcallback);
+                }, 2000)
+            }
+            this.physicsWorld.testCreateMob(callBack);
+
         }
     }
 
@@ -150,12 +161,22 @@ class Zone{
         }
     }
 
-    addPlayerCharacter(client, playerLocation){
-        let newPlayer = this.physicsWorld.addPlayerCharacter(client, playerLocation.pos)
+    addPlayerCharacter(client){
+
+        // respawn player with max health at zone spawn when they die
+        // TODO: add a global respawn point in town or something
+        let deathCallback  = () =>{
+            client.playerLocation.pos = Object.assign({}, SPAWNS[this.zoneID]);
+            this.addPlayerCharacter(client);
+        }
+
+
+        let newPlayer = this.physicsWorld.addPlayerCharacter(client, deathCallback)
         client.playerLocation.zone = this.zoneID;
         client.player = newPlayer;
 
-        this.zoneSender.notifyNewEntity(client, newPlayer);
+
+        this.zoneSender.notifyClientPlayer(client, newPlayer);
         this.zoneSender.initMessage(client, this.physicsWorld.entities, this.itemWorld.floorItems, newPlayer.config.key);
     }
 
@@ -216,9 +237,9 @@ class ZoneSender{
         return tempEntities;
     }
 
-    notifyNewEntity(client, entity){
-        this.room.broadcastMessage(client,'newEntity', {
-            id:entity.entityPos,
+    notifyNewEntity(entity, key){
+        this.room.roomMessage('newEntity', {
+            id:key,
             x:entity.pos.x,
             y:entity.pos.y,
             facing: entity.direction,
@@ -252,13 +273,17 @@ class ZoneSender{
         this.room.roomMessage('removeItem', {id:id})
     }
 
-    notifyClientPlayer(client, entity, entityPos){
-        client.emit('playerSpawn', {
-            id:entityPos,
+    notifyClientPlayer(client, entity){
+        this.room.broadcastMessage(client,'newEntity', {
+            id:entity.entityPos,
             x:entity.pos.x,
             y:entity.pos.y,
             facing: entity.direction,
-            state:entity.state
+            state:entity.state,
+            base: entity.animationComponent.baseSprite,
+            layers: entity.animationComponent.spriteLayers,
+            health: entity.health,
+            mHealth: entity.maxHealth
         })
     }
 
@@ -308,7 +333,7 @@ class PhysicsWorld{
 
     }
 
-    addPlayerCharacter(client){
+    addPlayerCharacter(client, deathcallback){
         let entityKey = this.lastEntityId;
         let playerConfig = {
             appearance: client.character.appearance,
@@ -316,7 +341,8 @@ class PhysicsWorld{
             key: entityKey,
             stats: client.playerStats,
             location: client.playerLocation,
-            _id: client.character._id
+            _id: client.character._id,
+            deathCallback: deathcallback //temp
         }
 
         let newPlayer = new characters.ServerPlayer(playerConfig, this.collisionManager);
@@ -328,7 +354,9 @@ class PhysicsWorld{
     testCreateMob(droptest){
         this.testMob = new characters.BasicMob(this.collisionManager,droptest);
         this.entities[this.lastEntityId] = this.testMob;
+        this.sender.notifyNewEntity(this.testMob, this.lastEntityId);
         this.lastEntityId++
+
     }
 
     removeEntity(id){

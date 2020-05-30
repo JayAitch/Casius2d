@@ -62,8 +62,8 @@ class GameScene extends Phaser.Scene {
 
 
     loadMap(id) {
-        this.clearEnities();
-        this.clearItems();
+  //      this.clearEnities();
+   //     this.clearItems();
         this.removeCurrentMap();
         let key = MAPS[id];
         let map = this.make.tilemap({key: key});
@@ -157,6 +157,8 @@ class GameScene extends Phaser.Scene {
         })
         this.mapEntities = {};
     }
+
+
     clearItems() {
         let itemKeys = Object.keys(this.floorItems);
         itemKeys.forEach( (key)=> {
@@ -165,6 +167,8 @@ class GameScene extends Phaser.Scene {
         })
         this.floorItems = {};
     }
+
+
     moveEntity(id, x, y, facing, state, health, mHealth){
         let entity = this.mapEntities[id];
         if(entity){

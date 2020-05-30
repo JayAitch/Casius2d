@@ -1,9 +1,9 @@
 const characterComponents = require('./character-components.js');
 directions = {"NORTH":"up", "WEST":"left", "SOUTH":"down", "EAST":"right" };
 states  = {"THRUST":"thrust", "WALK":"walk","CAST":"cast", "STOP":"stop"};
-global.colliderTypes = {"PLAYER":0,"MONSTER":1,"NONPASSIBLE":2, "TRIGGER":3, "ZONETRIGGER":4, "ATTACKSCAN":5};
+global.colliderTypes = {"PLAYER":"PLAYER","MONSTER":"MONSTER","NONPASSIBLE":"NONPASSIBLE", "TRIGGER":"TRIGGER", "ZONETRIGGER":"ZONETRIGGER", "ATTACKSCAN":"ATTACKSCAN"};
 
-
+messageTypes = {"DAMAGE":"DAMAGE", "REWARD":"REWARD"}
 
 
 
@@ -29,23 +29,24 @@ class MovingGameObject{
         return this.pos.y;
     }
 
-    addMovement(addedVelocity){
-        let previouseVelocity = this.velocity;
-        let x = Math.sign(addedVelocity.x) + Math.sign(previouseVelocity.x);
-        let y = Math.sign(addedVelocity.y) + Math.sign(previouseVelocity.y);
+    addMovement(addedVelocity) {
+        if (!this.isDelete) {
+            let previouseVelocity = this.velocity;
+            let x = Math.sign(addedVelocity.x) + Math.sign(previouseVelocity.x);
+            let y = Math.sign(addedVelocity.y) + Math.sign(previouseVelocity.y);
 
-        if(Math.abs(x) > 0 && Math.abs(y) > 0){
-            let xSign = Math.sign(x);
-            let ySign = Math.sign(y);
-            let mX = x;
-            let mY = y;
-            x = Math.pow(0.8,(mX * mX) + (mY * mY)) * xSign;
-            y = Math.pow(0.8,(mX * mX) + (mY *mY)) * ySign;
+            if (Math.abs(x) > 0 && Math.abs(y) > 0) {
+                let xSign = Math.sign(x);
+                let ySign = Math.sign(y);
+                let mX = x;
+                let mY = y;
+                x = Math.pow(0.8, (mX * mX) + (mY * mY)) * xSign;
+                y = Math.pow(0.8, (mX * mX) + (mY * mY)) * ySign;
+            }
+            this.velocity = {x: x * this.moveSpeed, y: y * this.moveSpeed};
+            this.animationComponent.facing = this.velocity; //temp}
         }
-        this.velocity = {x: x * this.moveSpeed, y:  y * this.moveSpeed};
-        this.animationComponent.facing = this.velocity; //temp
     }
-
     get direction(){
         return this.animationComponent.direction;
     }
@@ -149,12 +150,17 @@ class DamageableCharacter extends MovingGameObject {
         this.stats = stats;
     }
 
-    takeDamage(){
-        this.health -= 30;
+    takeDamage(damage){
+        let defence = this.stats.defence || 0;
+        let damageTake = damage - defence;
+        if(damageTake <= 0) damageTake = 1;
+        this.health -= damageTake;
         if(this.health <= 0) this.kill();
         let reward = 30;
         return reward;
     }
+
+
     get health(){
         return this.stats.health;
     }
@@ -172,18 +178,18 @@ class DamageableCharacter extends MovingGameObject {
 
 class BasicMob extends  DamageableCharacter{
 
-    constructor(collisionManager, test) {
+    constructor(collisionManager, deathCallback) {
         let layers = {base: "pig"};
         let pos = {x: 150, y: 150};
-        let stats = { health: 100, maxHealth:100 };
+        let stats = { health: 100, maxHealth:100, defence:5, attack:2 };
         super(pos, layers, stats);
         this.moveSpeed = 3;
         this.width = 32; // temp
         this.height = 32; // temp
-        this.deathCallbackTest = test;
+        this.stats = stats ;
+        this.deathCallback = deathCallback;
         this.createCollider(collisionManager);
         this.components.push(new characterComponents.AIComponent(this.pos, this.velocity));
-        //this.addMovement({x:1,y:1})
     }
 
     createCollider(collisionManager){
@@ -206,12 +212,28 @@ class BasicMob extends  DamageableCharacter{
     }
 
 
-    kill(){
-        this.isDelete = true;
-        this.deathCallbackTest(this.pos);
-        this.removeComponents();
-    }
+    kill() {
+        if(!this.isDelete){
+            //
 
+            this.deathCallback(this.pos);
+
+
+            this.isDelete = true;
+            this.removeComponents();
+            // this.attackingComponent.remove();
+            // this.attackingComponent = undefined;
+            this.animationComponent.remove();
+            this.animationComponent = undefined;
+        }
+    }
+    sendDamageMessage(other){
+        let message ={
+            type: messageTypes.DAMAGE,
+            damage: this.stats.attack
+        }
+        other.collisionCallback(message); //todo change to generic messaging functionality
+    }
 
     collisionCallback(other){
         switch(other.type){
@@ -219,8 +241,11 @@ class BasicMob extends  DamageableCharacter{
                 this.backStep();
                 this.stop();
                 break;
+            case colliderTypes.PLAYER:
+                this.sendDamageMessage(other);
+                break;
             case colliderTypes.ATTACKSCAN:
-                return this.takeDamage();
+                return this.takeDamage(other.damage);
                 break;
         }
     }
@@ -264,7 +289,6 @@ class ServerPlayer extends DamageableCharacter{
         this.attackingComponent = new characterComponents.AttackingComponent(collisionManager,
             this.pos,
             this.animationComponent,//wrong
-            collider.collisionRegistration, //TODO: wrong this has changed
             playerConfig.stats
             );
 
@@ -296,16 +320,30 @@ class ServerPlayer extends DamageableCharacter{
 
 
     attack(){
-        let reward = this.attackingComponent.attack();
-        this.config.stats.experience += reward;
-        this.isAttacking = true;
+        if(this.attackingComponent){
+            let reward = this.attackingComponent.attack();
+            this.config.stats.experience += reward;
+            this.isAttacking = true;
+        }
     }
 
     kill() {
-        // try change to is delete!!
-        //global.killPlayer(this.clientID, this.playerLocation.zone);
-        this.isDelete = true;
-        this.removeComponents();
+        if(!this.isDelete){
+
+            this.callback = setTimeout(() => {
+                this.config.stats.health = this.config.stats.maxHealth;
+                this.config.deathCallback();
+                clearTimeout(this.callback);
+
+            }, 2000)
+
+            this.isDelete = true;
+            this.removeComponents();
+            this.attackingComponent.remove();
+            this.attackingComponent = undefined;
+            this.animationComponent.remove();
+            this.animationComponent = undefined;
+        }
     }
 
     collisionCallback(other){
@@ -316,6 +354,12 @@ class ServerPlayer extends DamageableCharacter{
             case colliderTypes.PLAYER:
                 break;
             case colliderTypes.TRIGGER:
+            case messageTypes.DAMAGE: // todo move to an entity message method
+                let damage = other.damage;
+                this.takeDamage(damage)
+
+                break;
+            case colliderTypes.MONSTER:
                 break;
             case colliderTypes.ZONETRIGGER:
                 this.removeComponents();

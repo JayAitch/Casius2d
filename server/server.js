@@ -53,10 +53,12 @@ inventories ={
 
 
 class PlayerStats {
-    constructor(health, experience, zone) {
+    constructor(health, experience, defence, attack) {
         this.maxHealth = health;
         this.health = health;
         this.experience = experience;
+        this.defence = defence;
+        this.attack = attack;
     }
 
 }
@@ -83,7 +85,7 @@ io.on('connect', function(client) {
 
     client.on('login',function(username,password){
         curr_username = username
-        let playerStats = new PlayerStats(200,200, 0);
+        let playerStats = new PlayerStats(200,200, 5, 30);
         client.character = {};
         client.playerStats = playerStats;
         client.playerLocation = new PlayerLocation(0, {x:150,y:150})
@@ -171,7 +173,7 @@ function tryLogin(client, username, password){
         });
     }
 }
-
+// todo move this
 function setupCharacter(client,username){
     return new Promise((resolve) => {
         if(!dbDisabled){
@@ -241,23 +243,6 @@ global.testZoneJoin = function(clientID, playerLocation, zoneID, position){
     tryJoinZone(clientID, zoneID, playerLocation, position)
 }
 
-global.killPlayer = function(clientID, currentzoneID){
-    let zone = ZONES[currentzoneID];
-    let client = zone.zoneSender.clientLookup[clientID]
-    zone.physicsWorld.removeEntity(client.player.config.key);
-
-    let testRespawn = setTimeout(function() {
-        global.respawn(client);
-        clearTimeout(testRespawn);
-    }, 2000);
-}
-
-global.respawn = function(client){
-    let zoneid = client.playerStats.zone;
-    client.playerStats.health = client.playerStats.maxHealth;
-    let zone = ZONES[zoneid];
-    zone.join(client,{x:150,y:150});
-}
 
 global.randomInteger = function(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;

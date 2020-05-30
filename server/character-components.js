@@ -6,7 +6,10 @@ class AnimationComponent{
         this.baseSprite = animLayers.base
         this.spriteLayers = animLayers.layers;
     }
-
+    remove(){
+        this.isDelete = true;
+        delete this;
+    }
     set facing(val){
 
         if(val.x !== 0){
@@ -45,14 +48,17 @@ class AttackingComponent{
         let x = (direction.x * 30) + this.origin.x;
         let y = (direction.y * 30) + this.origin.y;
         let hitEntities = this.scanForEntities(x,y,150,150);
-        let damageMessage = {type:colliderTypes.ATTACKSCAN};
+        let damageMessage = {type:colliderTypes.ATTACKSCAN, damage:this.stats.attack};
         let reward = 0;
         hitEntities.forEach((entities)=>{
             reward += entities.onCollision(damageMessage);
         })
         return reward;
     }
-
+    remove(){
+        this.isDelete = true;
+        delete this;
+    }
 }
 
 function directionAsVector(direction){
@@ -131,6 +137,10 @@ class AIComponent{
                 break;
             default:
         }
+    }
+    remove(){
+        this.isDelete = true;
+        delete this;
     }
     changeDirection(){
         // if(this.flip){
