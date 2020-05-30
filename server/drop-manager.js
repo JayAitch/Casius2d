@@ -6,9 +6,20 @@ dropLookup = {
         },
         1:{
             item:{base: items.seeradish},
-            chance: 95
+            chance: 5
+        },
+        2:{
+            item:{base: items.leatherbelt, plus: 100},
+            chance: 50
+        },
+        3:{
+            item:{base: items.shield, plus: 100},
+            chance: 50
+        },
+        3:{
+            item:{base: items.dspear, plus: 6},
+            chance: 50
         }
-
     }
 };
 

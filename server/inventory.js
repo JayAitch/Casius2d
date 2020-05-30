@@ -78,6 +78,7 @@ class InventoryManager{
     get message(){
         return {inventory: this.inventory, paperDoll: this.paperDoll};
     }
+
     pickupItem(item){
 
         // let invItem = {
@@ -88,6 +89,7 @@ class InventoryManager{
         // TODO: add to paperdoll first
         return this.inv.addItem(item);
     }
+
     equiptItem(key, item){
         // todo: check item key
 
