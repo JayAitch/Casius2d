@@ -51,6 +51,7 @@ inventories ={
     ]
 }
 
+
 class PlayerStats {
     constructor(health, experience, zone) {
         this.maxHealth = health;
@@ -74,7 +75,7 @@ let secondZone = new zoneManager.Zone(1);
 let thirdZone = new zoneManager.Zone(2);
 
 
-global.ZONES = {0:firstZone,1:secondZone, 2: thirdZone}
+global.ZONES = {0:firstZone,1:secondZone, 2:thirdZone}
 
 io.on('connect', function(client) {
 
@@ -86,8 +87,7 @@ io.on('connect', function(client) {
         client.character = {};
         client.playerStats = playerStats;
         client.playerLocation = new PlayerLocation(0, {x:150,y:150})
-        client.character.invent = {};
-        tryLogin(client, username, password); 
+        tryLogin(client, username, password);
     });
 
     client.on('joinzone',function(data) {
@@ -106,7 +106,7 @@ io.on('connect', function(client) {
         });
 
         client.on('pickup',function(id) {
-            let zone = ZONES[client.playerLocation.zone];
+            let zone = ZONES[client.playerLocation.zone]
             zone.pickup(client, id);
         });
 
@@ -167,7 +167,7 @@ function tryLogin(client, username, password){
     else{
         setupCharacter(client,username).then(suceeded =>{
             client.emit('loggedIn');
-            
+
         });
     }
 }
@@ -179,7 +179,7 @@ function setupCharacter(client,username){
 
             characterPromise.then((chars) => {
                 if(chars == undefined){
-                    //* If no characters exist for this account then make one. 
+                    //* If no characters exist for this account then make one.
                     xDbManager.databaseConnection.createCharacter(username,players[0]).then((succeeded) =>{
                         if(succeeded){
                             //* Creation succeeded - go ahead and re-query and assign DB properties to character
@@ -188,7 +188,7 @@ function setupCharacter(client,username){
                                 //Do something with chars2
                                 console.log("Character made!");
                                 //TODO: register appearance as animkey, plus/effect and base
-                                //client.character.paperDoll = new invent.paperDoll(chars2[0].character.paperDoll);
+                                client.character.paperDoll = chars2[0].character.paperDoll;
                                 client.character.appearance = chars2[0].base // more in here later
                                 client.character._id = chars2[0]._id || randomInteger(0, 9999999); //temp
                                 return resolve(true);
@@ -200,7 +200,10 @@ function setupCharacter(client,username){
                         }
                     })
                 }else{
-                    //client.character.paperDoll = new invent.paperDoll(char[0].character.paperDoll);
+
+                    let invManager = new invent.InventoryManager(inventories[0], players[0].paperDoll);
+                    client.character.invent = invManager;
+
                     client.character.appearance = char[0].character.base;// more in here later
                     // TODO: use as database doc key
                     client.character._id = char[0]._id || randomInteger(0, 9999999); //temp
@@ -208,13 +211,11 @@ function setupCharacter(client,username){
                 }
             })
         }else{
-
             let invManager = new invent.InventoryManager(inventories[0], players[0].paperDoll);
-
-            client.character.invent = invManager; //paperDoll = new invent.PaperDoll(players[0].paperDoll);
+            client.character.invent = invManager;
             client.character.appearance = players[0].base;// more in here later
             client.character._id =  randomInteger(0, 9999999); //temp
-         //   console.log(client.character)
+            //   console.log(client.character)
             return resolve(true)
         }
 
