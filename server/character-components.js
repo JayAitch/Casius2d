@@ -1,6 +1,6 @@
 
 class AnimationComponent{
-    constructor(animLayers) {
+    constructor(animLayers,attackingComponent) {
         this.currentState = states.STOP;
         this.facing = directions.NORTH;
         this.baseSprite = animLayers.base
@@ -29,15 +29,16 @@ class AnimationComponent{
 }
 
 class AttackingComponent{
-    constructor(collisionManager, origin, directionObject, stats){
+    constructor(collisionManager, origin, directionObject, stats, enemyLayers){
         this.collisionManager = collisionManager;
         this.origin = origin;
         this.directionObject = directionObject;
         this.stats = stats;
+        this.enemyLayers = enemyLayers;
     }
 
     scanForEntities(x,y,width,height){
-        return this.collisionManager.boxScan({x:x,y:y},width,height,[2]);
+        return this.collisionManager.boxScan({x:x,y:y},width,height,this.enemyLayers);
     }
 
     attack(){
@@ -45,14 +46,28 @@ class AttackingComponent{
         let x = (direction.x * 30) + this.origin.x;
         let y = (direction.y * 30) + this.origin.y;
         let hitEntities = this.scanForEntities(x,y,150,150);
+
+        return this.damageAllEntities(hitEntities)
+    }
+
+
+    damageAllEntities(entities){
         let damageMessage = {type:colliderTypes.ATTACKSCAN};
         let reward = 0;
-        hitEntities.forEach((entities)=>{
-            reward += entities.onCollision(damageMessage);
+        entities.forEach((entity)=>{
+            reward += entity.onCollision(damageMessage);
         })
         return reward;
     }
 
+    scanInFront(width,height){
+        // issue with rotation of scanning thing
+        let direction = directionAsVector(this.directionObject.direction);
+        let x = (direction.x * 30) + this.origin.x;
+        let y = (direction.y * 30) + this.origin.y;
+        let hitEntities = this.scanForEntities(x,y,width,height);
+        return hitEntities;
+    }
 }
 
 function directionAsVector(direction){
@@ -84,7 +99,7 @@ class ColliderComponent{
         this.interacts = colliderConfig.interacts;
         this.isDelete = false;
     }
-
+    // TODO: change to pas by reference
     get x(){
         return this.basePos.x;
     }
@@ -106,32 +121,105 @@ class ColliderComponent{
 }
 
 class AIComponent{
-    constructor(pos, velocity){
+    constructor(pos, velocity, attackingComponent){
         this.tick = 0;
         this.pos = pos;
         this.velocity = velocity;
         this.firstAction = 10;
+        this.attackingComponent = attackingComponent;
+        this.attackRange = 50; //temp
+        this.attackCooldown = 10;
     }
+
     remove(){delete this;};
     update(entity){
         this.tick++;
-        switch (this.tick % this.firstAction) {
-            case 0:
-                this.changeDirection();
-                let velocity = {
-                    x: this.direction.x * 10,
-                    y: this.direction.y * 10
+
+        if(this.target){
+            if(this.target.isDelete) {
+                this.target = undefined;
+                entity.moveSpeed = 3 //temp
+                return;
+            }
+            if(this.isInRange()){
+                switch (this.tick % this.attackCooldown) {
+                    case 0:
+                    this.attackPlayer();
                 }
-                entity.stop();
-                entity.addMovement(velocity);
-                break
-            case 50:
-                this.changeDirection();
-                entity.stop();
-                break;
-            default:
+            }
+            else{
+                let directionToTarget = this.getDirectionToTarget();
+                let velocity = {
+                    x: directionToTarget.x * 10,
+                    y: directionToTarget.y * 10
+                }
+                switch (this.tick % 10) {
+                    case 0:
+                        entity.addMovement(velocity);
+                }
+
+            }
+
+        }else{
+            this.lookForPlayer();
+            if(this.target){
+                entity.moveSpeed = 8 //temp
+            }
+            switch (this.tick % this.firstAction) {
+                case 0:
+                    this.changeDirection();
+                    let velocity = {
+                        x: this.direction.x * 10,
+                        y: this.direction.y * 10
+                    }
+                    entity.stop();
+                    entity.addMovement(velocity);
+                    break
+                case 6:
+
+                case 50:
+                    this.changeDirection();
+                    entity.stop();
+
+                    break;
+                default:
+
+            }
+        }
+
+    }
+
+    isInRange() {
+        let targetPos = {
+            x: this.target.x,
+            y: this.target.y
+        }
+        let dist = distance(targetPos, this.pos);
+        return (dist < this.attackRange);
+    }
+
+    getDirectionToTarget(){
+        let direction = {
+            x:this.target.x - this.pos.x,// strapValue(this.target.x - this.pos.x,1,-1),
+            y:this.target.y - this.pos.y//  strapValue(this.target.y - this.pos.y,1,-1)
+        }
+        return direction;
+    }
+    attackPlayer(){
+
+        this.attackingComponent.damageAllEntities([this.target]);
+    }
+
+    lookForPlayer(){
+        //let hitEntites = this.attackingComponent.scanInFront(200,200);
+        let hitEntites = this.attackingComponent.scanForEntities(this.pos.x, this.pos.y, 400,400)
+        if(hitEntites.length > 0) {
+            this.target = hitEntites[0];
+            //TEMP
+
         }
     }
+
     changeDirection(){
         // if(this.flip){
         //     this.flip =!this.flip;

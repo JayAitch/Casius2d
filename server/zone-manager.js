@@ -110,7 +110,7 @@ class Zone{
         this.zoneID = zoneid;
 
         systems.addToUpdate(this);
-        this.testCreateMobLots(15);
+        this.testCreateMobLots(16);
     }
 
     testCreateMobLots(times){
@@ -335,6 +335,7 @@ class PhysicsWorld{
         let entity = this.entities[id];
         if(entity){
             this.sender.notifyEntityRemove(id);
+            entity.delete();
             delete this.entities[id];
         }
     }

@@ -269,3 +269,5 @@ global.distance = function(pointA, pointB){
     let c = Math.sqrt( a*a + b*b );
     return c;
 }
+
+global.strapValue = function (val, max, min) { return (val - min) / (max - min); }

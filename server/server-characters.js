@@ -1,10 +1,10 @@
 const characterComponents = require('./character-components.js');
 directions = {"NORTH":"up", "WEST":"left", "SOUTH":"down", "EAST":"right" };
 states  = {"THRUST":"thrust", "WALK":"walk","CAST":"cast", "STOP":"stop"};
-global.colliderTypes = {"PLAYER":0,"MONSTER":1,"NONPASSIBLE":2, "TRIGGER":3, "ZONETRIGGER":4, "ATTACKSCAN":5};
+global.colliderTypes = {"PLAYER":0,"MONSTER":1,"NONPASSIBLE":2, "TRIGGER":3, "ZONETRIGGER":4, "ATTACKSCAN":5, "DAMAGECALLBACK":6};
 
 
-
+//TODO: make message callbacks and seperate from collider types
 
 
 
@@ -74,6 +74,9 @@ class MovingGameObject{
             }
         }
     }
+    delete(){
+        this.removeComponents();
+    }
     update(){
         this.move();
         this.tempAnimationStateManager();
@@ -84,6 +87,7 @@ class MovingGameObject{
 
     removeComponents(){
         this.components.forEach(function (component) {
+            component.isDelete = true;
             component.remove();
         },this);
     }
@@ -180,9 +184,11 @@ class BasicMob extends  DamageableCharacter{
         this.moveSpeed = 3;
         this.width = 32; // temp
         this.height = 32; // temp
+        this.tick = 0; //temp
         this.deathCallbackTest = test;
         this.createCollider(collisionManager);
-        this.components.push(new characterComponents.AIComponent(this.pos, this.velocity));
+        this.attackingComponent = new characterComponents.AttackingComponent(collisionManager,this.pos, this.animationComponent,stats, [1])
+        this.components.push(new characterComponents.AIComponent(this.pos, this.velocity, this.attackingComponent));
         //this.addMovement({x:1,y:1})
     }
 
@@ -211,13 +217,27 @@ class BasicMob extends  DamageableCharacter{
         this.deathCallbackTest(this.pos);
         this.removeComponents();
     }
-
+    update() {
+        super.update();
+        this.tick++;//temp
+    }
 
     collisionCallback(other){
         switch(other.type){
             case colliderTypes.NONPASSIBLE:
-                this.backStep();
                 this.stop();
+                this.backStep();
+                break;
+            case colliderTypes.PLAYER:
+                if(!(this.tick % 10)){ // temp
+                    let callBack = {
+                        type: colliderTypes.DAMAGECALLBACK,
+                    }
+                    other.collisionCallback(callBack);
+
+                }
+
+
                 break;
             case colliderTypes.ATTACKSCAN:
                 return this.takeDamage();
@@ -264,8 +284,9 @@ class ServerPlayer extends DamageableCharacter{
         this.attackingComponent = new characterComponents.AttackingComponent(collisionManager,
             this.pos,
             this.animationComponent,//wrong
-            collider.collisionRegistration, //TODO: wrong this has changed
-            playerConfig.stats
+          //  collider.collisionRegistration, //TODO: wrong this has changed
+            playerConfig.stats,
+            [1,2]
             );
 
     }
@@ -303,7 +324,7 @@ class ServerPlayer extends DamageableCharacter{
 
     kill() {
         // try change to is delete!!
-        //global.killPlayer(this.clientID, this.playerLocation.zone);
+        //// global.killPlayer(this.clientID, this.playerLocation.zone);
         this.isDelete = true;
         this.removeComponents();
     }
@@ -317,6 +338,10 @@ class ServerPlayer extends DamageableCharacter{
                 break;
             case colliderTypes.TRIGGER:
                 break;
+            // case colliderTypes.DAMAGECALLBACK:
+            //     console.log("doing damge callback");
+            //     this.takeDamage();
+            //     break;
             case colliderTypes.ZONETRIGGER:
                 this.removeComponents();
                 let zoneTarget = other.zoneTarget;
