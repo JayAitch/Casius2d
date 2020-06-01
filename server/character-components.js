@@ -18,14 +18,23 @@ class AnimationComponent{
         delete this;
     }
 
+    set spriteConfig(val){
+        this.baseSprite = val.base
+        this.spriteLayers = val.layers;
+    }
+
     forceStateFor(time, cbTime, state, callback){
         this.currentState = states.THRUST;
-        this.forcedState = true;
-        let cbTimeout = setTimeout(callback,cbTime);
-        let stateTimeout = setTimeout(()=>{
-            this.currentState = states.STOP;
-            this.forcedState = false;
-        },time);
+        if(!this.forcedState){
+            this.forcedState = true;
+            let cbTimeout = setTimeout(callback,cbTime);
+            let stateTimeout = setTimeout(()=>{
+                this.currentState = states.STOP;
+                this.forcedState = false;
+            },time);
+
+        }
+
     }
 
     manageState(){
@@ -69,15 +78,16 @@ class AnimationComponent{
 }
 
 class AttackingComponent{
-    constructor(collisionManager, origin, directionObject, stats){
+    constructor(collisionManager, origin, directionObject, stats, zoneid){
         this.collisionManager = collisionManager;
         this.origin = origin;
         this.directionObject = directionObject;
         this.stats = stats;
+        this.zoneid = zoneid;
     }
 
     scanForEntities(x,y,width,height){
-        sendAOEDebug({x:x,y:y},width,height);
+        sendAOEDebug(this.zoneid,{x:x,y:y},width,height);
         return this.collisionManager.boxScan({x:x,y:y},width,height,[2]);
     }
 
@@ -220,7 +230,7 @@ class AIComponent{
 class MovementComponent{
     constructor(pos) {
         this.velocity = {x: 0, y: 0};
-        this.moveSpeed = 4;
+        this.moveSpeed = 24;
         this.pos = pos;
         this.previousePos = pos;
     }

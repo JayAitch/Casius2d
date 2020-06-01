@@ -10,7 +10,9 @@
     },
     "image": {
         "tiles": "assets/tilesets/magecity.png",
-        "tiles-extruded": "assets/tilesets/magecity-extruded.png"
+        "tiles-extruded": "assets/tilesets/magecity-extruded.png",
+        "inv-shield":"assets/character/a_shield_round.png",
+      "inv-spear":"assets/character/a_shield_round.png"
     },
     "tilemapTiledJSON": {
         "map": "assets/tilemaps/testmap.json",

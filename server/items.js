@@ -3,49 +3,57 @@ global.items  = {
         "id":"goldhelm",
         "animString" : "goldhelm",
         "inventoryIcon": "goldhelm",
-        "slot": "HEAD"
+        "slot": "HEAD",
+        "stats": {"defence": 10}
     },
     "bronzehelm": {
         "id":"bronzehelm",
         "animString" : "bronzehelm",
         "inventoryIcon": "bronzehelm",
-        "slot": "HEAD"
+        "slot": "HEAD",
+        "stats": {"defence": 1}
     },
     "dspear": {
         "id":"dspear",
         "animString" : "dspear",
         "inventoryIcon": "dspear",
-        "slot": "WEAPON"
+        "slot": "WEAPON",
+        "stats": {"damage": 55}
     },
     "goldlegs": {
         "id":"goldlegs",
         "animString" : "goldlegs",
         "inventoryIcon": "goldlegs",
-        "slot": "LEGS"
+        "slot": "LEGS",
+        "stats": {"defence": 22}
     },
     "leatherbelt": {
         "id":"leatherbelt",
         "animString" : "leatherbelt",
         "inventoryIcon": "leatherbelt",
-        "slot": "BELT"
+        "slot": "BELT",
+        "stats": {"defence": 1}
     },
     "jacket": {
         "id":"jacket",
         "animString" : "jacket",
         "inventoryIcon": "jacket",
-        "slot": "BODY"
+        "slot": "BODY",
+        "stats": {"defence": 5}
     },
     "shield": {
         "id":"shield",
         "animString" : "shield",
-        "inventoryIcon": "shield",
-        "slot": "OFFHAND"
+        "inventoryIcon": "inv-shield",
+        "slot": "OFFHAND",
+        "stats": {"defence": 22}
     },
     "spear": {
         "id":"spear",
         "animString" : "spear",
-        "inventoryIcon": "spear",
-        "slot": "WEAPON"
+        "inventoryIcon": "inv-spear",
+        "slot": "WEAPON",
+        "stats": {"damage":12}
     },
     "seeradish": {
         "id":"seeradish",
@@ -53,9 +61,6 @@ global.items  = {
         "stack-size": 999
     }
 };
-
-
-allGear = ["dspear", "goldhelm", "goldlegs", "leatherbelt", "jacket","dspear", "goldhelm", "goldlegs", "leatherbelt", "jacket"]
 
 
 

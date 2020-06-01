@@ -58,8 +58,6 @@ class GameScene extends Phaser.Scene {
 
         // set background color, so the sky is not black
         this.cameras.main.setBackgroundColor('#ccccff');
-
-
     }
 
     create(){
@@ -73,28 +71,30 @@ class GameScene extends Phaser.Scene {
         let pos = data.pos;
         let width = data.width;
         let height = data.height;
+console.log("PRINTING DEBUG");
+        let rect = new MyRectangle(this, pos.x,pos.y, width, height);
 
-        let rect = new MyRectangle(this, pos.x - width/2,pos.y - height/2, width, height);
         console.log("printing bruv");
         let graphics = this.add.graphics({fillStyle: {color: 0xff0000, alpha: 0.5}});
-        graphics.fillRectShape(rect);
-        //
-        // this.tweens.addCounter({
-        //     from: 0.5,
-        //     to: 0,
-        //     duration: 2000,
-        //     yoyo:false,
-        //     repeat: 0,
-        //     onUpdate: (tween)=>
-        //     {
-        //         let value = tween.getValue();
-        //         rect.setFillStyle(0xff0000, value);
-        //
-        //     }
-        // });
+        //graphics.fillRectShape(rect);
+
+        this.tweens.addCounter({
+            from: 0.8,
+            to: 0,
+            duration: 500,
+            yoyo:false,
+            repeat: 0,
+            onUpdate: (tween)=>
+            {
+                let value = tween.getValue();
+                rect.setFillStyle(0xff0000, value);
+
+            }
+        });
 
 
     }
+
     loadMap(id) {
   //      this.clearEnities();
    //     this.clearItems();
@@ -174,6 +174,14 @@ class GameScene extends Phaser.Scene {
     }
 
 
+    reloadEntity(id, base, layers){
+        let entity =  this.mapEntities[id];
+        console.log(layers);
+        entity.base = base;
+        entity.layers = layers;
+
+    }
+
     newEntity(id, x, y, facing, state, base, layers, health, mHealth){
         if(layers) {
             this.mapEntities[id] = new Player(this, {x: x, y: y}, facing, state, base, layers, health, mHealth);
@@ -230,7 +238,11 @@ class GameScene extends Phaser.Scene {
 
     update(){
         Object.keys(this.mapEntities).forEach((key)=>{
-            this.mapEntities[key].update()
+            let entity = this.mapEntities[key];
+            if(entity){
+                entity.update()
+            }
+
         });
     }
 

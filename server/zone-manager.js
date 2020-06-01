@@ -140,6 +140,10 @@ class Zone{
         }
     }
 
+    triggerEntityReload(key){
+       let entity = this.physicsWorld.entities[key];
+       this.zoneSender.notifyEntityReload(entity, key);
+    }
 
 
 
@@ -183,11 +187,10 @@ class Zone{
             this.addPlayerCharacter(client);
         }
 
-
-        let newPlayer = this.physicsWorld.addPlayerCharacter(client, deathCallback)
         client.playerLocation.zone = this.zoneID;
-        client.player = newPlayer;
+        let newPlayer = this.physicsWorld.addPlayerCharacter(client, deathCallback)
 
+        client.player = newPlayer;
 
         this.zoneSender.notifyClientPlayer(client, newPlayer);
         this.zoneSender.initMessage(client, this.physicsWorld.entities, this.itemWorld.floorItems, newPlayer.config.key);
@@ -276,6 +279,21 @@ class ZoneSender{
             mHealth: entity.maxHealth
         })
     }
+
+    notifyEntityReload(entity, key){
+        this.room.roomMessage('reloadEntity', {
+            id:entity.entityPos || key,
+            x:entity.pos.x,
+            y:entity.pos.y,
+            facing: entity.direction,
+            state:entity.state,
+            base: entity.animationComponent.baseSprite ,
+            layers: entity.animationComponent.spriteLayers,
+            health: entity.health,
+            mHealth: entity.maxHealth
+        })
+    }
+
 
     notifyEntityRemove(entityPos){
         this.room.roomMessage('removeEntity', {

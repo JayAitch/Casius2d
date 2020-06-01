@@ -145,6 +145,13 @@ class MovingSprite{
         }
 
     }
+    changeAnimations(){
+        let animPrefix = this.state;
+        let anim = animPrefix + this.facing;
+        this.animation = anim
+        this.lastAnim = anim;
+    }
+
     get x(){
         return this.sprite.x;
     }
@@ -199,7 +206,7 @@ class MovingMultiSprite extends MovingSprite{
             sprite.z = tempCharacterLayer +1;
             addSpriteEffect(sprite,scene, elem.effect); //temp
         })
-
+        this.scene = scene;
     }
 
     set animation(animKey){
@@ -210,6 +217,28 @@ class MovingMultiSprite extends MovingSprite{
             if(sprite.anims)
                 sprite.anims.play(key + animKey);
         })
+    }
+
+    set layers(val){
+        let keyList = Object.keys(this.spriteList);
+        keyList.forEach((key)=>{
+            let sprite2 = this.spriteList[key];
+            sprite2.destroy();
+            delete this.spriteList[key];
+        });
+
+        val.forEach((elem)=>{
+            let sprite = this.scene.add.sprite(this.pos.x, this.pos.y);;
+            this.spriteList[elem.base] = sprite;
+            sprite.z = tempCharacterLayer +2;
+            addSpriteEffect(sprite,this.scene, elem.effect); //temp
+        })
+
+        this.changeAnimations();
+    }
+
+    set base(val){
+        console.log(val);
     }
 
     destroy(){
@@ -229,6 +258,7 @@ class MovingMultiSprite extends MovingSprite{
             sprite.x = x;
             sprite.y = y;
             sprite.depth = tempCharacterLayer + y;
+
         })
     }
 }

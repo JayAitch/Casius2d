@@ -212,13 +212,11 @@ class ActionsList{
 
     setCallBack(callback){
         this.clickTarget = callback;
-        console.log(callback);
     }
 
 
     set callBack(val){
         this.clickTarget = val;
-        console.log(this.clickTarget);
     }
 
     handleAction(action){
@@ -257,14 +255,13 @@ class InventorySlot{
     }
 
     set amount(val){
-     //   console.log(val);
     }
     set item(val){
         this.slottedItem = val;
         if(val === undefined){
             this.sprite.setTexture();
         }else{
-            this.sprite.setTexture(val.id ||val.base.inventoryIcon);
+            this.sprite.setTexture(val.base.inventoryIcon || val.id);
         }
     }
     clickSlot(param){
@@ -295,6 +292,10 @@ class ClientInventory{
         if(slots % row){
             this.createRow(slots % row);
         }
+    }
+
+    getItem(slot){
+        return this.inventorySlots[slot];
     }
 
     set items(items){
@@ -356,12 +357,30 @@ class InventoryScene extends  Phaser.Scene {
     }
 
     clickSlot(slot){
-        this.actionsList.actions = ["EQUIPT", "DROP"];
+        this.actionsList.actions = ["EQUIPT", "DROP", "PRINT"];
         // maybe get actions from item?
         this.actionsList.setCallBack((action)=>{
-            this.sender.clickInventorySlot(slot, action);
-            this.actionsList.cleanUp();
+            if(action === "PRINT"){
+                this.testPrintItemStats(this.inventory.getItem(slot).slottedItem);
+            }
+            else{
+                this.sender.clickInventorySlot(slot, action);
+                this.actionsList.cleanUp();
+            }
+
         });
 
+    }
+
+
+    testPrintItemStats(item){
+        let stats = item.base.stats;
+        let plus = item.plus;
+        let statRow = "";
+        Object.keys(stats).forEach((key)=>{
+            statRow = `${statRow} ${key} : ${stats[key]} + ${plus} \n`
+
+        })
+        console.log(statRow);
     }
 }

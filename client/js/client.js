@@ -56,6 +56,13 @@ class Receiver{
             })
         });
 
+        this.socket.on('reloadEntity',(data)=>{
+            let dataRow = data;
+            console.log(data);
+            this.gameScene.reloadEntity(data.id, data.base, data.layers);
+            //this.gameScene.newEntity(dataRow.position, dataRow.x, dataRow.y, dataRow.facing, dataRow.state, dataRow.base, dataRow.layers, data.health, data.mHealth)
+        });
+
         this.socket.on('removeItem', (data)=>{
             this.gameScene.removeItem(data.id);
         });

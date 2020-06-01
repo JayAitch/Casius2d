@@ -47,6 +47,11 @@ class Room{
         this.notifyNewMember(client);
     }
 
+    getClient(clientID){
+        console.log(this.clientLookup);
+        return this.clientLookup[clientID];
+    }
+
     leave(client){
         client.leave(this.id, (client) =>{
             this.notifyMemberLeft(client)
@@ -55,6 +60,15 @@ class Room{
     }
 
     broadcastMessage(client, hook, data){
+        if(data){
+            client.broadcast.to(this.id).emit(hook, data);
+        }else{
+            client.broadcast.to(this.id).emit(hook);
+        }
+    }
+
+    broadcastMessageViaID(clientID, hook, data){
+        let client = this.clientLookup[clientID];
         if(data){
             client.broadcast.to(this.id).emit(hook, data);
         }else{

@@ -19,36 +19,51 @@ const xDbManager = require('./persistance-manager.js')
 //     console.log("I dided it?: " + done)
 // })
 
-
 players = {
     0:{
         base:"basecharacter",
         paperDoll:{
-            HEAD: {
-                base: items.bronzehelm,
-                plus:0
-            },
-            BODY: {
-                base: items.jacket,
-                plus:1
-            },
-            WEAPON: {
-                base: items.dspear,
-                plus:1
-            },
+            HEAD: undefined,
+            BODY:undefined,
+            WEAPON: undefined,
             OFFHAND: undefined,
-            LEGS: {base: items.goldlegs,
-                plus: 1
-            },
+            BELT:undefined,
+            LEGS: undefined,
             BOOTS: undefined
         }
     }
 };
 
+// players = {
+//     0:{
+//         base:"basecharacter",
+//         paperDoll:{
+//             HEAD: {
+//                 base: items.bronzehelm,
+//                 plus:0
+//             },
+//             BODY: {
+//                 base: items.jacket,
+//                 plus:1
+//             },
+//             WEAPON: {
+//                 base: items.dspear,
+//                 plus:1
+//             },
+//             OFFHAND: undefined,
+//             LEGS: {base: items.goldlegs,
+//                 plus: 1
+//             },
+//             BOOTS: undefined
+//         }
+//     }
+// };
+
 inventories ={
-    0:[{base:items.seeradish,quantity:1, plus:0},
+    1090909090:[{base:items.seeradish,quantity:1, plus:0},
         {base:items.goldhelm,quantity:1, plus:6}
-    ]
+    ],
+    0:[ ]
 }
 
 
@@ -67,7 +82,6 @@ class PlayerStats {
             let additional = json[expKey];
             let total = current + additional;
             this.experience[expKey] = total;
-            console.log(this.experience);
         })
     }
 }
@@ -76,6 +90,46 @@ class PlayerLocation{
     constructor(zone, pos){
         this.zone = zone;
         this.pos = pos;
+    }
+}
+
+
+// TODO: move messaging to a class via this
+global.serverSender = {
+    wholeRoom:function(hook, data, playerLocation) {
+        this.getRoom(playerLocation).roomMessage(hook, data);
+    },
+
+    getRoom:function(playerLocation) {
+        let zone = ZONES[playerLocation.zone];
+        return zone.zoneSender.room;
+    },
+
+    getZone:function(playerLocation) {
+        let zone = ZONES[playerLocation.zone];
+        return zone;
+    },
+
+    zoneMessage:function(hook,data,playerLocation){
+       // this.getSender(playerLocation);
+        //zoneSender.notfiyEnitityReload();
+    },
+    //temp
+        //// temp/////
+    propigateReload: function(key,playerLocation){
+        let zone = this.getZone(playerLocation);
+        zone.triggerEntityReload(key);
+    },
+
+
+    broadCastRoom:function(hook,data, playerLocation, id){
+        this.getRoom(playerLocation).broadcastMessageViaID(id,hook, data);
+    },
+
+    clientMessage:function(hook, data, playerLocation, id){
+        let room = this.getRoom(playerLocation);
+        let client = room.clientLookup[id];
+        client.emit(hook, data);
     }
 }
 
@@ -97,7 +151,7 @@ io.on('connect', function(client) {
         let playerStats = new PlayerStats(200,200, 5, 30);
         client.character = {};
         client.playerStats = playerStats;
-        client.playerLocation = new PlayerLocation(0, {x:150,y:150})
+        client.playerLocation = new PlayerLocation(0, {x:150,y:150});
         tryLogin(client, username, password);
     });
 
@@ -125,7 +179,7 @@ io.on('connect', function(client) {
             let slot = data.slot;
             let action = data.action; //TODO: use messaging action
             client.character.invent.actOnPaperDollSlot(slotActions.CLICK, slot);
-            client.emit("myInventory", client.character.invent.message);
+          //  client.emit("myInventory", client.character.invent.message);
         });
 
         client.on('clickInventorySlot',function(data) {
@@ -134,13 +188,12 @@ io.on('connect', function(client) {
             let zone = ZONES[client.playerLocation.zone];
             let playerPos = client.playerLocation.pos;
             client.character.invent.actOnInventorySlot(action, slot, zone, playerPos);
-            client.emit("myInventory", client.character.invent.message);
+          //  client.emit("myInventory", client.character.invent.message);
         });
     });
 
     client.on('createaccount', function(username,password){
         xDbManager.databaseConnection.createAccount(username,password).then(accountCreated => {
-            console.log(accountCreated);
             if(accountCreated){
                 console.log("Account created!")
             }else{
@@ -224,9 +277,8 @@ function setupCharacter(client,username){
         }else{
             client.character.appearance = players[0].base;// more in here later
             client.character._id =  randomInteger(0, 9999999); //temp
-            let invManager = new invent.InventoryManager(inventories[0], players[0].paperDoll);
+            let invManager = new invent.InventoryManager(inventories[0], players[0].paperDoll, client.playerLocation,  client.character._id, client.playerStats);
             client.character.invent = invManager;
-            //   console.log(client.character)
             return resolve(true)
         }
 
@@ -265,7 +317,6 @@ global.distance = function(pointA, pointB){
     return c;
 }
 
-global.sendAOEDebug = function(pos, width, height){
-    let zone = ZONES[0];//wrong
-    zone.zoneSender.room.roomMessage('AOEDebug',{pos:pos,width:width, height:height})
+global.sendAOEDebug = function(zoneid, pos, width, height){
+    serverSender.wholeRoom('AOEDebug', {pos:pos,width:width, height:height},{zone:zoneid})
 }
