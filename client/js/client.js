@@ -42,6 +42,10 @@ class Receiver{
         });
 
 
+        this.socket.on('AOEDebug',(data)=>{
+            this.gameScene.printAOEDebug(data);
+        });
+
         this.socket.on('entityList', (data)=>{
             // health is always blank here
             let keyList = Object.keys(data);

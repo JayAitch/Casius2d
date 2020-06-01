@@ -114,6 +114,7 @@ class Zone{
 
         systems.addToUpdate(this);
         this.testCreateMobLots(5);
+        this.testCreateNodeLots(5);
     }
 
     testCreateMobLots(times){
@@ -125,10 +126,22 @@ class Zone{
                     clearTimeout(timedcallback);
                 }, 2000)
             }
-            this.physicsWorld.testCreateMob(callBack);
-
+            this.physicsWorld.testCreateMob(callBack, characters.BasicMob);
         }
     }
+
+
+    testCreateNodeLots(times){
+        for(let i = 0; i < times; i++){
+            let callBack = (pos)=>{
+                this.itemWorld.addItem(pos,dropManager.roleDrop(0));
+            }
+            this.physicsWorld.testCreateMob(callBack, characters.BasicResource);
+        }
+    }
+
+
+
 
     join(clientID, playerLocation, previousZoneID, client, newPosition){
         if(previousZoneID != undefined){
@@ -229,11 +242,12 @@ class ZoneSender{
                 facing: entity.direction,
                 state:entity.state,
                 base: entity.animationComponent.baseSprite,
-                layers: entity.animationComponent.spriteLayers,
+                layers: entity.animationComponent.spriteLayers ,
                 health: entity.health,
                 mHealth: entity.maxHealth
             };
         });
+
         return tempEntities;
     }
 
@@ -244,7 +258,7 @@ class ZoneSender{
             y:entity.pos.y,
             facing: entity.direction,
             state:entity.state,
-            base: entity.animationComponent.baseSprite,
+            base: entity.animationComponent.baseSprite ,
             layers: entity.animationComponent.spriteLayers,
             health: entity.health,
             mHealth: entity.maxHealth
@@ -336,6 +350,7 @@ class PhysicsWorld{
     addPlayerCharacter(client, deathcallback){
         let entityKey = this.lastEntityId;
         let playerConfig = {
+            inventory: client.character.invent,
             appearance: client.character.appearance,
             paperDoll: client.character.invent.paperDoll,
             key: entityKey,
@@ -351,8 +366,8 @@ class PhysicsWorld{
         return newPlayer;
     }
 
-    testCreateMob(droptest){
-        this.testMob = new characters.BasicMob(this.collisionManager,droptest);
+    testCreateMob(droptest, type){
+        this.testMob = new type(this.collisionManager, droptest);
         this.entities[this.lastEntityId] = this.testMob;
         this.sender.notifyNewEntity(this.testMob, this.lastEntityId);
         this.lastEntityId++

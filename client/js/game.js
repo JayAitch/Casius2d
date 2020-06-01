@@ -19,7 +19,16 @@ class EquiptableItem extends Item{
         this.slot = slot
     }
 }
+class MyRectangle extends Phaser.GameObjects.Rectangle {
+    constructor(scene, x, y, width, height, fillColor) {
+        super(scene, x, y, width, height, fillColor);
+        // ...
+        scene.add.existing(this);
+    }
+    // ...
 
+    // preUpdate(time, delta) {}
+}
 
 let items;
 let MAPS = {0:"map",1:"map2", 2:"map3"}
@@ -60,7 +69,32 @@ class GameScene extends Phaser.Scene {
         this.controller = new Controller(this,this.client);
     }
 
+    printAOEDebug(data){
+        let pos = data.pos;
+        let width = data.width;
+        let height = data.height;
 
+        let rect = new MyRectangle(this, pos.x - width/2,pos.y - height/2, width, height);
+        console.log("printing bruv");
+        let graphics = this.add.graphics({fillStyle: {color: 0xff0000, alpha: 0.5}});
+        graphics.fillRectShape(rect);
+        //
+        // this.tweens.addCounter({
+        //     from: 0.5,
+        //     to: 0,
+        //     duration: 2000,
+        //     yoyo:false,
+        //     repeat: 0,
+        //     onUpdate: (tween)=>
+        //     {
+        //         let value = tween.getValue();
+        //         rect.setFillStyle(0xff0000, value);
+        //
+        //     }
+        // });
+
+
+    }
     loadMap(id) {
   //      this.clearEnities();
    //     this.clearItems();

@@ -56,11 +56,20 @@ class PlayerStats {
     constructor(health, experience, defence, attack) {
         this.maxHealth = health;
         this.health = health;
-        this.experience = experience;
+        this.experience = {};
         this.defence = defence;
         this.attack = attack;
     }
-
+    addExperience(json){
+        let keys = Object.keys(json);
+        keys.forEach(expKey=>{
+            let current = this.experience[expKey] || 0;
+            let additional = json[expKey];
+            let total = current + additional;
+            this.experience[expKey] = total;
+            console.log(this.experience);
+        })
+    }
 }
 
 class PlayerLocation{
@@ -96,11 +105,11 @@ io.on('connect', function(client) {
         firstJoin(client, curr_username, client.playerLocation);
 
         client.on('stop',function() {
-            client.player.stop();
+            client.player.movementComponent.stop();
         });
 
         client.on('move',function(data) {
-            client.player.addMovement({x:data.x, y:data.y});
+            client.player.movementComponent.addMovement({x:data.x, y:data.y});
         });
 
         client.on('attack',function(data) {
@@ -190,9 +199,9 @@ function setupCharacter(client,username){
                                 //Do something with chars2
                                 console.log("Character made!");
                                 //TODO: register appearance as animkey, plus/effect and base
-                                client.character.paperDoll = chars2[0].character.paperDoll;
-                                client.character.appearance = chars2[0].base // more in here later
-                                client.character._id = chars2[0]._id || randomInteger(0, 9999999); //temp
+                                //client.character.paperDoll = chars2[0].character.paperDoll;
+                                //client.character.appearance = chars2[0].base // more in here later
+                               // client.character._id = chars2[0]._id || randomInteger(0, 9999999); //temp
                                 return resolve(true);
                             })
                         }else{
@@ -213,10 +222,10 @@ function setupCharacter(client,username){
                 }
             })
         }else{
-            let invManager = new invent.InventoryManager(inventories[0], players[0].paperDoll);
-            client.character.invent = invManager;
             client.character.appearance = players[0].base;// more in here later
             client.character._id =  randomInteger(0, 9999999); //temp
+            let invManager = new invent.InventoryManager(inventories[0], players[0].paperDoll);
+            client.character.invent = invManager;
             //   console.log(client.character)
             return resolve(true)
         }
@@ -254,4 +263,9 @@ global.distance = function(pointA, pointB){
 
     let c = Math.sqrt( a*a + b*b );
     return c;
+}
+
+global.sendAOEDebug = function(pos, width, height){
+    let zone = ZONES[0];//wrong
+    zone.zoneSender.room.roomMessage('AOEDebug',{pos:pos,width:width, height:height})
 }

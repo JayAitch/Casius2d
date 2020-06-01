@@ -62,9 +62,9 @@ class PaperDoll{
 }
 
 class InventoryManager{
-    constructor(inventory, paperDoll){
+    constructor(inventory, paperDoll, location){
         this.inv = new Inventory(inventory);
-        this.ppD = new PaperDoll(paperDoll);;
+        this.ppD = new PaperDoll(paperDoll);
     }
 
     get paperDoll(){

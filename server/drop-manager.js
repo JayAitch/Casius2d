@@ -63,5 +63,7 @@ dropManager.createDrops();
 function roleDrop(id){
     return dropManager.createDrop(id);
 }
-
+global.getDrop = function(id){
+    return dropManager.createDrop(id);
+}
 module.exports={roleDrop}

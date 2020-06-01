@@ -115,8 +115,11 @@ class MovingSprite{
     }
 
     set animation(animKey){
-        let lookup = animations[this.animationLookup][animKey];
-        if(this.sprite.anims)
+        let anim = animations[this.animationLookup];
+        let lookup = "nothing" //temp
+        if(anim)
+            lookup = animations[this.animationLookup][animKey];
+        if(this.sprite.anims && lookup)
             this.sprite.anims.play(lookup);
     }
 
