@@ -32,6 +32,7 @@ function getWorldObjects(id){
                 pos: {x: object.x,y:object.y},
                 type:object.type,
             }
+            ////// TEMP /////
             let newzone = getProperty(object.properties, "zone");
             if(newzone !== undefined) newObject.zone = newzone;
 
@@ -41,7 +42,10 @@ function getWorldObjects(id){
             let ypos = getProperty(object.properties, "y");
             if(ypos !== undefined) newObject.y = ypos;
 
+            let id = getProperty(object.properties, "node_id");
+            if(id !== undefined) newObject.node_id = id;
 
+            console.log(newObject);
 
             worldObjects.push(newObject);
         });
@@ -104,6 +108,19 @@ class ItemWorld{
     }
 }
 
+nodeLookup = {
+    "rock_iron":{
+        "drop": "rock_iron_1",
+        "class": characters.BasicResource
+    },
+    "wood_magic":{
+        "drop": "wood_magic_1",
+        "class": characters.BasicResource
+    }
+}
+
+
+
 // receive mapped map!
 class Zone{
     constructor(zoneid) {
@@ -114,7 +131,7 @@ class Zone{
 
         systems.addToUpdate(this);
         this.testCreateMobLots(5);
-        this.testCreateNodeLots(5);
+      //  this.testCreateNodeLots(5);
     }
 
     testCreateMobLots(times){
@@ -130,15 +147,15 @@ class Zone{
         }
     }
 
-
-    testCreateNodeLots(times){
-        for(let i = 0; i < times; i++){
-            let callBack = (pos)=>{
-                this.itemWorld.addItem(pos,dropManager.roleDrop(0));
-            }
-            this.physicsWorld.testCreateMob(callBack, characters.BasicResource);
-        }
-    }
+    //
+    // testCreateNodeLots(times){
+    //     for(let i = 0; i < times; i++){
+    //         let callBack = (pos)=>{
+    //             this.itemWorld.addItem(pos,dropManager.roleDrop(0));
+    //         }
+    //         this.physicsWorld.testCreateMob(callBack, characters.BasicResource);
+    //     }
+    // }
 
     triggerEntityReload(key){
        let entity = this.physicsWorld.entities[key];
@@ -326,9 +343,11 @@ class PhysicsWorld{
         this.sender = sender;
         this.collisionManager = new systems.CollisionManager();
         this.worldObjects = getWorldObjects(zoneid); // use this to target specfic zone
-        this.createNonPassibles(this.worldObjects);
+        this.zoneid = zoneid;
         this.entities = {};
         this.lastEntityId = 0;
+        this.createFromJSON(this.worldObjects);
+
     }
 
     update(){
@@ -347,7 +366,7 @@ class PhysicsWorld{
         this.collisionManager.update();
     }
 
-    createNonPassibles(objects){
+    createFromJSON(objects){
         objects.forEach((object)=>{
             let x = object.pos.x + object.width/2;//temp
             let y = object.pos.y + object.height/2;
@@ -358,7 +377,21 @@ class PhysicsWorld{
                     break;
                 case "TRIGGER_ZONE_CHANGE":
                     let testZonePortal = new characters.ZonePortal(correctPos, object.width,object.height,this.collisionManager, object.zone, object.x,object.y);
+                    break;
+                case "NODE":
 
+
+                    let lookup = nodeLookup[object.node_id]
+                    console.log(object);
+                    let objClass = lookup.class;
+                    let drop = lookup.drop;
+                    // let callBack = (pos)=>{
+                    //     this.itemWorld.addItem(pos,dropManager.roleDrop(drop));
+                    // }
+                    let testNode = new objClass(this.collisionManager,correctPos, drop,  this.zoneid);
+                    console.log(testNode);
+                    this.entities[this.lastEntityId] = testNode;
+                    this.lastEntityId++;
             }
 
         })

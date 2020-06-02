@@ -60,10 +60,10 @@ players = {
 // };
 
 inventories ={
-    1090909090:[{base:items.seeradish,quantity:1, plus:0},
+    0:[{base:items.seeradish,quantity:1, plus:0},
         {base:items.goldhelm,quantity:1, plus:6}
     ],
-    0:[ ]
+    111110:[ ]
 }
 
 
@@ -73,7 +73,10 @@ class PlayerStats {
         this.health = health;
         this.experience = {};
         this.defence = defence;
+        this.attackSpeed = 600; //temp
+        this.baseAttack = 50;//temp
         this.attack = attack;
+        this.speed = 10;//temp
     }
     addExperience(json){
         let keys = Object.keys(json);
@@ -148,7 +151,8 @@ io.on('connect', function(client) {
 
     client.on('login',function(username,password){
         curr_username = username
-        let playerStats = new PlayerStats(200,200, 5, 30);
+        // for some reason this prints at 30 but is clearly nothing before the paperdoll is rebuilt
+        let playerStats = new PlayerStats(200,200, 5, 30); //these now recalculate
         client.character = {};
         client.playerStats = playerStats;
         client.playerLocation = new PlayerLocation(0, {x:150,y:150});

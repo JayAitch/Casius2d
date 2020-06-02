@@ -229,9 +229,9 @@ class AIComponent{
 
 // not currently used
 class MovementComponent{
-    constructor(pos) {
+    constructor(pos,speed) {
         this.velocity = {x: 0, y: 0};
-        this.moveSpeed = 24;
+        this.moveSpeed = speed;
         this.pos = pos;
         this.previousePos = pos;
     }

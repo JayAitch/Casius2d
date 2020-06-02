@@ -92,6 +92,7 @@ class PreloadScene extends Phaser.Scene{
         {
             //todo: move and test this at the end of on create
             this.scene.start('loginscene');
+            audioPlayer = new AudioPlayer();
         }, this);
     }
 
@@ -119,7 +120,7 @@ class PreloadScene extends Phaser.Scene{
                         break;
 
                     case 'audio':
-                        this.load[group](key, value);
+                        this.load[group](key, value.path);
                         break;
 
                     case 'spritesheet':

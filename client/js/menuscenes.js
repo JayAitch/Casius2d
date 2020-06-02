@@ -95,6 +95,7 @@ class PaperDoll{
             slot.item = item;
             slotInc++;
         })
+        audioPlayer.equipt.play();
     }
 
     createRow(slotKeys){
@@ -256,6 +257,7 @@ class InventorySlot{
 
     set amount(val){
     }
+
     set item(val){
         this.slottedItem = val;
         if(val === undefined){
@@ -264,6 +266,7 @@ class InventorySlot{
             this.sprite.setTexture(val.base.inventoryIcon || val.id);
         }
     }
+
     clickSlot(param){
         this.clickHandler(this.slot);
     }

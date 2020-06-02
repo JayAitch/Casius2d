@@ -30,6 +30,21 @@ class MyRectangle extends Phaser.GameObjects.Rectangle {
     // preUpdate(time, delta) {}
 }
 
+
+class AudioPlayer{
+    constructor(){
+       this.equipt = game.sound.add("equip-item"); // use a config
+       this.swing = game.sound.add("sword-swing"); // use a config
+       this.swing.volume = 0.2;
+       this.bgMusic = game.sound.add("backing-track");
+       this.bgMusic.volume = 0.01;
+       this.bgMusic.setLoop(true);
+       this.mobPain = game.sound.add("pig-grunt") // use a config
+    }
+}
+let audioPlayer;
+
+
 let items;
 let MAPS = {0:"map",1:"map2", 2:"map3"}
 class GameScene extends Phaser.Scene {
@@ -37,6 +52,7 @@ class GameScene extends Phaser.Scene {
         super({key: 'maingame'});
         this.mapEntities = {};
         this.floorItems = {};
+
     }
 
 
@@ -71,10 +87,10 @@ class GameScene extends Phaser.Scene {
         let pos = data.pos;
         let width = data.width;
         let height = data.height;
-console.log("PRINTING DEBUG");
+        console.log("PRINTING DEBUG");
         let rect = new MyRectangle(this, pos.x,pos.y, width, height);
+        audioPlayer.swing.play();
 
-        console.log("printing bruv");
         let graphics = this.add.graphics({fillStyle: {color: 0xff0000, alpha: 0.5}});
         //graphics.fillRectShape(rect);
 
@@ -137,6 +153,8 @@ console.log("PRINTING DEBUG");
         aboveLayer1.depth = tempAboveTileLayer;
         aboveLayer2.depth = tempAboveTileLayer + 1;
         aboveLayer3.depth = tempAboveTileLayer + 2;
+
+        audioPlayer.bgMusic.play(); // choose a song in the map data
     }
 
     removeCurrentMap() {
@@ -179,7 +197,6 @@ console.log("PRINTING DEBUG");
         console.log(layers);
         entity.base = base;
         entity.layers = layers;
-
     }
 
     newEntity(id, x, y, facing, state, base, layers, health, mHealth){

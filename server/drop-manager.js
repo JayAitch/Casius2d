@@ -1,41 +1,75 @@
 dropLookup = {
-    0:{
+    "rock_iron_1":{
         0:{
-        item:{base: items.goldhelm, plus:0},
-        chance: 5
+            item:{base: items.copperore},
+            chance: 50
+        },
+        0:{
+            item:{base: items.gem},
+            chance: 5
+        },
+        0:{
+            item:{base: items.copperore},
+            chance: 50
+        }
+    },
+    "wood_magic_1":{
+        0:{
+            item:{base: items.silk},
+            chance: 5
         },
         1:{
-            item:{base: items.seeradish},
-            chance: 5
-        },
-        2:{
-            item:{base: items.leatherbelt, plus: 100},
-            chance: 5
-        },
-        9:{
-            item:{base: items.shield, plus: 100},
-            chance: 5
+            item:{base: items.log},
+            chance: 50
         },
         3:{
-            item:{base: items.spear, plus: 6},
-            chance: 5
+            item:{base: items.petal},
+            chance: 15
         },
-        4:{
-            item:{base: items.dspear, plus:10000},
-            chance: 5
-        },
-        6:{
-            item:{base: items.leatherbelt, plus: 100},
-            chance: 5
-        },
-        7:{
-            item:{base: items.goldlegs, plus: 100},
-            chance: 5
-        },
-        8:{
-            item:{base: items.jacket, plus: 6},
-            chance: 5
+        0:{
+            item:{base: items.feather},
+            chance: 2
         }
+
+    },
+
+    0:{
+        0:{
+        item:{base: items.leatherbelt, plus:0},
+        chance: 5
+        },
+        // 1:{
+        //     item:{base: items.seeradish},
+        //     chance: 5
+        // },
+        // 2:{
+        //     item:{base: items.leatherbelt, plus: 100},
+        //     chance: 5
+        // },
+        // 9:{
+        //     item:{base: items.shield, plus: 100},
+        //     chance: 5
+        // },
+        // 3:{
+        //     item:{base: items.spear, plus: 6},
+        //     chance: 5
+        // },
+        // 4:{
+        //     item:{base: items.dspear, plus:10000},
+        //     chance: 5
+        // },
+        // 6:{
+        //     item:{base: items.leatherbelt, plus: 100},
+        //     chance: 5
+        // },
+        // 7:{
+        //     item:{base: items.goldlegs, plus: 100},
+        //     chance: 5
+        // },
+        // 8:{
+        //     item:{base: items.jacket, plus: 6},
+        //     chance: 5
+        // }
     }
 };
 
@@ -63,6 +97,7 @@ const dropManager = {
 
     },
     createDrop: function(id){
+
         let drop = this.drops[id];
         let dropPosition = randomInteger(0, drop.length - 1);
         let droppedItem = drop[dropPosition];

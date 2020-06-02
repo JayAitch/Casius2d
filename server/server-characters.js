@@ -121,16 +121,14 @@ class DamageableCharacter extends GameObject {
 // ToDo: this shouldnt move
 class BasicResource extends  DamageableCharacter{
 
-    constructor(collisionManager, dropCallback, zone) {
+    constructor(collisionManager,pos, dropId, zone) {
         let layers = {base: "rock"};
-        let pos = {x: 250, y: 250};
         let stats = { health: 100, maxHealth:100, defence:5};
         super(pos,  stats, zone);
-        this.moveSpeed = 3;
         this.width = 32; // temp
         this.height = 32; // temp
         this.stats = stats ;
-        this.dropCallback = dropCallback;
+        this.dropId = dropId
         this.createCollider(collisionManager);
         this.animationComponent = new characterComponents.AnimationComponent(layers, {x:0,y:0});
     }
@@ -159,7 +157,7 @@ class BasicResource extends  DamageableCharacter{
 
     takeDamage(damage) {
         //this.dropCallback(this.pos);
-        let drop = getDrop(0);
+        let drop = getDrop(this.dropId);
         let rewardMessage = {
             type: messageTypes.REWARD,
             items: [drop],
@@ -193,27 +191,28 @@ class BasicMob extends  DamageableCharacter{
     constructor(collisionManager, deathCallback, zone) {
         let layers = {base: "pig"};
         let pos = {x: 150, y: 150};
-        let stats = { health: 100, maxHealth:100, defence:5, attack:2 };
+        let stats = {health: 100, maxHealth:100, defence:0, attack:2, speed:3 };
         super(pos, stats, zone);
-        this.moveSpeed = 3;
         this.width = 32; // temp
         this.height = 32; // temp
         this.stats = stats ;
         this.deathCallback = deathCallback;
         this.createCollider(collisionManager);
-        this.movementComponent = new characterComponents.MovementComponent(this.pos);
+        this.movementComponent = new characterComponents.MovementComponent(this.pos, stats.speed);
         this.animationComponent = new characterComponents.AnimationComponent(layers, this.movementComponent);
         this.components.push(new characterComponents.AIComponent(this.pos, this.velocity, this.movementComponent));
         this.components.push(this.movementComponent);
         this.components.push(this.animationComponent);
-
     }
+
     get direction(){
         return this.animationComponent.direction;
     }
+
     get state(){
         return this.animationComponent.currentState;
     }
+
     createCollider(collisionManager){
         let colliderConfig = {
             width:this.width,
@@ -257,6 +256,7 @@ class BasicMob extends  DamageableCharacter{
             type: messageTypes.DAMAGE,
             damage: this.stats.attack
         }
+        // todo: we are still having the player callkback
         other.collisionCallback(message); //todo change to generic messaging functionality
     }
 
@@ -264,6 +264,7 @@ class BasicMob extends  DamageableCharacter{
     message(message) {
         switch (message.type) {
             case messageTypes.DAMAGE:
+                console.log(message);
                 let reward = this.takeDamage(message.damage);
                 let rewardMessage = {type:messageTypes.REWARD,
                     experience: {combat:reward}
@@ -291,39 +292,13 @@ class BasicMob extends  DamageableCharacter{
 
 class ServerPlayer extends DamageableCharacter{
     constructor(playerConfig, collisionManager){
-        // let animLayers = {base:playerConfig.appearance}; // TODO: hair etc
-        // let paperDoll = playerConfig.paperDoll;
-        // let layers = [];
-        //
-        // let item = getGearSlot(paperDoll, "BOOTS")
-        // if(item)layers.push({base:item.base.animString,effect: item.plus});
-        //
-        // item = getGearSlot(paperDoll, "LEGS")
-        // if(item)layers.push({base:item.base.animString,effect: item.plus});
-        //
-        // item = getGearSlot(paperDoll, "BODY")
-        // if(item)layers.push({base:item.base.animString,effect: item.plus});
-        //
-        // item = getGearSlot(paperDoll, "HEAD")
-        // if(item)layers.push({base:item.base.animString,effect: item.plus});
-        //
-        // item = getGearSlot(paperDoll, "WEAPON")
-        // if(item)layers.push({base:item.base.animString,effect: item.plus});
-        //
-        // item = getGearSlot(paperDoll, "OFFHAND")
-        // if(item)layers.push({base:item.base.animString,effect: item.plus});
-        //
-        // animLayers.layers = layers;
-
         super(playerConfig.location.pos,  playerConfig.stats, playerConfig.location.zone);
-
-
         this.config = playerConfig;
         this.width = 32;
         this.height = 48;
 
         let collider = this.createCollider(collisionManager);
-        this.movementComponent = new characterComponents.MovementComponent(this.pos);
+        this.movementComponent = new characterComponents.MovementComponent(this.pos, this.config.stats.speed);
         let animLayers = this.animationLayers;
         this.animationComponent = new characterComponents.AnimationComponent(animLayers, this.movementComponent);
 
@@ -333,7 +308,7 @@ class ServerPlayer extends DamageableCharacter{
         // may need stats to calculate damage etc
         this.attackingComponent = new characterComponents.AttackingComponent(collisionManager,
             this.pos,
-            this.animationComponent,//wrong
+            this.animationComponent,
             playerConfig.stats,
             this.zone
             );
@@ -362,6 +337,9 @@ class ServerPlayer extends DamageableCharacter{
         if(item)layers.push({base:item.base.animString,effect: item.plus});
 
         item = getGearSlot(paperDoll, "HEAD")
+        if(item)layers.push({base:item.base.animString,effect: item.plus});
+
+        item = getGearSlot(paperDoll, "BELT")
         if(item)layers.push({base:item.base.animString,effect: item.plus});
 
         item = getGearSlot(paperDoll, "WEAPON")
@@ -425,15 +403,14 @@ class ServerPlayer extends DamageableCharacter{
 
 
     attack(){
-        console.log(this.config.stats)
         let rewardCB = (rewardMessage)=>{this.message(rewardMessage);};
         let attackMessage = {
             type: messageTypes.DAMAGE,
-            damage: this.config.stats.damage || 0,
+            damage: this.config.stats.attack || 0,
             rewardCB: rewardCB
         }
         let attackCB = ()=>{this.attackingComponent.attack(attackMessage)};
-        this.animationComponent.forceStateFor(400,180,states.THRUST, attackCB)
+        this.animationComponent.forceStateFor(this.config.stats.attackSpeed,this.config.stats.attackSpeed/2,states.THRUST, attackCB)
     }
 
     kill() {

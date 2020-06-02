@@ -173,9 +173,9 @@ class InventoryManager{
 
 
     testCalculateStats() {
-
+        /// TEMP do this in stats!!
         let ppdKeys = Object.keys(this.paperDoll);
-        let statTotals = {};
+        let statTotals = {attack:this.playerStats.baseAttack};
         ppdKeys.forEach((key)=>{
             let stats = this.paperDoll[key].base.stats;
             let plus =  this.paperDoll[key].plus || 0;
@@ -183,7 +183,7 @@ class InventoryManager{
             let statKeys = Object.keys(stats);
             statKeys.forEach((statKey)=>{
                 let statTot = statTotals[statKey] || 0
-                statTotals[statKey] = statTot +(stats[statKey] + plus)
+                statTotals[statKey] = statTot +(stats[statKey] + plus);
             })
 
 
@@ -194,6 +194,7 @@ class InventoryManager{
             // health will break some things :)
             this.playerStats[totalStatKey] = stat;
         })
+
     }
 
     clientUpdate(){

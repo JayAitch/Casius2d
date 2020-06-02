@@ -238,7 +238,7 @@ class MovingMultiSprite extends MovingSprite{
     }
 
     set base(val){
-        console.log(val);
+       // console.log(val);
     }
 
     destroy(){
@@ -267,9 +267,15 @@ class MovingMultiSprite extends MovingSprite{
 class TestMonster extends MovingSprite{
     constructor(scene, pos, base, health, mHealth){
         super(scene, pos, base);
-        this.healthBar = new HealthBar(scene,pos.x,pos.y,60,8, health, mHealth,-30)
+        this.healthBar = new HealthBar(scene,pos.x,pos.y,60,8, health, mHealth,-30);
+        this.prevHealth = health || 99999; //temp
     }
+
     set health(val){
+        if(this.prevHealth > val) {
+            audioPlayer.mobPain.play();
+            this.prevHealth = val;
+        }
         this.healthBar.health = val;
     }
 
