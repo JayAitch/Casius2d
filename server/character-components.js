@@ -11,6 +11,7 @@ class AnimationComponent{
         this.deltaTime = 0;
         this.previouseVelo = moveComp.velocity;
         this.forcedState = false;
+        this.direction = {x:-1,y:0};
     }
 
     remove(){
@@ -92,7 +93,7 @@ class AttackingComponent{
     }
 
     attack(message){
-        let direction = directionAsVector(this.directionObject.direction);
+        let direction = directionAsVector(this.directionObject.direction)|| {x: 0, y: -1};
         let x = (direction.x * 50) + this.origin.x;
         let y = (direction.y * 50) + this.origin.y;
         let hitEntities = this.scanForEntities(x,y,50,50);
