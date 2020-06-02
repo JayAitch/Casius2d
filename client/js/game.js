@@ -277,15 +277,18 @@ class GameScene extends Phaser.Scene {
 
 class Controller{
     constructor(scene, client){
-        let leftKey = scene.input.keyboard.addKey("LEFT");
-        let rightKey = scene.input.keyboard.addKey("RIGHT");
-        let upKey = scene.input.keyboard.addKey("UP");
-        let downKey = scene.input.keyboard.addKey("DOWN");
+        let leftKey = scene.input.keyboard.addKey("A");
+        let rightKey = scene.input.keyboard.addKey("D");
+        let upKey = scene.input.keyboard.addKey("W");
+        let downKey = scene.input.keyboard.addKey("S");
         //    let spaceKey = scene.input.keyboard.addKey("SPACE");
         let spaceKey = scene.input.keyboard.addKey("SPACE");
         let ctrlKey = scene.input.keyboard.addKey("CTRL");
 
         this.client = client;
+
+        //this.directionKeys = {left:leftKey, right:rightKey, up:upKey, down:downKey}
+        this.directionKeys = [leftKey, rightKey, upKey, downKey]
 
         ctrlKey.on('down', (event)=> {
             let itemID = scene.getClosestItem();
@@ -297,12 +300,19 @@ class Controller{
             client.sender.attack();
         });
 
+
+
+
         leftKey.on('down', (event)=> {
             client.sender.move({x: -1, y:0});
         });
 
-        leftKey.on('up', function(event) {
-            client.sender.stop();
+        leftKey.on('up', (event)=> {
+
+            if (!this.isAnotherDirectionKeyDown()){
+                client.sender.stop();
+            }
+
         });
 
 
@@ -310,24 +320,40 @@ class Controller{
             client.sender.move({x:1, y:0});
         });
 
-        rightKey.on('up', function(event) {
-            client.sender.stop();
+        rightKey.on('up', (event)=> {
+            if (!this.isAnotherDirectionKeyDown()){
+                client.sender.stop();
+            }
         });
 
         upKey.on('down', (event)=> {
             client.sender.move({x:0, y:-1});
         });
 
-        upKey.on('up', function(event) {
-            client.sender.stop();
+        upKey.on('up', (event)=> {
+            if (!this.isAnotherDirectionKeyDown()){
+                client.sender.stop();
+            }
         });
 
         downKey.on('down', (event)=> {
             client.sender.move({x:0, y:1});
         });
-        downKey.on('up', function(event) {
-            client.sender.stop();
+        downKey.on('up', (event)=> {
+            if (!this.isAnotherDirectionKeyDown()){
+                client.sender.stop();
+            }
         });
     }
 
+    isAnotherDirectionKeyDown(){
+        let isDown = false;
+        this.directionKeys.forEach((key)=>{
+            if(key.isDown){
+                let button = this.directionKeys[key];
+                isDown = true;
+            }
+        })
+        return isDown;
+    }
 }
