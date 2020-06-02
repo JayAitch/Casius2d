@@ -121,14 +121,15 @@ class DamageableCharacter extends GameObject {
 // ToDo: this shouldnt move
 class BasicResource extends  DamageableCharacter{
 
-    constructor(collisionManager,pos, dropId, zone) {
+    constructor(collisionManager,pos, dropId, zone, reward) {
         let layers = {base: "rock"};
         let stats = { health: 100, maxHealth:100, defence:5};
         super(pos,  stats, zone);
         this.width = 32; // temp
         this.height = 32; // temp
         this.stats = stats ;
-        this.dropId = dropId
+        this.dropId = dropId;
+        this.skillReward = reward;
         this.createCollider(collisionManager);
         this.animationComponent = new characterComponents.AnimationComponent(layers, {x:0,y:0});
     }
@@ -158,10 +159,11 @@ class BasicResource extends  DamageableCharacter{
     takeDamage(damage) {
         //this.dropCallback(this.pos);
         let drop = getDrop(this.dropId);
+        let reward = this.skillReward;
         let rewardMessage = {
             type: messageTypes.REWARD,
             items: [drop],
-            experience: {mining: 30}
+            experience: {[reward.type]: reward.amount}
         }
         return rewardMessage;
         //return super.takeDamage(damage);
@@ -267,7 +269,7 @@ class BasicMob extends  DamageableCharacter{
                 console.log(message);
                 let reward = this.takeDamage(message.damage);
                 let rewardMessage = {type:messageTypes.REWARD,
-                    experience: {combat:reward}
+                    experience: {[skillLevels.COMBAT]:reward}
                 }
                 message.rewardCB(rewardMessage);
                 break;
@@ -376,7 +378,7 @@ class ServerPlayer extends DamageableCharacter{
         if(rewardMessage.experience){
 
             this.config.stats.addExperience(rewardMessage.experience);
-
+            console.log(this.config.stats);
         }
     }
 
@@ -406,7 +408,7 @@ class ServerPlayer extends DamageableCharacter{
         let rewardCB = (rewardMessage)=>{this.message(rewardMessage);};
         let attackMessage = {
             type: messageTypes.DAMAGE,
-            damage: this.config.stats.attack || 0,
+            damage: this.config.stats.attack + this.config.stats.attack || 0,
             rewardCB: rewardCB
         }
         let attackCB = ()=>{this.attackingComponent.attack(attackMessage)};

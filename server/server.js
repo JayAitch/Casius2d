@@ -74,7 +74,6 @@ class PlayerStats {
         this.experience = {};
         this.defence = defence;
         this.attackSpeed = 600; //temp
-        this.baseAttack = 50;//temp
         this.attack = attack;
         this.speed = 10;//temp
     }

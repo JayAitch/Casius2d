@@ -107,15 +107,18 @@ class ItemWorld{
 
     }
 }
-
+global.skillLevels = {"WOODCUTTING":"WOODCUTTING","MINING":"MINING","BLACKSMITH":"BLACKSMITH", "COMBAT":"COMBAT"}
 nodeLookup = {
     "rock_iron":{
         "drop": "rock_iron_1",
-        "class": characters.BasicResource
+        "class": characters.BasicResource,
+        "reward": {"type": skillLevels.MINING, "amount":15}
+
     },
     "wood_magic":{
         "drop": "wood_magic_1",
-        "class": characters.BasicResource
+        "class": characters.BasicResource,
+        "reward": {"type": skillLevels.WOODCUTTING, "amount":15}
     }
 }
 
@@ -133,7 +136,8 @@ class Zone{
         this.testCreateMobLots(5);
       //  this.testCreateNodeLots(5);
     }
-
+// todo: move to mob factor, promote more stats/ai configuration
+//       spawn from zones added to map use A*
     testCreateMobLots(times){
         for(let i = 0; i < times; i++){
             let callBack = (pos)=>{
@@ -188,7 +192,6 @@ class Zone{
         if(!item) return;
 
         let hasPickedUp =  client.character.invent.pickupItem(item);
-        // TODO: check pickup range serverrside (50)
         if(hasPickedUp){
             this.itemWorld.removeItem(id);
             client.emit("myInventory",client.character.invent.message)
@@ -365,7 +368,7 @@ class PhysicsWorld{
         });
         this.collisionManager.update();
     }
-
+    /// TODO move to zone factory
     createFromJSON(objects){
         objects.forEach((object)=>{
             let x = object.pos.x + object.width/2;//temp
@@ -379,17 +382,12 @@ class PhysicsWorld{
                     let testZonePortal = new characters.ZonePortal(correctPos, object.width,object.height,this.collisionManager, object.zone, object.x,object.y);
                     break;
                 case "NODE":
-
-
-                    let lookup = nodeLookup[object.node_id]
-                    console.log(object);
+                    // todo - make this better
+                    let lookup = nodeLookup[object.node_id];
                     let objClass = lookup.class;
                     let drop = lookup.drop;
-                    // let callBack = (pos)=>{
-                    //     this.itemWorld.addItem(pos,dropManager.roleDrop(drop));
-                    // }
-                    let testNode = new objClass(this.collisionManager,correctPos, drop,  this.zoneid);
-                    console.log(testNode);
+                    let reward = lookup.reward;
+                    let testNode = new objClass(this.collisionManager,correctPos, drop,  this.zoneid, reward);
                     this.entities[this.lastEntityId] = testNode;
                     this.lastEntityId++;
             }

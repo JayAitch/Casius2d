@@ -47,7 +47,7 @@
                   "options":{"frameWidth":64,"frameHeight":64}
                 },
                 "seeradish": {
-                  "path":"assets/character/seeraddish.png",
+                  "path":"assets/item_icons/seeraddish.png",
                   "options":{"frameWidth":32,"frameHeight":32}
                 },
                 "goldhelm": {

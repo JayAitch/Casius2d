@@ -38,38 +38,46 @@ dropLookup = {
         item:{base: items.leatherbelt, plus:0},
         chance: 5
         },
-        // 1:{
-        //     item:{base: items.seeradish},
-        //     chance: 5
-        // },
-        // 2:{
-        //     item:{base: items.leatherbelt, plus: 100},
-        //     chance: 5
-        // },
-        // 9:{
-        //     item:{base: items.shield, plus: 100},
-        //     chance: 5
-        // },
-        // 3:{
-        //     item:{base: items.spear, plus: 6},
-        //     chance: 5
-        // },
-        // 4:{
-        //     item:{base: items.dspear, plus:10000},
-        //     chance: 5
-        // },
-        // 6:{
-        //     item:{base: items.leatherbelt, plus: 100},
-        //     chance: 5
-        // },
-        // 7:{
-        //     item:{base: items.goldlegs, plus: 100},
-        //     chance: 5
-        // },
-        // 8:{
-        //     item:{base: items.jacket, plus: 6},
-        //     chance: 5
-        // }
+        1:{
+            item:{base: items.seeradish},
+            chance: 5
+        },
+        2:{
+            item:{base: items.leatherbelt, plus: 100},
+            chance: 5
+        },
+        9:{
+            item:{base: items.shield, plus: 100},
+            chance: 5
+        },
+        3:{
+            item:{base: items.spear, plus: 6},
+            chance: 5
+        },
+        4:{
+            item:{base: items.dspear, plus:10000},
+            chance: 5
+        },
+        6:{
+            item:{base: items.leatherbelt, plus: 100},
+            chance: 5
+        },
+        7:{
+            item:{base: items.goldlegs, plus: 100},
+            chance: 5
+        },
+        8:{
+            item:{base: items.jacket, plus: 6},
+            chance: 5
+        },
+        9:{
+            item:{base: items.gem},
+            chance: 5
+        },
+        10:{
+            item:{base: items.goldbar},
+            chance: 5
+        }
     }
 };
 
