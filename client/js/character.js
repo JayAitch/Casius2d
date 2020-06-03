@@ -430,7 +430,9 @@ class MovingMultiSprite extends MovingSprite{
             let sprite = scene.add.sprite(pos.x, pos.y);
             this.spriteList[elem.base] = sprite;
             sprite.z = tempCharacterLayer +1;
-            this.testRender = addSpriteEffect(sprite,scene, elem.effect); //temp
+            let test = addSpriteEffect(sprite,scene, elem.effect); //temp
+            if(test)
+                this.testRender = test; //temp
         })
         this.scene = scene;
         this.time = 0;

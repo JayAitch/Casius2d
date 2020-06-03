@@ -1,6 +1,7 @@
 const roomManager = require('./room-manager.js');
 const systems = require('./systems.js');
-const characters = require('./server-characters.js');
+const characters = require('./server-characters.js'); //temp
+const gameObjects = require('./game-object-factory.js');
 const fs = require('fs');
 const dropManager = require('./drop-manager.js');
 systems.startUpdate();
@@ -132,9 +133,9 @@ class Zone{
     constructor(zoneid) {
         this.zoneSender = new ZoneSender(zoneid);
         this.physicsWorld = new PhysicsWorld(zoneid, this.zoneSender);
-        this.itemWorld = new ItemWorld(this.zoneSender,this.physicsWorld )
+        this.itemWorld = new ItemWorld(this.zoneSender,this.physicsWorld);
         this.zoneID = zoneid;
-
+        this.gameObjFactory = gameObjects.factory(this.physicsWorld.collisionManager, this.itemWorld);
         systems.addToUpdate(this);
         this.testCreateMobLots(5);
       //  this.testCreateNodeLots(5);
