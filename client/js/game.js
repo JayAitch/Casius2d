@@ -88,7 +88,7 @@ class GameScene extends Phaser.Scene {
         this.playerID = id;
         let myPlayer = this.mapEntities[this.playerID];
 
-        this.cameras.main.zoomTo(1.2,0);
+        this.cameras.main.zoomTo(1.9,0);
         this.cameras.main.startFollow(myPlayer.sprite);
 
         // set background color, so the sky is not black

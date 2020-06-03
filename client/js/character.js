@@ -160,63 +160,26 @@ class MovingSprite{
     }
 }
 
-function sixPlusEffect(sprite, scene){
-    scene.tweens.addCounter({
-        from: 255,
-        to: 0,
-        duration: 200,
-        yoyo:true,
-        repeat: -1,
-        onUpdate: (tween)=>
-        {
-            sprite.setTint(Phaser.Display.Color.GetColor(sprite.currentTint[0], sprite.currentTint[1], sprite.currentTint[2]));
-        }
-    });
-    scene.tweens.addCounter({
-        from: 50,
-        to: 211,
-        duration: 1000,
-        yoyo:true,
-        repeat: -1,
-        onUpdate: (tween)=>
-        {
-            let value = Math.floor(tween.getValue());
-            sprite.currentTint[1] = value;
-        }
-    });
-
-    scene.tweens.addCounter({
-        from: 211,
-        to: 50,
-        duration: 1000,
-        yoyo:true,
-        repeat: -1,
-        onUpdate: (tween)=>
-        {
-            let value = Math.floor(tween.getValue());
-            sprite.currentTint[0] = value;
-        }
-    });
-}
 
 
 function threePlusEffect(sprite, scene){
     scene.tweens.addCounter({
-        from: 1000,
-        to: 50,
-        duration: 500,
+        from: 255,
+        to: 0,
+        duration: 3000,
         yoyo:true,
         repeat: -1,
         onUpdate: (tween)=>
         {
-            sprite.setTint(Phaser.Display.Color.GetColor(sprite.currentTint[0], sprite.currentTint[1], sprite.currentTint[2]));
+            sprite.tintTopLeft = Phaser.Display.Color.GetColor(sprite.currentTint[2], sprite.currentTint[1], sprite.currentTint[0]);
+            sprite.tintBottomRight = Phaser.Display.Color.GetColor(sprite.currentTint[0], sprite.currentTint[1], sprite.currentTint[2]);
         }
     });
 
 
     scene.tweens.addCounter({
         from: 200,
-        to: 111,
+        to: 140,
         duration: 2000,
         yoyo:true,
         repeat: -1,
@@ -232,9 +195,9 @@ function threePlusEffect(sprite, scene){
 
 function fourPlusEffect(sprite, scene){
     scene.tweens.addCounter({
-        from: 1000,
-        to: 50,
-        duration: 500,
+        from: 255,
+        to: 0,
+        duration: 3000,
         yoyo:true,
         repeat: -1,
         onUpdate: (tween)=>
@@ -244,7 +207,7 @@ function fourPlusEffect(sprite, scene){
     });
     scene.tweens.addCounter({
         from: 255,
-        to: 111,
+        to: 60,
         duration: 1000,
         yoyo:true,
         repeat: -1,
@@ -256,22 +219,155 @@ function fourPlusEffect(sprite, scene){
     });
 }
 
+// todo: generalise effects with custom shader
 function plusEightEffect(sprite, scene){
+
+    customPipeline = game.renderer.addPipeline('Custom', new CustomPipeline(game));
+
+    sprite.setPipeline('Custom');
+
+    return customPipeline;
+    // scene.tweens.addCounter({
+    //     from: 2,
+    //     to: 0,
+    //     duration: 2000,
+    //     yoyo:true,
+    //     repeat: -1,
+    //     onUpdate: (tween)=>
+    //     {
+    //         customPipeline.setFloat1('tim', tween.getValue());
+    //         //console.log(tween.getValue());
+    //         //customPipeline.setFloat2('uResolution', Phaser.Display.Color.GetColor(sprite.currentTint[0]),Phaser.Display.Color.GetColor(sprite.currentTint[1]));
+    //
+    //         let value = Math.floor(tween.getValue());
+    //
+    // //        sprite.setTint(Phaser.Display.Color.GetColor(sprite.currentTint[0], sprite.currentTint[1], sprite.currentTint[2]));
+    //       //  sprite.setTintFill( 0xffffff,0xffffff,0xffffff,0xffffff)
+    //     }
+    // });
+    // scene.tweens.addCounter({
+    //     from: 255,
+    //     to: 5000,
+    //     duration: 50000,
+    //     yoyo:true,
+    //     repeat: -1,
+    //     onUpdate: (tween)=>
+    //     {
+    //         let value = Math.floor(tween.getValue());
+    //         sprite.currentTint[1] = value;
+    //     }
+    // });
+    // //
+    // scene.tweens.addCounter({
+    //     from: 255,
+    //     to: 5000,
+    //     duration: 100000,
+    //     yoyo:true,
+    //     repeat: -1,
+    //     onUpdate: (tween)=>
+    //     {
+    //         let value = Math.floor(tween.getValue());
+    //         sprite.currentTint[0] = value;
+    //     }
+    // });
+
+    // scene.tweens.addCounter({
+    //     from: 255,
+    //     to: 50,
+    //     duration: 200,
+    //     yoyo:true,
+    //     repeat: -1,
+    //     onUpdate: (tween)=>
+    //     {
+    //         // sprite.tintTopLeft = Phaser.Display.Color.GetColor(sprite.currentTint[2], sprite.currentTint[1], sprite.currentTint[0]);
+    //         // sprite.tintBottomLeft = Phaser.Display.Color.GetColor(sprite.currentTint[0], sprite.currentTint[1], sprite.currentTint[2]);
+    //         // sprite.tintTopRight = Phaser.Display.Color.GetColor(sprite.currentTint[2], sprite.currentTint[1], sprite.currentTint[0]);
+    //         // sprite.tintBottomRight = Phaser.Display.Color.GetColor(sprite.currentTint[0], sprite.currentTint[1], sprite.currentTint[2]);
+    //
+    //
+    //
+    //         sprite.tintTopLeft = Phaser.Display.Color.GetColor(sprite.currentTint[2], sprite.currentTint[1], sprite.currentTint[0]);
+    //         // sprite.tintBottomLeft = Phaser.Display.Color.GetColor(sprite.currentTint[2], sprite.currentTint[1], sprite.currentTint[0]);
+    //         //  sprite.tintTopRight = Phaser.Display.Color.GetColor(sprite.currentTint[2], sprite.currentTint[1], sprite.currentTint[0]);
+    //         sprite.tintBottomRight = Phaser.Display.Color.GetColor(sprite.currentTint[2], sprite.currentTint[1], sprite.currentTint[0]);
+    //     }
+    // });
+    //
+    // scene.tweens.addCounter({
+    //     from: 255,
+    //     to: 30,
+    //     duration: 200,
+    //     yoyo:true,
+    //     repeat: -1,
+    //     onUpdate: (tween)=>
+    //     {
+    //         let value = Math.floor(tween.getValue());
+    //         sprite.currentTint[0] = value;
+    //
+    //
+    //     }
+    // });
+    //
+    //
+    // scene.tweens.addCounter({
+    //     from: 30,
+    //     to: 255,
+    //     duration: 500,
+    //     yoyo:true,
+    //     repeat: -1,
+    //     onUpdate: (tween)=>
+    //     {
+    //         let value = Math.floor(tween.getValue());
+    //         //   sprite.currentTint[1] = value;
+    //     }
+    // });
+    //
+    //
+    // scene.tweens.addCounter({
+    //     from: 255,
+    //     to: 30,
+    //     duration: 500,
+    //     yoyo:true,
+    //     repeat: -1,
+    //     onUpdate: (tween)=>
+    //     {
+    //         let value = Math.floor(tween.getValue());
+    //         sprite.currentTint[2] = value;
+    //
+    //     }
+    // });
+
+
+
+
+
+}
+function sixPlusEffect(sprite, scene){
     scene.tweens.addCounter({
-        from: 1000,
+        from: 255,
         to: 50,
-        duration: 500,
+        duration: 200,
         yoyo:true,
         repeat: -1,
         onUpdate: (tween)=>
         {
-            sprite.setTint(Phaser.Display.Color.GetColor(sprite.currentTint[0], sprite.currentTint[1], sprite.currentTint[2]));
+            // sprite.tintTopLeft = Phaser.Display.Color.GetColor(sprite.currentTint[2], sprite.currentTint[1], sprite.currentTint[0]);
+            // sprite.tintBottomLeft = Phaser.Display.Color.GetColor(sprite.currentTint[0], sprite.currentTint[1], sprite.currentTint[2]);
+            // sprite.tintTopRight = Phaser.Display.Color.GetColor(sprite.currentTint[2], sprite.currentTint[1], sprite.currentTint[0]);
+            // sprite.tintBottomRight = Phaser.Display.Color.GetColor(sprite.currentTint[0], sprite.currentTint[1], sprite.currentTint[2]);
+
+
+
+            sprite.tintTopLeft = Phaser.Display.Color.GetColor(sprite.currentTint[2], sprite.currentTint[1], sprite.currentTint[0]);
+           // sprite.tintBottomLeft = Phaser.Display.Color.GetColor(sprite.currentTint[2], sprite.currentTint[1], sprite.currentTint[0]);
+           //  sprite.tintTopRight = Phaser.Display.Color.GetColor(sprite.currentTint[2], sprite.currentTint[1], sprite.currentTint[0]);
+             sprite.tintBottomRight = Phaser.Display.Color.GetColor(sprite.currentTint[2], sprite.currentTint[1], sprite.currentTint[0]);
         }
     });
 
     scene.tweens.addCounter({
         from: 255,
-        to: 111,
+        to: 30,
         duration: 200,
         yoyo:true,
         repeat: -1,
@@ -279,27 +375,29 @@ function plusEightEffect(sprite, scene){
         {
             let value = Math.floor(tween.getValue());
             sprite.currentTint[0] = value;
+
+
         }
     });
 
 
     scene.tweens.addCounter({
-        from: 255,
-        to: 50,
+        from: 30,
+        to: 255,
         duration: 500,
         yoyo:true,
         repeat: -1,
         onUpdate: (tween)=>
         {
             let value = Math.floor(tween.getValue());
-            sprite.currentTint[1] = value;
+         //   sprite.currentTint[1] = value;
         }
     });
 
 
     scene.tweens.addCounter({
         from: 255,
-        to: 50,
+        to: 30,
         duration: 500,
         yoyo:true,
         repeat: -1,
@@ -307,6 +405,7 @@ function plusEightEffect(sprite, scene){
         {
             let value = Math.floor(tween.getValue());
             sprite.currentTint[2] = value;
+
         }
     });
 }
@@ -316,8 +415,8 @@ function addSpriteEffect(sprite,scene,level){
     sprite.currentTint = [255,255,255]
     if(level >= 2 && level <= 3) threePlusEffect(sprite,scene);
     if(level >= 4 && level <= 5) fourPlusEffect(sprite,scene);
-    if(level >= 6 && level <= 7) sixPlusEffect(sprite,scene);
-    if(level >= 8) plusEightEffect(sprite,scene);
+    if(level >= 6 && level <= 7) return sixPlusEffect(sprite,scene);
+    if(level >= 8)  return plusEightEffect(sprite,scene);
 }
 
 
@@ -331,9 +430,10 @@ class MovingMultiSprite extends MovingSprite{
             let sprite = scene.add.sprite(pos.x, pos.y);
             this.spriteList[elem.base] = sprite;
             sprite.z = tempCharacterLayer +1;
-            addSpriteEffect(sprite,scene, elem.effect); //temp
+            this.testRender = addSpriteEffect(sprite,scene, elem.effect); //temp
         })
         this.scene = scene;
+        this.time = 0;
         this.changeAnimations();
     }
 
@@ -346,6 +446,17 @@ class MovingMultiSprite extends MovingSprite{
                 sprite.anims.play(key + animKey);
         })
     }
+
+
+    update(){
+       // super.update();
+        // TODO move shaders and stuff to an renderItem class
+        if(this.testRender){
+            this.testRender.setFloat1('time', this.time);
+            this.time += 0.05
+        }
+    }
+
 
     set layers(val){
         let keyList = Object.keys(this.spriteList);
@@ -452,5 +563,244 @@ class Player extends MovingMultiSprite{
         this.healthBar.x = this.pos.x;
         this.healthBar.y = this.pos.y;
         this.healthBar.draw();
+        super.update();
     }
 }
+
+var CustomPipeline = new Phaser.Class({
+
+    Extends: Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline,
+
+    initialize:
+
+        function CustomPipeline (game)
+        {
+            Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline.call(this, {
+                game: game,
+                renderer: game.renderer,
+                fragShader:` 
+                    precision lowp float;
+                    varying vec2 outTexCoord;
+                    varying vec4 vColor;
+                    varying vec4 outTint;
+                    uniform sampler2D uSampler;
+                    uniform float time;
+
+
+
+            vec4 plasma()
+            {
+                float freq = 0.08;
+                float value =
+                    sin(time + freq);
+                     
+                    //  +
+                    // sin(time + freq) +
+                    // sin(time + freq) +
+                    // cos(time + freq * 2.0);
+
+                return vec4(
+                    cos(value) * 0.5,
+                    sin(value)* 0.5,
+                    sin(value * 3.14 * 2.0)* 0.5,
+                    1
+                );
+            }
+//
+//             void main()
+//             {
+//                 vec4 texel = texture2D(uMainSampler, outTexCoord);
+//                 texel *= vec4(outTint.rgb * outTint.a, outTint.a);
+//                 gl_FragColor = texel * plasma();
+//             }
+
+
+
+
+
+                    void main() {
+                        vec4 sum = vec4(0);
+                        vec2 texcoord = outTexCoord;
+                        for(int xx = -4; xx <= 4; xx++) {
+                            for(int yy = -3; yy <= 3; yy++) {
+                                float dist = sqrt(float(xx*xx) + float(yy*yy));
+                                float factor = 0.0;
+                                if (dist == 0.0) {
+                                    factor = 2.0;
+                                } else {
+                                    factor = 2.0 / abs(float(dist));
+                                }
+                            sum += texture2D(uSampler, texcoord + vec2(xx, yy) * 0.002) * factor;
+                            }
+                        }
+                        
+                        // float sinTime = abs(sin(time)); 
+                        // vec4 texel = texture2D(uSampler, outTexCoord);
+                        // texel *= vec4(outTint.rgb * outTint.a, outTint.a);
+                        //
+                        // gl_FragColor = texel + (sum * sinTime) * 0.025 + texture2D(uSampler, texcoord);
+                        //       
+                        
+                                  
+                    vec4 texel = texture2D(uSampler, outTexCoord);
+                    texel *= vec4(outTint.rgb * outTint.a, outTint.a);
+                    texel *= plasma();
+                    float sinTime = abs(sin(time));
+                    gl_FragColor = texel + (sum * sinTime) * 0.025 + texture2D(uSampler, texcoord) ;
+                        
+                   //     float sinTime = abs(sin(time));                      
+                   //     gl_FragColor = (sum * sinTime) * 0.025 + texture2D(uSampler, texcoord); 
+                    }
+                           
+                 `
+            });
+        }
+
+
+});
+
+
+// `
+//                     precision lowp float;
+//                     varying vec2 outTexCoord;
+//                     varying vec4 vColor;
+//
+//                     uniform sampler2D uSampler;
+//                     uniform float time;
+//
+//                     void main() {
+//                         vec4 sum = vec4(0);
+//                         vec2 texcoord = outTexCoord;
+//                         for(int xx = -4; xx <= 4; xx++) {
+//                             for(int yy = -3; yy <= 3; yy++) {
+//                                 float dist = sqrt(float(xx*xx) + float(yy*yy));
+//                                 float factor = 0.0;
+//                                 if (dist == 0.0) {
+//                                     factor = 2.0;
+//                                 } else {
+//                                     factor = 2.0 / abs(float(dist));
+//                                 }
+//                             sum += texture2D(uSampler, texcoord + vec2(xx, yy) * 0.002) * factor;
+//                             }
+//                         }
+//                         float sinTime = abs(sin(time));
+//                         gl_FragColor = (sum * sinTime) * 0.025 + texture2D(uSampler, texcoord);
+//                     }
+//
+//                  `
+
+
+
+
+
+// var CustomPipeline = new Phaser.Class({
+//
+//     Extends: Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline,
+//
+//     initialize:
+//
+//         function CustomPipeline (game)
+//         {
+//             Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline.call(this, {
+//                 game: game,
+//                 renderer: game.renderer,
+//                 fragShader: `
+//             precision mediump float;
+//
+//             uniform sampler2D uMainSampler;
+//             uniform vec2 resolution;
+//             uniform float uTime;
+//
+//             varying vec2 outTexCoord;
+//             varying vec4 outTint;
+//
+//             vec4 plasma()
+//             {
+//                 vec2 pixelPos = vec2(gl_FragCoord.x/resolution.x,gl_FragCoord.y/resolution.y);
+//                 float freq = 0.8;
+//                 float value =
+//                     sin(uTime + uTime *  freq) +
+//                     sin(uTime + uTime *  freq) +
+//                     sin(uTime + uTime *  freq) +
+//                     cos(uTime + uTime * freq * 2.0);
+//
+//                 return vec4(
+//                     cos(value),
+//                     sin(value),
+//                     sin(value * 3.14 * 2.0),
+//                     1
+//                 );
+//             }
+//
+//             void main()
+//             {
+//                 vec4 texel = texture2D(uMainSampler, outTexCoord);
+//                 texel *= vec4(outTint.rgb * outTint.a, outTint.a);
+//                 gl_FragColor = texel * plasma();
+//             }
+//
+//             `
+//             });
+//         }
+//
+//
+// });
+
+
+
+
+
+
+//
+// var CustomPipeline = new Phaser.Class({
+//
+//     Extends: Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline,
+//
+//     initialize:
+//
+//         function CustomPipeline (game)
+//         {
+//             Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline.call(this, {
+//                 game: game,
+//                 renderer: game.renderer,
+//                 fragShader: `
+//             precision mediump float;
+//
+//             uniform sampler2D uMainSampler;
+//             uniform vec2 uResolution;
+//             uniform float uTime;
+//
+//             varying vec2 outTexCoord;
+//             varying vec4 outTint;
+//
+//             vec4 plasma()
+//             {
+//                 vec2 pixelPos = gl_FragCoord.xy / uResolution * 20.0;
+//                 float freq = 0.8;
+//                 float value =
+//                     sin(uTime + pixelPos.x * freq) +
+//                     sin(uTime + pixelPos.y * freq) +
+//                     sin(uTime + (pixelPos.x + pixelPos.y) * freq) +
+//                     cos(uTime + sqrt(length(pixelPos - 0.5)) * freq * 2.0);
+//
+//                 return vec4(
+//                     cos(value),
+//                     sin(value),
+//                     sin(value * 3.14 * 2.0),
+//                     cos(value)
+//                 );
+//             }
+//
+//             void main()
+//             {
+//                 vec4 texel = texture2D(uMainSampler, outTexCoord);
+//                 texel *= vec4(outTint.rgb * outTint.a, outTint.a);
+//                 gl_FragColor = texel * plasma();
+//             }
+//
+//             `
+//             });
+//         }
+//
+//
+// });
