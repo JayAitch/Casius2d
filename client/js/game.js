@@ -32,16 +32,35 @@ class MyRectangle extends Phaser.GameObjects.Rectangle {
 
 
 class AudioPlayer{
-    constructor(){
-       this.equipt = game.sound.add("equip-item"); // use a config
-       this.swing = game.sound.add("sword-swing"); // use a config
-       this.swing.volume = 0.2;
-       this.bgMusic = game.sound.add("backing-track");
-       this.bgMusic.volume = 0.01;
-       this.bgMusic.setLoop(true);
-       this.mobPain = game.sound.add("pig-grunt") // use a config
+    constructor() {
+        this.equipt = game.sound.add("equip-item"); // use a config
+        this.swing = game.sound.add("sword-swing"); // use a config
+        this.swing.volume = 0.2;
+        this.bgMusic = game.sound.add("backing-track");
+        this.bgMusic.volume = 0.01;
+        this.bgMusic.setLoop(true);
+        this.mobPain = game.sound.add("pig-grunt"); // use a config
+
+        this.footsteps = [];
+        this.testFoosteps();
+        this.mobPain = game.sound.add("pig-grunt");
+    }
+    testFoosteps(){
+        for(let i = 0; i < 8; i++){
+            let footstep = game.sound.add("footstep"+i)
+            footstep.volume = 0.1;
+            this.footsteps.push(footstep);
+        }
+    }
+    playFootstep(){
+        let footstepNumber = randomInteger(0, 8)
+        console.log(this.footsteps);
+        let foostep = this.footsteps[footstepNumber];
+        foostep.play();
     }
 }
+
+
 let audioPlayer;
 
 

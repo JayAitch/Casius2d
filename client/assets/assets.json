@@ -58,6 +58,10 @@
                   "path":"assets/character/armour/helm/bronze_helm.png",
                   "options":{"frameWidth":64,"frameHeight":64}
                 },
+                "goldmask": {
+                  "path":"assets/character/armour/helm/golden_mask.png",
+                  "options":{"frameWidth":64,"frameHeight":64}
+                },
                 "goldlegs": {
                     "path":"assets/character/armour/legs/golden_greaves_male.png",
                     "options":{"frameWidth":64,"frameHeight":64}
@@ -99,6 +103,36 @@
       },
       "pig-grunt": {
         "path": "assets/sounds/pig_grunt.wav"
+      },
+      "footstep0": {
+        "path": "assets/sounds/footstep00.ogg"
+      },
+      "footstep1": {
+        "path": "assets/sounds/footstep01.ogg"
+      },
+      "footstep2": {
+        "path": "assets/sounds/footstep02.ogg"
+      },
+      "footstep3": {
+        "path": "assets/sounds/footstep03.ogg"
+      },
+      "footstep4": {
+        "path": "assets/sounds/footstep04.ogg"
+      },
+      "footstep5": {
+        "path": "assets/sounds/footstep05.ogg"
+      },
+      "footstep6": {
+        "path": "assets/sounds/footstep06.ogg"
+      },
+      "footstep7": {
+        "path": "assets/sounds/footstep07.ogg"
+      },
+      "footstep8": {
+        "path": "assets/sounds/footstep08.ogg"
+      },
+      "footstep9": {
+        "path": "assets/sounds/footstep09.ogg"
       }
     }
 

@@ -1,13 +1,26 @@
 global.items  = {
     "goldhelm": {
         "id":"goldhelm",
+        "name": "Golden Helm",
+        "description": "Soft metal, hard helm, makes sense.",
         "animString" : "goldhelm",
         "inventoryIcon": "goldhelm",
         "slot": "HEAD",
         "stats": {"defence": 10}
     },
+    "goldmask": {
+        "id":"goldmask",
+        "name": "Golden Mask",
+        "description": "Probably the sickest item in the game.",
+        "animString" : "goldmask",
+        "inventoryIcon": "goldmask",
+        "slot": "HEAD",
+        "stats": {"defence": 2, "magic":30}
+    },
     "bronzehelm": {
         "id":"bronzehelm",
+        "name": "Bronze Helm",
+        "description": "Usually worse then gold, for some reason.",
         "animString" : "bronzehelm",
         "inventoryIcon": "bronzehelm",
         "slot": "HEAD",
@@ -15,6 +28,9 @@ global.items  = {
     },
     "dspear": {
         "id":"dspear",
+        "id":"bronzehelm",
+        "name": "Dragon Spear",
+        "description": "Made for killing dragons from dragons.",
         "animString" : "dspear",
         "inventoryIcon": "dspear",
         "slot": "WEAPON",
@@ -22,6 +38,8 @@ global.items  = {
     },
     "goldlegs": {
         "id":"goldlegs",
+        "name": "Golden Legs",
+        "description": "Incredibly stylish.",
         "animString" : "goldlegs",
         "inventoryIcon": "goldlegs",
         "slot": "LEGS",
@@ -29,6 +47,7 @@ global.items  = {
     },
     "leatherbelt": {
         "id":"leatherbelt",
+        "name": "Leather Belt",
         "animString" : "leatherbelt",
         "inventoryIcon": "leatherbelt",
         "slot": "BELT",

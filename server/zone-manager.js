@@ -108,6 +108,7 @@ class ItemWorld{
     }
 }
 global.skillLevels = {"WOODCUTTING":"WOODCUTTING","MINING":"MINING","BLACKSMITH":"BLACKSMITH", "COMBAT":"COMBAT"}
+
 nodeLookup = {
     "rock_iron":{
         "drop": "rock_iron_1",
@@ -121,6 +122,8 @@ nodeLookup = {
         "reward": {"type": skillLevels.WOODCUTTING, "amount":15}
     }
 }
+
+
 
 
 
@@ -150,16 +153,6 @@ class Zone{
             this.physicsWorld.testCreateMob(callBack, characters.BasicMob);
         }
     }
-
-    //
-    // testCreateNodeLots(times){
-    //     for(let i = 0; i < times; i++){
-    //         let callBack = (pos)=>{
-    //             this.itemWorld.addItem(pos,dropManager.roleDrop(0));
-    //         }
-    //         this.physicsWorld.testCreateMob(callBack, characters.BasicResource);
-    //     }
-    // }
 
     triggerEntityReload(key){
        let entity = this.physicsWorld.entities[key];

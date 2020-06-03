@@ -1,3 +1,28 @@
+
+const textStyles = {
+    "header": {
+        fill: '#777',
+        fontFamily: "arial",
+        fontSize: "48px",
+    },
+    "menu-header": {
+        fill: '#777',
+        fontFamily: "arial",
+        fontSize: "24px",
+    },
+    "menu-body": {
+        fill: '#777',
+        fontFamily: "arial",
+        fontSize: "14px",
+    },
+    "button":{
+        fill: '#777',
+        fontFamily: "arial",
+        fontSize: "14px",
+    }
+}
+
+
 class LoginScene extends  Phaser.Scene {
     constructor() {
         super({key: 'loginscene'});
@@ -113,11 +138,11 @@ class PaperDoll{
 
 class ActionsList{
     constructor(scene) {
-        this.slotWidth = 100
+        this.slotWidth = 50
         this.slotHeight = 50;
-        this.exSize = 15;
+        this.exSize = 35;
         this.x = 400;
-        this.y = 400;
+        this.y = 600;
         this.itemOffset = 0;
         this.scene = scene;
         this.zones = [];
@@ -128,27 +153,36 @@ class ActionsList{
     }
 
     set actions(actionsList){
-        this.cleanUp();
+        let yOffset = -15;
 
         let ex = new Phaser.Geom.Rectangle(
-            this.x - this.exSize,
-            this.y - this.exSize,
+           this.x - this.exSize,
+           this.y + yOffset,
+          //   this.x,
+          //   this.y,
             this.exSize,
             this.exSize
         );
 
-        let graphics = this.scene.add.graphics({ fillStyle: { color: 0xffffff,alpha:0.5 } });
+        let graphics = this.scene.add.graphics({ fillStyle: { color: 0xffffff,alpha:0.9 } });
         let exZone = this.scene.add.zone(
             this.x - this.exSize/2,
-            this.y- this.exSize/2,
+            this.y + yOffset,
+            // this.x,
+            // this.y - this.exSize,
             this.exSize,
             this.exSize
         );
-
+        graphics.setDepth(UILayer + 15);
         let exText = this.scene.add.text(
             this.x - this.exSize/2,
-            this.y- this.exSize/2,'X'
+            this.y,
+            'X',
+            textStyles.button
         );
+
+
+        exText.setDepth(UILayer + 16);
         offsetByWidth(exText);
 
 
@@ -158,6 +192,7 @@ class ActionsList{
         this.itemOffset += this.slotHeight + 2
         graphics.fillRectShape(ex);
         exZone.setInteractive().on('pointerdown', ()=>{
+            console.log("pressed the X");
             this.closeActionList();
         })
 
@@ -171,7 +206,7 @@ class ActionsList{
                 this.slotHeight
             );
 
-            let graphics = this.scene.add.graphics({ fillStyle: { color: 0xffffff,alpha:0.5 } });
+            let graphics = this.scene.add.graphics({ fillStyle: { color: 0xffffff,alpha:0.9 } });
             let zone = this.scene.add.zone(
                 this.x,
                 this.y + this.itemOffset,
@@ -179,7 +214,7 @@ class ActionsList{
                 this.slotHeight
             );
 
-            let actionText = this.scene.add.text(this.x,this.y + this.itemOffset,action);
+            let actionText = this.scene.add.text(this.x,this.y + this.itemOffset,action,textStyles.button);
             offsetByWidth(actionText);
             this.texts.push(actionText);
             this.zones.push(zone);
@@ -191,9 +226,49 @@ class ActionsList{
             })
         })
     }
+
+
+    set target(slot){
+        this.cleanUp();
+        let item = slot.slottedItem;
+        this.x = slot.x;
+        this.y = slot.y;
+        let graphics = this.scene.add.graphics({ fillStyle: { color: 0xffffff,alpha:0.5 } });
+        let rect = new Phaser.Geom.Rectangle(
+            30, 30, 400, 400
+        );
+        graphics.fillRectShape(rect);
+        this.graphics.push(graphics);
+
+        let plus = item.plus;
+        let itemName = item.base.name;
+        if(plus) itemName = `${itemName} + ${plus}`
+
+        let itemstring = "\n";
+        let descString = item.base.description || "";
+
+
+        let stats = item.base.stats
+        if(stats !== undefined){
+            Object.keys(stats).forEach((key)=>{
+                itemstring = `${itemstring} ${key} : ${stats[key]} + ${plus} \n`
+            })
+        }
+        let nameText = this.scene.add.text(30 ,30, itemName, textStyles["menu-header"]);
+        let descText = this.scene.add.text(30 ,60, descString, textStyles["menu-body"]);
+        let statTexts = this.scene.add.text(30 ,80, itemstring, textStyles["menu-body"]);
+        this.texts.push(statTexts);
+        this.texts.push(descText);
+        this.texts.push(nameText);
+       // offsetByWidth(statTexts)
+    }
+
+
     closeActionList(){
         this.cleanUp();
     }
+
+
     cleanUp(){
         this.graphics.forEach((graphic)=>{
             graphic.clear();
@@ -243,6 +318,8 @@ class InventorySlot{
         this.slot = slot;
         this.inventory = inventory;
         this.sprite = scene.add.image(x, y);
+        this.x = x;
+        this.y = y;
         this.sprite.depth = UILayer
         this.clickHandler = clickHandler;
         let rect = new Phaser.Geom.Rectangle(x - slotSize / 2, y - slotSize / 2, slotSize, slotSize);
@@ -356,21 +433,17 @@ class InventoryScene extends  Phaser.Scene {
     }
 
     create() {
-        this.inventory = new ClientInventory(this, 500, 550, 24, 4,slotNumber=>{this.clickSlot(slotNumber)});
+        this.inventory = new ClientInventory(this, 510, 610, 24, 4,slotNumber=>{this.clickSlot(slotNumber)});
     }
 
     clickSlot(slot){
-        this.actionsList.actions = ["EQUIPT", "DROP", "PRINT"];
+        this.actionsList.target = this.inventory.getItem(slot);
+        this.actionsList.actions = ["EQUIPT", "DROP"];
+
         // maybe get actions from item?
         this.actionsList.setCallBack((action)=>{
-            if(action === "PRINT"){
-                this.testPrintItemStats(this.inventory.getItem(slot).slottedItem);
-            }
-            else{
-                this.sender.clickInventorySlot(slot, action);
-                this.actionsList.cleanUp();
-            }
-
+            this.sender.clickInventorySlot(slot, action);
+            this.actionsList.cleanUp();
         });
 
     }

@@ -174,6 +174,81 @@
                       "frameRate": 10
                     }
         },
+
+     "goldmask" : {
+       "castup" : {
+         "frames" : {"key": "goldmask","start" : 0, "end" : 6},
+         "frameRate" : 10,
+         "repeat" : -1
+       },
+       "castleft": {
+         "frames" : { "key": "goldmask","start" : 13, "end" : 19 },
+         "frameRate" : 10,
+         "repeat" : -1
+       },
+       "castdown": {
+         "frames": { "key": "goldmask","start" : 26, "end" : 32},
+         "frameRate": 10
+       },
+       "castright": {
+         "frames": { "key": "goldmask","start" : 39, "end" : 45},
+         "frameRate": 10
+       },
+
+       "thrustup": {
+         "frames": { "key": "goldmask","start" : 52, "end" : 59},
+         "frameRate": 10
+       },
+       "thrustleft": {
+         "frames": { "key": "goldmask","start" : 65, "end" : 72},
+         "frameRate": 10
+       },
+       "thrustdown": {
+         "frames": { "key": "goldmask","start" : 78, "end" : 85},
+         "frameRate": 10
+       },
+       "thrustright": {
+         "frames": { "key": "goldmask","start" : 91, "end" : 98},
+         "frameRate": 10
+       },
+       "walkup": {
+         "frames": { "key": "goldmask","start" : 104, "end" : 112},
+         "frameRate": 10,
+         "repeat": -1
+       },
+       "walkleft": {
+         "frames": { "key": "goldmask","start" : 117, "end" : 125},
+         "frameRate": 10,
+         "repeat": -1
+       },
+       "walkdown": {
+         "frames": { "key": "goldmask","start" : 130, "end" : 138},
+         "frameRate": 10,
+         "repeat": -1
+       },
+       "walkright": {
+         "frames": { "key": "goldmask","start" : 143, "end" : 151},
+         "frameRate": 10,
+         "repeat": -1
+       },
+       "stopleft": {
+         "frames": { "key": "goldmask","frame" : 117},
+         "frameRate": 10
+       },
+       "stopup": {
+         "frames": { "key": "goldmask","frame" : 104},
+         "frameRate": 10
+       },
+       "stopdown": {
+         "frames": { "key": "goldmask","frame" : 130},
+         "frameRate": 10
+       },
+       "stopright": {
+         "frames": { "key": "goldmask","frame" : 143},
+         "frameRate": 10
+       }
+     },
+
      "bronzehelm" : {
        "castup" : {
          "frames" : {"key": "bronzehelm","start" : 0, "end" : 6},

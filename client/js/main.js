@@ -23,3 +23,6 @@ const tempAboveTileLayer = 50000;
 window.addEventListener('load', (event) => {
     game = new Phaser.Game(config);
 });
+randomInteger = function(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}

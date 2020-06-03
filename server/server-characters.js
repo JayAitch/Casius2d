@@ -314,7 +314,6 @@ class ServerPlayer extends DamageableCharacter{
             playerConfig.stats,
             this.zone
             );
-
     }
 
     modifyComponents(){
@@ -405,10 +404,11 @@ class ServerPlayer extends DamageableCharacter{
 
 
     attack(){
-        let rewardCB = (rewardMessage)=>{this.message(rewardMessage);};
+        let rewardCB = (rewardMessage)=>{this.message(rewardMessage);}
+        let damage =  this.config.stats.damage || 0
         let attackMessage = {
             type: messageTypes.DAMAGE,
-            damage: this.config.stats.attack + this.config.stats.attack || 0,
+            damage: this.config.stats.attack +damage || 0,
             rewardCB: rewardCB
         }
         let attackCB = ()=>{this.attackingComponent.attack(attackMessage)};

@@ -161,9 +161,61 @@ class MovingSprite{
 }
 
 function sixPlusEffect(sprite, scene){
-    let currentTint = [255,255,255]
     scene.tweens.addCounter({
         from: 255,
+        to: 0,
+        duration: 200,
+        yoyo:true,
+        repeat: -1,
+        onUpdate: (tween)=>
+        {
+            sprite.setTint(Phaser.Display.Color.GetColor(sprite.currentTint[0], sprite.currentTint[1], sprite.currentTint[2]));
+        }
+    });
+    scene.tweens.addCounter({
+        from: 50,
+        to: 211,
+        duration: 1000,
+        yoyo:true,
+        repeat: -1,
+        onUpdate: (tween)=>
+        {
+            let value = Math.floor(tween.getValue());
+            sprite.currentTint[1] = value;
+        }
+    });
+
+    scene.tweens.addCounter({
+        from: 211,
+        to: 50,
+        duration: 1000,
+        yoyo:true,
+        repeat: -1,
+        onUpdate: (tween)=>
+        {
+            let value = Math.floor(tween.getValue());
+            sprite.currentTint[0] = value;
+        }
+    });
+}
+
+
+function threePlusEffect(sprite, scene){
+    scene.tweens.addCounter({
+        from: 1000,
+        to: 50,
+        duration: 500,
+        yoyo:true,
+        repeat: -1,
+        onUpdate: (tween)=>
+        {
+            sprite.setTint(Phaser.Display.Color.GetColor(sprite.currentTint[0], sprite.currentTint[1], sprite.currentTint[2]));
+        }
+    });
+
+
+    scene.tweens.addCounter({
+        from: 200,
         to: 111,
         duration: 2000,
         yoyo:true,
@@ -171,11 +223,25 @@ function sixPlusEffect(sprite, scene){
         onUpdate: (tween)=>
         {
             let value = Math.floor(tween.getValue());
-            currentTint[0] = value;
-            sprite.setTint(Phaser.Display.Color.GetColor(currentTint[0], currentTint[1], currentTint[2]));
+            sprite.currentTint[1] = value;
         }
     });
+}
 
+
+
+function fourPlusEffect(sprite, scene){
+    scene.tweens.addCounter({
+        from: 1000,
+        to: 50,
+        duration: 500,
+        yoyo:true,
+        repeat: -1,
+        onUpdate: (tween)=>
+        {
+            sprite.setTint(Phaser.Display.Color.GetColor(sprite.currentTint[0], sprite.currentTint[1], sprite.currentTint[2]));
+        }
+    });
     scene.tweens.addCounter({
         from: 255,
         to: 111,
@@ -185,15 +251,76 @@ function sixPlusEffect(sprite, scene){
         onUpdate: (tween)=>
         {
             let value = Math.floor(tween.getValue());
-            currentTint[1] = value;
+            sprite.currentTint[1] = value;
+        }
+    });
+}
+
+function plusEightEffect(sprite, scene){
+    scene.tweens.addCounter({
+        from: 1000,
+        to: 50,
+        duration: 500,
+        yoyo:true,
+        repeat: -1,
+        onUpdate: (tween)=>
+        {
+            sprite.setTint(Phaser.Display.Color.GetColor(sprite.currentTint[0], sprite.currentTint[1], sprite.currentTint[2]));
+        }
+    });
+
+    scene.tweens.addCounter({
+        from: 255,
+        to: 111,
+        duration: 200,
+        yoyo:true,
+        repeat: -1,
+        onUpdate: (tween)=>
+        {
+            let value = Math.floor(tween.getValue());
+            sprite.currentTint[0] = value;
+        }
+    });
+
+
+    scene.tweens.addCounter({
+        from: 255,
+        to: 50,
+        duration: 500,
+        yoyo:true,
+        repeat: -1,
+        onUpdate: (tween)=>
+        {
+            let value = Math.floor(tween.getValue());
+            sprite.currentTint[1] = value;
+        }
+    });
+
+
+    scene.tweens.addCounter({
+        from: 255,
+        to: 50,
+        duration: 500,
+        yoyo:true,
+        repeat: -1,
+        onUpdate: (tween)=>
+        {
+            let value = Math.floor(tween.getValue());
+            sprite.currentTint[2] = value;
         }
     });
 }
 
 
 function addSpriteEffect(sprite,scene,level){
-    if(level === 6) sixPlusEffect(sprite,scene);
+    sprite.currentTint = [255,255,255]
+    if(level >= 2 && level <= 3) threePlusEffect(sprite,scene);
+    if(level >= 4 && level <= 5) fourPlusEffect(sprite,scene);
+    if(level >= 6 && level <= 7) sixPlusEffect(sprite,scene);
+    if(level >= 8) plusEightEffect(sprite,scene);
 }
+
+
 
 class MovingMultiSprite extends MovingSprite{
 
@@ -207,6 +334,7 @@ class MovingMultiSprite extends MovingSprite{
             addSpriteEffect(sprite,scene, elem.effect); //temp
         })
         this.scene = scene;
+        this.changeAnimations();
     }
 
     set animation(animKey){
@@ -268,7 +396,7 @@ class TestMonster extends MovingSprite{
     constructor(scene, pos, base, health, mHealth){
         super(scene, pos, base);
         this.healthBar = new HealthBar(scene,pos.x,pos.y,60,8, health, mHealth,-30);
-        this.prevHealth = health || 99999; //temp
+        this.prevHealth = health || -100; //temp
     }
 
     set health(val){
@@ -313,6 +441,11 @@ class Player extends MovingMultiSprite{
         super.destroy();
         this.healthBar.destroy();
     }
+
+    // playWalk(){
+    //     let cb = ()=>{audioPlayer.playFootstep()}
+    //     setInterval(cb, 300);
+    // }
 
     update(){
         this.move();
