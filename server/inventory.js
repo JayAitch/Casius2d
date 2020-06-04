@@ -165,7 +165,7 @@ class InventoryManager{
         // not like this
         let zone = ZONES[this.ownerLocation.zone];
         let client = zone.zoneSender.room.clientLookup[this.ownerID];
-        let key = client.player.entityPos;
+        let key = client.player.key;
         // deffinately not like this!!
         client.player.modifyComponents();
         serverSender.propigateReload(key, this.ownerLocation);

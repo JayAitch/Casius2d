@@ -71,11 +71,13 @@ class GameScene extends Phaser.Scene {
         super({key: 'maingame'});
         this.mapEntities = {};
         this.floorItems = {};
+        this.time = 0;
 
     }
 
 
     preload(){
+        this.customPipeline = game.renderer.addPipeline('Custom', new CustomPipeline(game));
     }
 
     init(data){
@@ -87,7 +89,6 @@ class GameScene extends Phaser.Scene {
     loadPlayerData(id){
         this.playerID = id;
         let myPlayer = this.mapEntities[this.playerID];
-
         this.cameras.main.zoomTo(1.9,0);
         this.cameras.main.startFollow(myPlayer.sprite);
 
@@ -137,7 +138,7 @@ class GameScene extends Phaser.Scene {
         let key = MAPS[id];
         let map = this.make.tilemap({key: key});
         this.currentMap = map;
-
+        this.tick = 0;
         const tileset = map.addTilesetImage("magecity", "tiles-extruded",32,32,1,2);
         //TODO: cleanup layers
         const groundLayer1 = map.createStaticLayer("ground_layer_1", tileset, 0, 0);
@@ -213,11 +214,10 @@ class GameScene extends Phaser.Scene {
 
     reloadEntity(id, base, layers){
         let entity =  this.mapEntities[id];
-        console.log(layers);
         entity.base = base;
         entity.layers = layers;
     }
-
+    // TODO: change to some kind of config
     newEntity(id, x, y, facing, state, base, layers, health, mHealth){
         if(layers) {
             this.mapEntities[id] = new Player(this, {x: x, y: y}, facing, state, base, layers, health, mHealth);
@@ -274,12 +274,15 @@ class GameScene extends Phaser.Scene {
 
     update(){
         Object.keys(this.mapEntities).forEach((key)=>{
+
             let entity = this.mapEntities[key];
             if(entity){
                 entity.update()
             }
-
         });
+        this.tick += 0.05;
+        this.customPipeline.setFloat1("time", this.tick);
+
     }
 
     loadInventory(items){

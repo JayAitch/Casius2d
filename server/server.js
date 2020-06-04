@@ -95,6 +95,7 @@ class PlayerStats {
     }
 }
 
+// this could be used along with id to get the room etc
 class PlayerLocation{
     constructor(zone, pos){
         this.zone = zone;
@@ -125,7 +126,7 @@ global.serverSender = {
     },
     //temp
         //// temp/////
-    propigateReload: function(key,playerLocation){
+    propigateReload: function(key, playerLocation){
         let zone = this.getZone(playerLocation);
         zone.triggerEntityReload(key);
     },

@@ -118,18 +118,18 @@ class DamageableCharacter extends GameObject {
     }
 }
 
-// ToDo: this shouldnt move
+
 class BasicResource extends  DamageableCharacter{
 
-    constructor(collisionManager,pos, dropId, zone, reward) {
-        let layers = {base: "rock"};
-        let stats = { health: 100, maxHealth:100, defence:5};
-        super(pos,  stats, zone);
+    constructor(collisionManager,config) {
+        let layers = config.layers
+        let stats = config.stats;
+        super(config.pos,  stats, config.zone);
         this.width = 32; // temp
         this.height = 32; // temp
         this.stats = stats ;
-        this.dropId = dropId;
-        this.skillReward = reward;
+        this.dropId = config.drop;
+        this.skillReward = config.reward;
         this.createCollider(collisionManager);
         this.animationComponent = new characterComponents.AnimationComponent(layers, {x:0,y:0});
     }
@@ -190,15 +190,15 @@ class BasicResource extends  DamageableCharacter{
 
 class BasicMob extends  DamageableCharacter{
 
-    constructor(collisionManager, deathCallback, zone) {
+    constructor(collisionManager, config) {
         let layers = {base: "pig"};
         let pos = {x: 150, y: 150};
-        let stats = {health: 100, maxHealth:100, defence:0, attack:2, speed:3 };
-        super(pos, stats, zone);
+        let stats = config.stats;
+        super(pos, stats, config.zone);
         this.width = 32; // temp
         this.height = 32; // temp
         this.stats = stats ;
-        this.deathCallback = deathCallback;
+        this.deathCallback = config.deathCallback;
         this.createCollider(collisionManager);
         this.movementComponent = new characterComponents.MovementComponent(this.pos, stats.speed);
         this.animationComponent = new characterComponents.AnimationComponent(layers, this.movementComponent);
@@ -293,12 +293,12 @@ class BasicMob extends  DamageableCharacter{
 
 
 class ServerPlayer extends DamageableCharacter{
-    constructor(playerConfig, collisionManager){
+    constructor(collisionManager, playerConfig){
         super(playerConfig.location.pos,  playerConfig.stats, playerConfig.location.zone);
         this.config = playerConfig;
         this.width = 32;
         this.height = 48;
-
+        console.log(this.pos);
         let collider = this.createCollider(collisionManager);
         this.movementComponent = new characterComponents.MovementComponent(this.pos, this.config.stats.speed);
         let animLayers = this.animationLayers;
@@ -361,7 +361,7 @@ class ServerPlayer extends DamageableCharacter{
         return this.animationComponent.currentState;
     }
 
-    get entityPos(){
+    get key(){
         return this.config.key;
     }
 

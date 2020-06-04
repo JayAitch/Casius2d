@@ -221,12 +221,7 @@ function fourPlusEffect(sprite, scene){
 
 // todo: generalise effects with custom shader
 function plusEightEffect(sprite, scene){
-
-    customPipeline = game.renderer.addPipeline('Custom', new CustomPipeline(game));
-
     sprite.setPipeline('Custom');
-
-    return customPipeline;
     // scene.tweens.addCounter({
     //     from: 2,
     //     to: 0,
@@ -430,12 +425,10 @@ class MovingMultiSprite extends MovingSprite{
             let sprite = scene.add.sprite(pos.x, pos.y);
             this.spriteList[elem.base] = sprite;
             sprite.z = tempCharacterLayer +1;
-            let test = addSpriteEffect(sprite,scene, elem.effect); //temp
-            if(test)
-                this.testRender = test; //temp
+            this.testRender = addSpriteEffect(sprite,scene, elem.effect); //temp
         })
         this.scene = scene;
-        this.time = 0;
+        this.tick = 0;
         this.changeAnimations();
     }
 
@@ -450,14 +443,7 @@ class MovingMultiSprite extends MovingSprite{
     }
 
 
-    update(){
-       // super.update();
-        // TODO move shaders and stuff to an renderItem class
-        if(this.testRender){
-            this.testRender.setFloat1('time', this.time);
-            this.time += 0.05
-        }
-    }
+
 
 
     set layers(val){
@@ -481,6 +467,9 @@ class MovingMultiSprite extends MovingSprite{
     set base(val){
        // console.log(val);
     }
+
+
+
 
     destroy(){
         super.destroy();
@@ -565,7 +554,6 @@ class Player extends MovingMultiSprite{
         this.healthBar.x = this.pos.x;
         this.healthBar.y = this.pos.y;
         this.healthBar.draw();
-        super.update();
     }
 }
 
@@ -580,7 +568,8 @@ var CustomPipeline = new Phaser.Class({
             Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline.call(this, {
                 game: game,
                 renderer: game.renderer,
-                fragShader:` 
+                fragShader://
+`
                     precision lowp float;
                     varying vec2 outTexCoord;
                     varying vec4 vColor;
@@ -595,7 +584,7 @@ var CustomPipeline = new Phaser.Class({
                 float freq = 0.08;
                 float value =
                     sin(time + freq);
-                     
+
                     //  +
                     // sin(time + freq) +
                     // sin(time + freq) +
@@ -635,31 +624,145 @@ var CustomPipeline = new Phaser.Class({
                             sum += texture2D(uSampler, texcoord + vec2(xx, yy) * 0.002) * factor;
                             }
                         }
-                        
-                        // float sinTime = abs(sin(time)); 
+
+                        // float sinTime = abs(sin(time));
                         // vec4 texel = texture2D(uSampler, outTexCoord);
                         // texel *= vec4(outTint.rgb * outTint.a, outTint.a);
                         //
                         // gl_FragColor = texel + (sum * sinTime) * 0.025 + texture2D(uSampler, texcoord);
-                        //       
-                        
-                                  
+                        //
+
+
                     vec4 texel = texture2D(uSampler, outTexCoord);
                     texel *= vec4(outTint.rgb * outTint.a, outTint.a);
                     texel *= plasma();
                     float sinTime = abs(sin(time));
                     gl_FragColor = texel + (sum * sinTime) * 0.025 + texture2D(uSampler, texcoord) ;
-                        
-                   //     float sinTime = abs(sin(time));                      
-                   //     gl_FragColor = (sum * sinTime) * 0.025 + texture2D(uSampler, texcoord); 
+
+                        // float sinTime = abs(sin(time));
+                        // gl_FragColor = (sum * sinTime) * 0.025 + texture2D(uSampler, texcoord);
                     }
-                           
+
                  `
             });
         }
 
 
 });
+
+
+// `
+//                     precision lowp float;
+//                     varying vec2 outTexCoord;
+//                     varying vec4 vColor;
+//
+//                     uniform sampler2D uSampler;
+//                     uniform float time;
+//
+//                     void main() {
+//                         vec4 sum = vec4(0);
+//                         vec2 texcoord = outTexCoord;
+//                         for(int xx = -4; xx <= 4; xx++) {
+//                             for(int yy = -3; yy <= 3; yy++) {
+//                                 float dist = sqrt(float(xx*xx) + float(yy*yy));
+//                                 float factor = 0.0;
+//                                 if (dist == 0.0) {
+//                                     factor = 2.0;
+//                                 } else {
+//                                     factor = 2.0 / abs(float(dist));
+//                                 }
+//                             sum += texture2D(uSampler, texcoord + vec2(xx, yy) * 0.002) * factor;
+//                             }
+//                         }
+//                         float sinTime = abs(sin(time));
+//                         gl_FragColor = (sum * sinTime) * 0.025 + texture2D(uSampler, texcoord);
+//                     }
+//                  `
+
+
+
+
+
+
+//
+// `
+//                     precision lowp float;
+//                     varying vec2 outTexCoord;
+//                     varying vec4 vColor;
+//                     varying vec4 outTint;
+//                     uniform sampler2D uSampler;
+//                     uniform float time;
+//
+//
+//
+//             vec4 plasma()
+//             {
+//                 float freq = 0.08;
+//                 float value =
+//                     sin(time + freq);
+//
+//                     //  +
+//                     // sin(time + freq) +
+//                     // sin(time + freq) +
+//                     // cos(time + freq * 2.0);
+//
+//                 return vec4(
+//                     cos(value) * 0.5,
+//                     sin(value)* 0.5,
+//                     sin(value * 3.14 * 2.0)* 0.5,
+//                     1
+//                 );
+//             }
+// //
+// //             void main()
+// //             {
+// //                 vec4 texel = texture2D(uMainSampler, outTexCoord);
+// //                 texel *= vec4(outTint.rgb * outTint.a, outTint.a);
+// //                 gl_FragColor = texel * plasma();
+// //             }
+//
+//
+//
+//
+//
+//                     void main() {
+//                         vec4 sum = vec4(0);
+//                         vec2 texcoord = outTexCoord;
+//                         for(int xx = -4; xx <= 4; xx++) {
+//                             for(int yy = -3; yy <= 3; yy++) {
+//                                 float dist = sqrt(float(xx*xx) + float(yy*yy));
+//                                 float factor = 0.0;
+//                                 if (dist == 0.0) {
+//                                     factor = 2.0;
+//                                 } else {
+//                                     factor = 2.0 / abs(float(dist));
+//                                 }
+//                             sum += texture2D(uSampler, texcoord + vec2(xx, yy) * 0.002) * factor;
+//                             }
+//                         }
+//
+//                         // float sinTime = abs(sin(time));
+//                         // vec4 texel = texture2D(uSampler, outTexCoord);
+//                         // texel *= vec4(outTint.rgb * outTint.a, outTint.a);
+//                         //
+//                         // gl_FragColor = texel + (sum * sinTime) * 0.025 + texture2D(uSampler, texcoord);
+//                         //
+//
+//
+//                     vec4 texel = texture2D(uSampler, outTexCoord);
+//                     texel *= vec4(outTint.rgb * outTint.a, outTint.a);
+//                     texel *= plasma();
+//                     float sinTime = abs(sin(time));
+//                     gl_FragColor = texel + (sum * sinTime) * 0.025 + texture2D(uSampler, texcoord) ;
+//
+//                         // float sinTime = abs(sin(time));
+//                         // gl_FragColor = (sum * sinTime) * 0.025 + texture2D(uSampler, texcoord);
+//                     }
+//
+//                  `
+
+
+
 
 
 // `
