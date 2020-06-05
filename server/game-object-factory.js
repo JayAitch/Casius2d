@@ -1,5 +1,5 @@
 const characters = require('./server-characters.js');
-global.entityTypeLookup = {"PLAYER":"player", "PIG":"pig", "NONPASSIBLE":"nonPassible", "TRIGGER_ZONE_CHANGE":"portal", "BASENODE":"baseNode"}
+global.entityTypeLookup = {"PLAYER":"player", "PIG":"pig", "NONPASSIBLE":"nonPassible", "TRIGGER_ZONE_CHANGE":"portal", "BASENODE":"baseNode", "SHOPKEEPER":"shopKeeper"}
 
 entityTypes = {
     "player": {
@@ -21,6 +21,10 @@ entityTypes = {
     "baseNode":{
         id:"baseNode",
         constructor: characters.BasicResource
+    },
+    "shopKeeper":{
+        id:"shopKeeper",
+        constructor: characters.ShopKeeper
     }
 
 }

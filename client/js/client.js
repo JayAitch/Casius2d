@@ -36,17 +36,24 @@ class Receiver{
             this.gameScene.loadPlayerData(data.id);
         });
 
-
         this.socket.on('myInventory',(data)=>{
             this.gameScene.loadInventory(data);
         });
 
+        this.socket.on('shopList',(data)=>{
+            let keyList = Object.keys(data);
+            keyList.forEach((key)=>{
+                let dataRow = data[key];
+                this.gameScene.updateShops(dataRow.position, dataRow.stock);
+            })
+        });
 
         this.socket.on('AOEDebug',(data)=>{
             this.gameScene.printAOEDebug(data);
         });
 
         this.socket.on('entityList', (data)=>{
+            console.log(data)
             // health is always blank here
             let keyList = Object.keys(data);
             this.gameScene.clearEnities();
@@ -132,6 +139,15 @@ class Sender{
         this.socket.emit('pickup', id);
     }
 
+    clickShopSlot(slot,action,shopid){
+        this.socket.emit('clickShopSlot', {key:shopid,action:action, slot:slot});
+    }
+
+
+    //
+    // buyItem(shopid, slot){
+    //     this.socket.emit('buy', {id:shopid, slot:slot});
+    // }
     clickPaperDollSlot(slot,action){
         this.socket.emit('clickPaperDoll', {slot: slot, action: action});
     }

@@ -78,7 +78,6 @@ class ZonePortal{
             type: colliderTypes.ZONETRIGGER
         }
 
-        console.log(config);
         this.collider = new characterComponents.ColliderComponent(collisionManager, colliderConfig);
         this.collider.zoneTarget = config.zoneTarget;
         this.collider.posTarget = {x:config.posTarget.x || 0, y:config.posTarget.y  || 0};
@@ -197,13 +196,13 @@ class BasicMob extends  DamageableCharacter{
         let layers = {base: "pig"};
         let pos = {x: 150, y: 150};
         let stats = config.stats;
-        super(pos, stats, config.zone);
+        super(pos, config.stats, config.zone);
         this.width = 32; // temp
         this.height = 32; // temp
         this.stats = stats ;
         this.deathCallback = config.deathCallback;
         this.createCollider(collisionManager);
-        this.movementComponent = new characterComponents.MovementComponent(this.pos, stats.speed);
+        this.movementComponent = new characterComponents.MovementComponent(this.pos, config.stats.speed);
         this.animationComponent = new characterComponents.AnimationComponent(layers, this.movementComponent);
         this.components.push(new characterComponents.AIComponent(this.pos, this.velocity, this.movementComponent));
         this.components.push(this.movementComponent);
@@ -292,6 +291,87 @@ class BasicMob extends  DamageableCharacter{
         }
     }
 }
+
+class ShopKeeper extends GameObject{
+    constructor(collisionManager, config) {
+        super(config.zone, config.pos);
+        let stats = {speed:10}
+        this.pos = config.position;
+        this.width = 32; // temp
+        this.height = 32; // temp
+        let animLayers = {base:"basecharacter"};
+        this.movementComponent = new characterComponents.MovementComponent(this.pos, stats);
+        this.animationComponent = new characterComponents.AnimationComponent(animLayers, this.movementComponent);
+        this.baseStock = config.baseStock;
+        this.stock = this.baseStock;
+        this.tick = 0;
+        this.createCollider(collisionManager);
+    }
+
+
+    update() {
+        super.update();
+        this.tick =+0.5;
+        if(!(this.tick % 500)){
+            this.modifyStock();
+        }
+    }
+
+    getPrice(key){
+        let amount = this.stock[key] || 0;
+        return amount;
+    }
+
+    get prices(){
+
+    }
+
+    get direction(){
+        return this.animationComponent.direction;
+    }
+
+    get state(){
+        return this.animationComponent.currentState;
+    }
+
+    modifyStock(){
+        console.log("changing stock");
+    }
+
+
+
+    createCollider(collisionManager){
+        let colliderConfig = {
+            width:this.width,
+            height: this.height,
+            pos: this.pos,
+            layer:2,
+            //  interacts:[0,1,3,4],
+            interacts:[0],
+            callback: (other)=>{
+                return this.collisionCallback(other);
+            },
+            message: (message)=>{
+               console.log("nope");
+            },
+            type: colliderTypes.MONSTER
+        }
+        let collider = new characterComponents.ColliderComponent(collisionManager, colliderConfig)
+        this.components.push(collider);
+        return collider;
+    }
+
+
+    collisionCallback(other){
+        switch(other.type){
+            case colliderTypes.NONPASSIBLE:
+                this.movementComponent.backStep();
+                this.movementComponent.stop();
+                break;
+        }
+    }
+}
+
 
 
 class ServerPlayer extends DamageableCharacter{
@@ -470,4 +550,4 @@ class ServerPlayer extends DamageableCharacter{
     }
 }
 
-module.exports = {ServerPlayer, NonPassibleTerrain, ZonePortal, BasicMob, BasicResource}
+module.exports = {ServerPlayer, NonPassibleTerrain, ZonePortal, BasicMob, BasicResource, ShopKeeper}

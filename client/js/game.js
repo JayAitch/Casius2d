@@ -71,6 +71,8 @@ class GameScene extends Phaser.Scene {
         super({key: 'maingame'});
         this.mapEntities = {};
         this.floorItems = {};
+        this.shopList = {};
+        this.interactables  = {};
         this.time = 0;
 
     }
@@ -88,7 +90,7 @@ class GameScene extends Phaser.Scene {
     loadPlayerData(id){
         this.playerID = id;
         let myPlayer = this.mapEntities[this.playerID];
-        this.cameras.main.zoomTo(1.9,0);
+       // this.cameras.main.zoomTo(1.9,0);
         this.cameras.main.startFollow(myPlayer.sprite);
 
         // set background color, so the sky is not black
@@ -98,7 +100,8 @@ class GameScene extends Phaser.Scene {
     create(){
         this.scene.launch("paperdoll", this.client.sender);
         this.scene.launch("inventory", this.client.sender);
-        items = this.cache.json.get('items');
+        this.scene.launch("shop", this.client.sender);
+        items = this.cache.json.get('items'); // unused
         this.controller = new Controller(this,this.client);
     }
 
@@ -178,6 +181,40 @@ class GameScene extends Phaser.Scene {
         return itemKey;
     }
 
+    updateShops(key, stock){
+        this.shopList[key] = stock;
+        let potentialEntity = this.mapEntities[key];
+        if(potentialEntity){
+            potentialEntity.shop = stock;
+            this.interactables[key] = potentialEntity;
+            potentialEntity.interact = ()=>{ this.showStock(stock, key);}
+        }
+    }
+
+    interactWithClosest(){
+        let range = 50;
+
+        let myPlayer = this.mapEntities[this.playerID];
+        let entityKey = undefined
+        let keys = Object.keys(this.interactables);
+        let mapEntity = undefined;
+        keys.forEach((key)=>{
+            mapEntity = this.interactables[key];
+            let distance = Phaser.Math.Distance.Between(mapEntity.x,mapEntity.y,myPlayer.pos.x,myPlayer.pos.y);
+            // soft check temporry
+            if( distance < range){
+                entityKey = key;
+            }
+        })
+        if(mapEntity){
+            mapEntity.interact();
+        }else{
+
+        }
+
+       // return entityKey;
+
+    }
 
     newItem(i,item,pos){
         let floorItem = this.add.sprite(pos.x, pos.y, item.id)
@@ -214,6 +251,12 @@ class GameScene extends Phaser.Scene {
             mEntity.destroy();
         })
         this.mapEntities = {};
+    }
+
+    showStock(stock, key){
+        let shop = this.scene.get("shop");
+        shop.stock = stock;
+        shop.id = key;
     }
 
 
@@ -271,11 +314,25 @@ class GameScene extends Phaser.Scene {
         pD.items = items.paperDoll;
     }
 
+    hideMenus(){
+        let pD = this.scene.get("paperdoll");
+        let inv = this.scene.get("inventory");
+        let shop = this.scene.get("shop");
+        pD.hide = true;
+        inv.hide = true;
+        shop.hide = true;
+    }
+
     toggleInventory(){
         let pD = this.scene.get("paperdoll");
         let inv = this.scene.get("inventory");
+        let shop = this.scene.get("shop");
         pD.hide = !pD.hide;
         inv.hide = !inv.hide;
+        if(inv.hide){
+            shop.hide = true;
+        }
+
     }
 }
 
@@ -292,6 +349,8 @@ class Controller{
         let spaceKey = scene.input.keyboard.addKey("SPACE");
         let ctrlKey = scene.input.keyboard.addKey("CTRL");
         let iKey = scene.input.keyboard.addKey("I");
+        let eKey = scene.input.keyboard.addKey("E");
+
 
         this.client = client;
 
@@ -302,6 +361,15 @@ class Controller{
             let itemID = scene.getClosestItem();
             if(itemID)
                 client.sender.pickupItem(itemID);
+        });
+
+
+        eKey.on('down', (event)=> {
+            let interactableID = scene.interactWithClosest();
+
+            // console.log(interactableID);
+            // if(interactableID)
+            //     client.sender.interact(interactableID);
         });
 
         spaceKey.on('down', (event)=> {

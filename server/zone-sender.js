@@ -24,11 +24,26 @@ class ZoneSender{
         this.room.leave(client);
     }
 
-    initMessage(client, enities, items) {
-        client.emit("entityList", this.sendEntities(enities));
+    initMessage(client, entities, items, shops) {
+        client.emit("entityList", this.sendEntities(entities));
         client.emit("itemList", items);
         client.emit("myPlayer", {id: client.player.key});
         client.emit("myInventory", {inventory:client.character.invent.inventory,paperDoll: client.character.invent.paperDoll });
+        client.emit("shopList", this.sendShops(shops));
+    }
+
+    sendShops(shops) {
+        let tempShops = {};
+        console.log(shops);
+        let entityKeys = Object.keys(shops);
+        entityKeys.forEach( (key)=> {
+            let shop = shops[key];
+            tempShops[key] = {
+                position:key,
+                stock:shop.stock
+            };
+        });
+        return tempShops;
     }
 
     sendEntities(entites) {

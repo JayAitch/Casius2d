@@ -12,7 +12,7 @@ const config = {
     dom: {
         createContainer: true
     },
-    scene: [BootScene, PreloadScene, LoginScene, GameScene, PaperDollScene,InventoryScene],
+    scene: [BootScene, PreloadScene, LoginScene, GameScene, PaperDollScene,InventoryScene, ShopScene],
 };
 let game;
 
@@ -23,8 +23,8 @@ const tempAboveTileLayer = 50000;
 
 window.addEventListener('load', (event) => {
     game = new Phaser.Game(config);
-
 });
+
 randomInteger = function(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
