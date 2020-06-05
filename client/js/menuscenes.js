@@ -211,7 +211,7 @@ class ActionsList{
             this.exSize,
             this.exSize
         );
-        graphics.setDepth(UILayer + 15);
+        graphics.depth = UILayer + 15;
         let exText = this.scene.add.text(
             this.x - this.exSize/2,
             this.y,
@@ -219,8 +219,7 @@ class ActionsList{
             textStyles.button
         );
 
-
-        exText.setDepth(UILayer + 16);
+        graphics.depth = UILayer + 99999;
         offsetByWidth(exText);
 
 
@@ -251,8 +250,9 @@ class ActionsList{
                 this.slotWidth,
                 this.slotHeight
             );
-
+            graphics.depth = UILayer + 999999;
             let actionText = this.scene.add.text(this.x,this.y + this.itemOffset,action,textStyles.button);
+            actionText.setDepth( UILayer + 999999);
             offsetByWidth(actionText);
             this.texts.push(actionText);
             this.zones.push(zone);
@@ -423,7 +423,12 @@ class ClientInventory{
         this.inventorySlots.forEach(slot => {
             let itemkey = itemKeys[slotInc];
             let item = items[itemkey];
-            slot.item = item;
+            if(item && item.item){
+                slot.item = item.item || item;// todo: show amount
+            }else{
+                slot.item = item;// todo: show amount
+            }
+
             slotInc++;
         })
     }
@@ -448,6 +453,47 @@ class ClientInventory{
     }
 }
 
+class ShopScene extends Phaser.Scene {
+    constructor() {
+        super({key: 'shop'});
+        this.actionsList = new ActionsList(this);
+    }
+    init(data){
+        this.sender = data;
+    }
+    create(){
+        this.inventory = new ClientInventory(this, 510, 400, 24, 4,slotNumber=>{this.clickSlot(slotNumber)});
+        this.inventory.hide = true;
+    }
+
+
+    set hide(val){
+        this.inventory.hide = val;
+    }
+
+    set id(id){
+       this.shopId = id;
+    }
+    set stock(val){
+        this.inventory.hide = false;
+        this.inventory.items = val;
+    }
+
+    clickSlot(slot){
+        this.actionsList.target = this.inventory.getItem(slot);
+        this.actionsList.actions = ["BUY"];
+
+        // maybe get actions from item?
+        this.actionsList.setCallBack((action)=>{
+            this.sender.clickShopSlot(slot, action, this.shopId);
+            this.actionsList.cleanUp();
+        });
+
+    }
+}
+
+
+
 
 
 class InventoryScene extends  Phaser.Scene {
@@ -466,6 +512,7 @@ class InventoryScene extends  Phaser.Scene {
     set hide(val){
         this.inventory.hide = val;
         this.isHide = val;
+        console.log(val);
         this.actionsList.hide = val;
     }
     get hide(){

@@ -56,8 +56,49 @@ class Zone{
         mapBuilder.build(this.factory, this.zoneID,  this.physicsWorld); // more concrete management of nodes, will remove physics world from this
         systems.addToUpdate(this);
         this.testCreateMobLots(5);
-
+        this.testCreateShopKeeper();
     }
+
+    testCreateShopKeeper() {
+        this.shops = {};
+
+        // temp
+        let config = {
+            position: {x: 150, y: 150},
+            baseStock: shops[0],
+            zone: this.zoneID
+        }
+
+        let entityConfig = {
+            type: entityTypeLookup.SHOPKEEPER,
+            config: config
+        }
+
+
+        let newMob = this.factory.new(entityConfig);
+        this.physicsWorld.addNewMob(newMob);
+        this.shops[this.physicsWorld.lastEntityId - 1] = newMob; //temp
+    }
+
+
+    buyItem(client, shopid, slot){
+        // todo:
+        let item = this.shops[shopid].stock[slot].item//;[slot];
+
+        client.character.invent.pickupItem(item)
+        console.log(client);
+    }
+    //
+    // shopTrade(client, id){
+    //     // let shops = this.shops[id];
+    //     // if(shops){
+    //     //     let interactReturn = shops.interact();
+    //     //     let clientId = client.character._id;
+    //     //     let location = client.playerLocation;
+    //     //     serverSender.clientMessage(interactReturn.hook, interactReturn.data, location, clientId)
+    //     // }
+    // }
+
 
 // todo: move to mob factor, promote more stats/ai configuration
 //       spawn from zones added to map use A*
@@ -161,7 +202,7 @@ class Zone{
         client.player = newPlayer;
 
         this.zoneSender.notifyClientPlayer(client, newPlayer);
-        this.zoneSender.initMessage(client, this.physicsWorld.entities, this.itemWorld.floorItems, newPlayer.key);
+        this.zoneSender.initMessage(client, this.physicsWorld.entities, this.itemWorld.floorItems, this.shops);
     }
 
     update(){

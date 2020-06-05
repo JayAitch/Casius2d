@@ -58,9 +58,93 @@ players = {
 //         }
 //     }
 // };
-
+// temp
+global.shops = {
+    0:[
+        {
+            item: {base:items.goldhelm, plus: 2},
+            amount: 12
+        },
+        {
+            item: {base:items.goldhelm, plus: 4},
+            amount: 12
+        },
+        {
+            item: {base:items.goldhelm, plus: 6},
+            amount: 12
+        },
+        {
+            item: {base:items.goldhelm, plus: 8},
+            amount: 12
+        },
+        {
+            item: {base:items.jacket, plus: 2},
+            amount: 12
+        },
+        {
+            item: {base:items.jacket, plus: 4},
+            amount: 12
+        },
+        {
+            item: {base:items.jacket, plus: 6},
+            amount: 12
+        },
+        {
+            item: {base:items.jacket, plus: 8},
+            amount: 12
+        },
+        {
+            item: {base:items.dspear, plus: 2},
+            amount: 12
+        },
+        {
+            item: {base:items.dspear, plus: 4},
+            amount: 12
+        },
+        {
+            item: {base:items.dspear, plus: 6},
+            amount: 12
+        },
+        {
+            item: {base:items.dspear, plus: 8},
+            amount: 12
+        },
+        {
+            item: {base:items.goldlegs, plus: 2},
+            amount: 12
+        },
+        {
+            item: {base:items.goldlegs, plus: 4},
+            amount: 12
+        },
+        {
+            item: {base:items.goldlegs, plus: 6},
+            amount: 12
+        },
+        {
+            item: {base:items.goldlegs, plus: 8},
+            amount: 12
+        },
+        {
+            item: {base:items.leatherbelt, plus: 2},
+            amount: 12
+        },
+        {
+            item: {base:items.leatherbelt, plus: 4},
+            amount: 12
+        },
+        {
+            item: {base:items.leatherbelt, plus: 6},
+            amount: 12
+        },
+        {
+            item: {base:items.leatherbelt, plus: 8},
+            amount: 12
+        }
+    ]
+}
 inventories ={
-    0:[{base:items.seeradish,quantity:1, plus:0},
+    01212:[{base:items.seeradish,quantity:1, plus:0},
         {base:items.goldhelm,quantity:1, plus:6},
         {base:items.goldhelm,quantity:1, plus:600},
         {base:items.goldmask,quantity:1, plus:3},
@@ -70,7 +154,7 @@ inventories ={
         {base:items.jacket,quantity:1, plus:4},
         {base:items.jacket,quantity:1, plus:6}
     ],
-    111110:[ ]
+    0:[ ]
 }
 
 
@@ -185,6 +269,14 @@ io.on('connect', function(client) {
             let zone = ZONES[client.playerLocation.zone]
             zone.pickup(client, id);
         });
+
+
+        client.on('clickShopSlot',function(data) {
+            let action = data.action // todo
+            let zone = ZONES[client.playerLocation.zone]
+            zone.buyItem(client, data.key, data.slot);
+        });
+
 
         client.on('clickPaperDoll',function(data) {
             let slot = data.slot;
