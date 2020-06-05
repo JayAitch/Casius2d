@@ -75,9 +75,8 @@ class GameScene extends Phaser.Scene {
 
     }
 
-
     preload(){
-        this.customPipeline = game.renderer.addPipeline('Custom', new CustomPipeline(game));
+        this.shinyRender = game.renderer.addPipeline('Custom', new ShinyGlowRender(game));
     }
 
     init(data){
@@ -132,15 +131,14 @@ class GameScene extends Phaser.Scene {
     }
 
     loadMap(id) {
-  //      this.clearEnities();
-   //     this.clearItems();
         this.removeCurrentMap();
         let key = MAPS[id];
         let map = this.make.tilemap({key: key});
         this.currentMap = map;
         this.tick = 0;
         const tileset = map.addTilesetImage("magecity", "tiles-extruded",32,32,1,2);
-        //TODO: cleanup layers
+
+        //TODO: cleanup layers with array or something // we probably want the render order to be the same as tiled
         const groundLayer1 = map.createStaticLayer("ground_layer_1", tileset, 0, 0);
         const groundLayer2 = map.createStaticLayer("ground_layer_2", tileset, 0, 0);
         const groundLayer3 = map.createStaticLayer("ground_layer_3", tileset, 0, 0);
@@ -151,24 +149,6 @@ class GameScene extends Phaser.Scene {
         const aboveLayer1 = map.createStaticLayer("above_player_1", tileset, 0, 0);
         const aboveLayer2 = map.createStaticLayer("above_player_2", tileset, 0, 0);
         const aboveLayer3 = map.createStaticLayer("above_player_3", tileset, 0, 0);
-
-        // preserve for moving to dynamic layers if appropriote
-        // this.mapLayers["ground_layer_1"] = groundLayer1;
-        // this.mapLayers["ground_layer_2"] = groundLayer2;
-        // this.mapLayers["ground_layer_3"] = groundLayer3;
-        //
-        // this.mapLayers["below_player_1"] = belowLayer1;
-        // this.mapLayers["below_player_2"] = belowLayer2;
-        // this.mapLayers["below_player_3"] = belowLayer3;
-        //
-        // this.mapLayers["above_player_1"] = aboveLayer1;
-        // this.mapLayers["above_player_2"] = aboveLayer2;
-        // this.mapLayers["above_player_3"] = aboveLayer3;
-
-
-            //  const worldLayer = map.createStaticLayer("Below player", tileset, 0, 0);
-     //   const aboveLayer = map.createStaticLayer("Above player", tileset, 0, 0);
-
 
         aboveLayer1.depth = tempAboveTileLayer;
         aboveLayer2.depth = tempAboveTileLayer + 1;
@@ -281,17 +261,22 @@ class GameScene extends Phaser.Scene {
             }
         });
         this.tick += 0.05;
-        this.customPipeline.setFloat1("time", this.tick);
-
+        this.shinyRender.setFloat1("time", this.tick);
     }
 
     loadInventory(items){
-        let inv = this.scene.get("inventory")
+        let inv = this.scene.get("inventory");
         inv.items = items.inventory;
-        let pD = this.scene.get("paperdoll")
+        let pD = this.scene.get("paperdoll");
         pD.items = items.paperDoll;
     }
 
+    toggleInventory(){
+        let pD = this.scene.get("paperdoll");
+        let inv = this.scene.get("inventory");
+        pD.hide = !pD.hide;
+        inv.hide = !inv.hide;
+    }
 }
 
 
@@ -306,6 +291,7 @@ class Controller{
         //    let spaceKey = scene.input.keyboard.addKey("SPACE");
         let spaceKey = scene.input.keyboard.addKey("SPACE");
         let ctrlKey = scene.input.keyboard.addKey("CTRL");
+        let iKey = scene.input.keyboard.addKey("I");
 
         this.client = client;
 
@@ -322,7 +308,9 @@ class Controller{
             client.sender.attack();
         });
 
-
+        iKey.on('down', (event)=> {
+            scene.toggleInventory();
+        });
 
 
         leftKey.on('down', (event)=> {
