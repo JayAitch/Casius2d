@@ -49,15 +49,16 @@ function getGearSlot(paperdoll, key) {
 
 
 class NonPassibleTerrain{
-    constructor(pos, width, height, collisionManager) {
+    constructor(collisionManager, config) {
         let colliderConfig = {
-            width:width,
-            height: height,
-            pos: pos,
+            width:config.width,
+            height: config.height,
+            pos: config.pos,
             layer:0,
             callback: this.collisionCallback,
             type: colliderTypes.NONPASSIBLE
         }
+
         this.collider = new characterComponents.ColliderComponent(collisionManager, colliderConfig)
     }
 
@@ -67,18 +68,20 @@ class NonPassibleTerrain{
 
 // this needs to be ona  different layer
 class ZonePortal{
-    constructor(pos, width, height, collisionManager, zoneTarget, x, y) {
+    constructor(collisionManager, config) {
         let colliderConfig = {
-            width:width,
-            height: height,
-            pos: pos,
+            width:config.width,
+            height: config.height,
+            pos: config.pos,
             layer:0,
             callback: this.collisionCallback,
             type: colliderTypes.ZONETRIGGER
         }
+
+        console.log(config);
         this.collider = new characterComponents.ColliderComponent(collisionManager, colliderConfig);
-        this.collider.zoneTarget = zoneTarget;
-        this.collider.posTarget = {x:x || 0, y:y  || 0};
+        this.collider.zoneTarget = config.zoneTarget;
+        this.collider.posTarget = {x:config.posTarget.x || 0, y:config.posTarget.y  || 0};
     }
 
     collisionCallback(other){
@@ -266,7 +269,6 @@ class BasicMob extends  DamageableCharacter{
     message(message) {
         switch (message.type) {
             case messageTypes.DAMAGE:
-                console.log(message);
                 let reward = this.takeDamage(message.damage);
                 let rewardMessage = {type:messageTypes.REWARD,
                     experience: {[skillLevels.COMBAT]:reward}
@@ -298,7 +300,6 @@ class ServerPlayer extends DamageableCharacter{
         this.config = playerConfig;
         this.width = 32;
         this.height = 48;
-        console.log(this.pos);
         let collider = this.createCollider(collisionManager);
         this.movementComponent = new characterComponents.MovementComponent(this.pos, this.config.stats.speed);
         let animLayers = this.animationLayers;
@@ -322,7 +323,6 @@ class ServerPlayer extends DamageableCharacter{
 
     get animationLayers(){
         let playerConfig = this.config;
-        console.log("setting anim layers");
         let animLayers = {base:playerConfig.appearance};
         // TODO: hair etc
         let paperDoll = playerConfig.paperDoll;
@@ -377,7 +377,6 @@ class ServerPlayer extends DamageableCharacter{
         if(rewardMessage.experience){
 
             this.config.stats.addExperience(rewardMessage.experience);
-            console.log(this.config.stats);
         }
     }
 
