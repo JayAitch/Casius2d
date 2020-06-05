@@ -115,8 +115,11 @@ class MovingSprite{
     }
 
     set animation(animKey){
-        let lookup = animations[this.animationLookup][animKey];
-        if(this.sprite.anims)
+        let anim = animations[this.animationLookup];
+        let lookup = "nothing" //temp
+        if(anim)
+            lookup = animations[this.animationLookup][animKey];
+        if(this.sprite.anims && lookup)
             this.sprite.anims.play(lookup);
     }
 
@@ -142,6 +145,13 @@ class MovingSprite{
         }
 
     }
+    changeAnimations(){
+        let animPrefix = this.state;
+        let anim = animPrefix + this.facing;
+        this.animation = anim
+        this.lastAnim = anim;
+    }
+
     get x(){
         return this.sprite.x;
     }
@@ -150,40 +160,139 @@ class MovingSprite{
     }
 }
 
-function sixPlusEffect(sprite, scene){
-    let currentTint = [255,255,255]
+// todo: generalise effects with custom shader
+
+function threePlusEffect(sprite, scene){
     scene.tweens.addCounter({
         from: 255,
-        to: 111,
+        to: 0,
+        duration: 3000,
+        yoyo:true,
+        repeat: -1,
+        onUpdate: (tween)=>
+        {
+            sprite.tintTopLeft = Phaser.Display.Color.GetColor(sprite.currentTint[2], sprite.currentTint[1], sprite.currentTint[0]);
+            sprite.tintBottomRight = Phaser.Display.Color.GetColor(sprite.currentTint[0], sprite.currentTint[1], sprite.currentTint[2]);
+        }
+    });
+
+
+    scene.tweens.addCounter({
+        from: 200,
+        to: 140,
         duration: 2000,
         yoyo:true,
         repeat: -1,
         onUpdate: (tween)=>
         {
             let value = Math.floor(tween.getValue());
-            currentTint[0] = value;
-            sprite.setTint(Phaser.Display.Color.GetColor(currentTint[0], currentTint[1], currentTint[2]));
+            sprite.currentTint[1] = value;
         }
     });
+}
 
+// todo: generalise effects with custom shader
+
+function fourPlusEffect(sprite, scene){
     scene.tweens.addCounter({
         from: 255,
-        to: 111,
+        to: 0,
+        duration: 3000,
+        yoyo:true,
+        repeat: -1,
+        onUpdate: (tween)=>
+        {
+            sprite.setTint(Phaser.Display.Color.GetColor(sprite.currentTint[0], sprite.currentTint[1], sprite.currentTint[2]));
+        }
+    });
+    scene.tweens.addCounter({
+        from: 255,
+        to: 60,
         duration: 1000,
         yoyo:true,
         repeat: -1,
         onUpdate: (tween)=>
         {
             let value = Math.floor(tween.getValue());
-            currentTint[1] = value;
+            sprite.currentTint[1] = value;
+        }
+    });
+}
+
+
+function plusEightEffect(sprite, scene){
+    sprite.setPipeline('Custom');
+}
+// todo: generalise effects with custom shader
+function sixPlusEffect(sprite, scene){
+    scene.tweens.addCounter({
+        from: 255,
+        to: 50,
+        duration: 200,
+        yoyo:true,
+        repeat: -1,
+        onUpdate: (tween)=>
+        {
+            sprite.tintTopLeft = Phaser.Display.Color.GetColor(sprite.currentTint[2], sprite.currentTint[1], sprite.currentTint[0]);
+            sprite.tintBottomRight = Phaser.Display.Color.GetColor(sprite.currentTint[2], sprite.currentTint[1], sprite.currentTint[0]);
+        }
+    });
+
+    scene.tweens.addCounter({
+        from: 255,
+        to: 30,
+        duration: 200,
+        yoyo:true,
+        repeat: -1,
+        onUpdate: (tween)=>
+        {
+            let value = Math.floor(tween.getValue());
+            sprite.currentTint[0] = value;
+
+
+        }
+    });
+
+
+    scene.tweens.addCounter({
+        from: 30,
+        to: 255,
+        duration: 500,
+        yoyo:true,
+        repeat: -1,
+        onUpdate: (tween)=>
+        {
+            let value = Math.floor(tween.getValue());
+         //   sprite.currentTint[1] = value;
+        }
+    });
+
+
+    scene.tweens.addCounter({
+        from: 255,
+        to: 30,
+        duration: 500,
+        yoyo:true,
+        repeat: -1,
+        onUpdate: (tween)=>
+        {
+            let value = Math.floor(tween.getValue());
+            sprite.currentTint[2] = value;
+
         }
     });
 }
 
 
 function addSpriteEffect(sprite,scene,level){
-    if(level === 6) sixPlusEffect(sprite,scene);
+    sprite.currentTint = [255,255,255]
+    if(level >= 2 && level <= 3) threePlusEffect(sprite,scene);
+    if(level >= 4 && level <= 5) fourPlusEffect(sprite,scene);
+    if(level >= 6 && level <= 7) return sixPlusEffect(sprite,scene);
+    if(level >= 8)  return plusEightEffect(sprite,scene);
 }
+
+
 
 class MovingMultiSprite extends MovingSprite{
 
@@ -194,9 +303,11 @@ class MovingMultiSprite extends MovingSprite{
             let sprite = scene.add.sprite(pos.x, pos.y);
             this.spriteList[elem.base] = sprite;
             sprite.z = tempCharacterLayer +1;
-            addSpriteEffect(sprite,scene, elem.effect); //temp
+            this.testRender = addSpriteEffect(sprite,scene, elem.effect); //temp
         })
-
+        this.scene = scene;
+        this.tick = 0;
+        this.changeAnimations();
     }
 
     set animation(animKey){
@@ -208,6 +319,35 @@ class MovingMultiSprite extends MovingSprite{
                 sprite.anims.play(key + animKey);
         })
     }
+
+
+
+
+
+    set layers(val){
+        let keyList = Object.keys(this.spriteList);
+        keyList.forEach((key)=>{
+            let sprite2 = this.spriteList[key];
+            sprite2.destroy();
+            delete this.spriteList[key];
+        });
+
+        val.forEach((elem)=>{
+            let sprite = this.scene.add.sprite(this.pos.x, this.pos.y);;
+            this.spriteList[elem.base] = sprite;
+            sprite.z = tempCharacterLayer +2;
+            addSpriteEffect(sprite,this.scene, elem.effect); //temp
+        })
+
+        this.changeAnimations();
+    }
+
+    set base(val){
+       // console.log(val);
+    }
+
+
+
 
     destroy(){
         super.destroy();
@@ -226,6 +366,7 @@ class MovingMultiSprite extends MovingSprite{
             sprite.x = x;
             sprite.y = y;
             sprite.depth = tempCharacterLayer + y;
+
         })
     }
 }
@@ -234,9 +375,15 @@ class MovingMultiSprite extends MovingSprite{
 class TestMonster extends MovingSprite{
     constructor(scene, pos, base, health, mHealth){
         super(scene, pos, base);
-        this.healthBar = new HealthBar(scene,pos.x,pos.y,60,8, health, mHealth,-30)
+        this.healthBar = new HealthBar(scene,pos.x,pos.y,60,8, health, mHealth,-30);
+        this.prevHealth = health || -100; //temp
     }
+
     set health(val){
+        if(this.prevHealth > val) {
+            audioPlayer.mobPain.play();
+            this.prevHealth = val;
+        }
         this.healthBar.health = val;
     }
 
@@ -282,3 +429,4 @@ class Player extends MovingMultiSprite{
         this.healthBar.draw();
     }
 }
+

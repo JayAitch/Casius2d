@@ -10,7 +10,23 @@
     },
     "image": {
         "tiles": "assets/tilesets/magecity.png",
-        "tiles-extruded": "assets/tilesets/magecity-extruded.png"
+        "tiles-extruded": "assets/tilesets/magecity-extruded.png",
+        "invshield":"assets/item_icons/a_shield_round.png",
+       "invspear":"assets/item_icons/inv_spear.png",
+      "copperbar":"assets/item_icons/crafting/copper_bar.png",
+      "copperore":"assets/item_icons/crafting/copper_ore.png",
+      "goldbar":"assets/item_icons/crafting/gold_bar.png",
+      "goldore":"assets/item_icons/crafting/gold_ore.png",
+      "ironbar":"assets/item_icons/crafting/iron_bar.png",
+      "ironore":"assets/item_icons/crafting/iron_ore.png",
+      "feather":"assets/item_icons/crafting/feather.png",
+      "gem":"assets/item_icons/crafting/gem.png",
+      "leather":"assets/item_icons/crafting/leather.png",
+      "log":"assets/item_icons/crafting/log.png",
+      "nails":"assets/item_icons/crafting/nails.png",
+      "petal":"assets/item_icons/crafting/petal.png",
+      "plank":"assets/item_icons/crafting/plank.png",
+      "silk":"assets/item_icons/crafting/silk.png"
     },
     "tilemapTiledJSON": {
         "map": "assets/tilemaps/testmap.json",
@@ -18,6 +34,10 @@
         "map3": "assets/tilemaps/testmap3.json"
     },
     "spritesheet":{
+                "crafting": {
+                  "path":"assets/item_icons/crafting.png",
+                  "options":{"frameWidth":32,"frameHeight":32}
+                },
                 "boar": {
                   "path":"assets/character/boar.png",
                   "options":{"frameWidth":64,"frameHeight":64}
@@ -27,7 +47,7 @@
                   "options":{"frameWidth":64,"frameHeight":64}
                 },
                 "seeradish": {
-                  "path":"assets/character/seeraddish.png",
+                  "path":"assets/item_icons/seeraddish.png",
                   "options":{"frameWidth":32,"frameHeight":32}
                 },
                 "goldhelm": {
@@ -36,6 +56,10 @@
                 },
                 "bronzehelm": {
                   "path":"assets/character/armour/helm/bronze_helm.png",
+                  "options":{"frameWidth":64,"frameHeight":64}
+                },
+                "goldmask": {
+                  "path":"assets/character/armour/helm/golden_mask.png",
                   "options":{"frameWidth":64,"frameHeight":64}
                 },
                 "goldlegs": {
@@ -68,6 +92,48 @@
                 }
     },
     "audio": {
+        "backing-track": {
+          "path": "assets/sounds/backing_track.mp3"
+        },
+      "equip-item": {
+        "path": "assets/sounds/equip_item.ogg"
+      },
+      "sword-swing": {
+        "path": "assets/sounds/sword_swing.wav"
+      },
+      "pig-grunt": {
+        "path": "assets/sounds/pig_grunt.wav"
+      },
+      "footstep0": {
+        "path": "assets/sounds/footstep00.ogg"
+      },
+      "footstep1": {
+        "path": "assets/sounds/footstep01.ogg"
+      },
+      "footstep2": {
+        "path": "assets/sounds/footstep02.ogg"
+      },
+      "footstep3": {
+        "path": "assets/sounds/footstep03.ogg"
+      },
+      "footstep4": {
+        "path": "assets/sounds/footstep04.ogg"
+      },
+      "footstep5": {
+        "path": "assets/sounds/footstep05.ogg"
+      },
+      "footstep6": {
+        "path": "assets/sounds/footstep06.ogg"
+      },
+      "footstep7": {
+        "path": "assets/sounds/footstep07.ogg"
+      },
+      "footstep8": {
+        "path": "assets/sounds/footstep08.ogg"
+      },
+      "footstep9": {
+        "path": "assets/sounds/footstep09.ogg"
+      }
     }
 
 }

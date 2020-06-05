@@ -1,22 +1,69 @@
+directions = {"NORTH":"up", "WEST":"left", "SOUTH":"down", "EAST":"right" };
+global.states  = {"THRUST":"thrust", "WALK":"walk","CAST":"cast", "STOP":"stop"};
 
 class AnimationComponent{
-    constructor(animLayers) {
+    constructor(animLayers, moveComp) {
         this.currentState = states.STOP;
         this.facing = directions.NORTH;
         this.baseSprite = animLayers.base
         this.spriteLayers = animLayers.layers;
+        this.moveComp = moveComp;
+        this.deltaTime = 0;
+        this.previouseVelo = moveComp.velocity;
+        this.forcedState = false;
+        this.direction = {x:-1,y:0};
     }
+
     remove(){
         this.isDelete = true;
         delete this;
     }
+
+    set spriteConfig(val){
+        this.baseSprite = val.base
+        this.spriteLayers = val.layers;
+    }
+
+    forceStateFor(time, cbTime, state, callback){
+        this.currentState = states.THRUST;
+        if(!this.forcedState){
+            this.forcedState = true;
+            let cbTimeout = setTimeout(callback,cbTime);
+            let stateTimeout = setTimeout(()=>{
+                this.currentState = states.STOP;
+                this.forcedState = false;
+            },time);
+
+        }
+
+    }
+
+    manageState(){
+        let velocity = this.moveComp.velocity
+        if(!this.forcedState && this.previouseVelo !== velocity){
+            this.facing = velocity;
+            if (velocity.x === 0 && velocity.y === 0) {
+                this.currentState = states.STOP;
+            } else {
+                this.currentState = states.WALK;
+            }
+            this.previouseVelo = velocity;
+        }
+    }
+
+
+    update(){
+        this.manageState();
+        this.deltaTime++;
+    }
+
     set facing(val){
 
         if(val.x !== 0){
             if(val.x > 0){
                 this.direction = directions.EAST;
             }
-            else{
+            else if(val.x < 0){
                 this.direction = directions.WEST;
             }
         }
@@ -24,7 +71,7 @@ class AnimationComponent{
             if(val.y > 0){
                 this.direction = directions.SOUTH;
             }
-            else{
+            else if(val.y < 0){
                 this.direction = directions.NORTH;
             }
         }
@@ -32,29 +79,30 @@ class AnimationComponent{
 }
 
 class AttackingComponent{
-    constructor(collisionManager, origin, directionObject, stats){
+    constructor(collisionManager, origin, directionObject, stats, zoneid){
         this.collisionManager = collisionManager;
         this.origin = origin;
         this.directionObject = directionObject;
         this.stats = stats;
+        this.zoneid = zoneid;
     }
 
     scanForEntities(x,y,width,height){
+        sendAOEDebug(this.zoneid,{x:x,y:y},width,height);
         return this.collisionManager.boxScan({x:x,y:y},width,height,[2]);
     }
 
-    attack(){
-        let direction = directionAsVector(this.directionObject.direction);
-        let x = (direction.x * 30) + this.origin.x;
-        let y = (direction.y * 30) + this.origin.y;
-        let hitEntities = this.scanForEntities(x,y,150,150);
-        let damageMessage = {type:colliderTypes.ATTACKSCAN, damage:this.stats.attack};
-        let reward = 0;
+    attack(message){
+        let direction = directionAsVector(this.directionObject.direction)|| {x: 0, y: -1};
+        let x = (direction.x * 50) + this.origin.x;
+        let y = (direction.y * 50) + this.origin.y;
+        let hitEntities = this.scanForEntities(x,y,50,50);
         hitEntities.forEach((entities)=>{
-            reward += entities.onCollision(damageMessage);
+            entities.message(message);
         })
-        return reward;
     }
+
+
     remove(){
         this.isDelete = true;
         delete this;
@@ -78,6 +126,8 @@ function directionAsVector(direction){
     }
 }
 
+
+
 class ColliderComponent{
     constructor(collisionManager, colliderConfig) {
         this.collisionCallback = colliderConfig.callback;
@@ -89,6 +139,7 @@ class ColliderComponent{
         this.collisionRegistration = collisionManager.addCollider(colliderConfig.layer,this);
         this.interacts = colliderConfig.interacts;
         this.isDelete = false;
+        this.message = colliderConfig.message;
     }
 
     get x(){
@@ -111,14 +162,18 @@ class ColliderComponent{
     }
 }
 
+
+
+
 class AIComponent{
-    constructor(pos, velocity){
+    constructor(pos, velocity, movementComp){
         this.tick = 0;
         this.pos = pos;
         this.velocity = velocity;
         this.firstAction = 10;
+        this.movementComp = movementComp;
     }
-    remove(){delete this;};
+    remove(){delete this;}
     update(entity){
         this.tick++;
         switch (this.tick % this.firstAction) {
@@ -128,12 +183,12 @@ class AIComponent{
                     x: this.direction.x * 10,
                     y: this.direction.y * 10
                 }
-                entity.stop();
-                entity.addMovement(velocity);
+                this.movementComp.stop();
+                this.movementComp.addMovement(velocity);
                 break
             case 50:
                 this.changeDirection();
-                entity.stop();
+                this.movementComp.stop();
                 break;
             default:
         }
@@ -174,14 +229,27 @@ class AIComponent{
 
 // not currently used
 class MovementComponent{
-    constructor(pos) {
+    constructor(pos,speed) {
         this.velocity = {x: 0, y: 0};
-        this.moveSpeed = 4;
+        this.moveSpeed = speed;
         this.pos = pos;
+        this.previousePos = pos;
     }
+
+    stop(){
+        this.velocity = {x:0,y:0};
+    }
+
     move(){
-        this.pos.x = this.pos.x + this.velocity.x;
-        this.pos.y = this.pos.y + this.velocity.y;
+        this.previousePos = this.pos;
+        this.pos.x = this.previousePos.x + this.velocity.x;
+        this.pos.y = this.previousePos.y + this.velocity.y;
+    }
+
+    backStep(){
+        this.pos = this.previousePos;
+        this.pos.x = this.previousePos.x - this.velocity.x;
+        this.pos.y = this.previousePos.y - this.velocity.y;
     }
 
     addMovement(addedVelocity){
@@ -199,6 +267,15 @@ class MovementComponent{
         }
 
         this.velocity = {x: x * this.moveSpeed, y:  y * this.moveSpeed};
+    }
+
+    update(){
+        this.move();
+    }
+
+    remove(){
+        this.isDelete = true;
+        delete this;
     }
 }
 

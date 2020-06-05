@@ -42,14 +42,25 @@ class Receiver{
         });
 
 
+        this.socket.on('AOEDebug',(data)=>{
+            this.gameScene.printAOEDebug(data);
+        });
+
         this.socket.on('entityList', (data)=>{
             // health is always blank here
             let keyList = Object.keys(data);
             this.gameScene.clearEnities();
             keyList.forEach((key)=>{
                 let dataRow = data[key];
-                this.gameScene.newEntity(dataRow.position, dataRow.x, dataRow.y, dataRow.facing, dataRow.state, dataRow.base, dataRow.layers, data.health, data.mHealth);
+                this.gameScene.newEntity(key, dataRow.x, dataRow.y, dataRow.facing, dataRow.state, dataRow.base, dataRow.layers, data.health, data.mHealth);
             })
+        });
+
+        this.socket.on('reloadEntity',(data)=>{
+            let dataRow = data;
+            console.log(data);
+            this.gameScene.reloadEntity(data.id, data.base, data.layers);
+            //this.gameScene.newEntity(dataRow.position, dataRow.x, dataRow.y, dataRow.facing, dataRow.state, dataRow.base, dataRow.layers, data.health, data.mHealth)
         });
 
         this.socket.on('removeItem', (data)=>{

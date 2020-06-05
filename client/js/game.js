@@ -19,6 +19,49 @@ class EquiptableItem extends Item{
         this.slot = slot
     }
 }
+class MyRectangle extends Phaser.GameObjects.Rectangle {
+    constructor(scene, x, y, width, height, fillColor) {
+        super(scene, x, y, width, height, fillColor);
+        // ...
+        scene.add.existing(this);
+    }
+    // ...
+
+    // preUpdate(time, delta) {}
+}
+
+
+class AudioPlayer{
+    constructor() {
+        this.equipt = game.sound.add("equip-item"); // use a config
+        this.swing = game.sound.add("sword-swing"); // use a config
+        this.swing.volume = 0.2;
+        this.bgMusic = game.sound.add("backing-track");
+        this.bgMusic.volume = 0.01;
+        this.bgMusic.setLoop(true);
+        this.mobPain = game.sound.add("pig-grunt"); // use a config
+
+        this.footsteps = [];
+        this.testFoosteps();
+        this.mobPain = game.sound.add("pig-grunt");
+    }
+    testFoosteps(){
+        for(let i = 0; i < 8; i++){
+            let footstep = game.sound.add("footstep"+i)
+            footstep.volume = 0.1;
+            this.footsteps.push(footstep);
+        }
+    }
+    playFootstep(){
+        let footstepNumber = randomInteger(0, 8)
+        console.log(this.footsteps);
+        let foostep = this.footsteps[footstepNumber];
+        foostep.play();
+    }
+}
+
+
+let audioPlayer;
 
 
 let items;
@@ -28,10 +71,12 @@ class GameScene extends Phaser.Scene {
         super({key: 'maingame'});
         this.mapEntities = {};
         this.floorItems = {};
+        this.time = 0;
+
     }
 
-
     preload(){
+        this.shinyRender = game.renderer.addPipeline('Custom', new ShinyGlowRender(game));
     }
 
     init(data){
@@ -43,14 +88,11 @@ class GameScene extends Phaser.Scene {
     loadPlayerData(id){
         this.playerID = id;
         let myPlayer = this.mapEntities[this.playerID];
-
-        this.cameras.main.zoomTo(1.2,0);
+        this.cameras.main.zoomTo(1.9,0);
         this.cameras.main.startFollow(myPlayer.sprite);
 
         // set background color, so the sky is not black
         this.cameras.main.setBackgroundColor('#ccccff');
-
-
     }
 
     create(){
@@ -60,17 +102,43 @@ class GameScene extends Phaser.Scene {
         this.controller = new Controller(this,this.client);
     }
 
+    printAOEDebug(data){
+        let pos = data.pos;
+        let width = data.width;
+        let height = data.height;
+        console.log("PRINTING DEBUG");
+        let rect = new MyRectangle(this, pos.x,pos.y, width, height);
+        audioPlayer.swing.play();
+
+        let graphics = this.add.graphics({fillStyle: {color: 0xff0000, alpha: 0.5}});
+        //graphics.fillRectShape(rect);
+
+        this.tweens.addCounter({
+            from: 0.8,
+            to: 0,
+            duration: 500,
+            yoyo:false,
+            repeat: 0,
+            onUpdate: (tween)=>
+            {
+                let value = tween.getValue();
+                rect.setFillStyle(0xff0000, value);
+
+            }
+        });
+
+
+    }
 
     loadMap(id) {
-  //      this.clearEnities();
-   //     this.clearItems();
         this.removeCurrentMap();
         let key = MAPS[id];
         let map = this.make.tilemap({key: key});
         this.currentMap = map;
-
+        this.tick = 0;
         const tileset = map.addTilesetImage("magecity", "tiles-extruded",32,32,1,2);
-        //TODO: cleanup layers
+
+        //TODO: cleanup layers with array or something // we probably want the render order to be the same as tiled
         const groundLayer1 = map.createStaticLayer("ground_layer_1", tileset, 0, 0);
         const groundLayer2 = map.createStaticLayer("ground_layer_2", tileset, 0, 0);
         const groundLayer3 = map.createStaticLayer("ground_layer_3", tileset, 0, 0);
@@ -82,27 +150,11 @@ class GameScene extends Phaser.Scene {
         const aboveLayer2 = map.createStaticLayer("above_player_2", tileset, 0, 0);
         const aboveLayer3 = map.createStaticLayer("above_player_3", tileset, 0, 0);
 
-        // preserve for moving to dynamic layers if appropriote
-        // this.mapLayers["ground_layer_1"] = groundLayer1;
-        // this.mapLayers["ground_layer_2"] = groundLayer2;
-        // this.mapLayers["ground_layer_3"] = groundLayer3;
-        //
-        // this.mapLayers["below_player_1"] = belowLayer1;
-        // this.mapLayers["below_player_2"] = belowLayer2;
-        // this.mapLayers["below_player_3"] = belowLayer3;
-        //
-        // this.mapLayers["above_player_1"] = aboveLayer1;
-        // this.mapLayers["above_player_2"] = aboveLayer2;
-        // this.mapLayers["above_player_3"] = aboveLayer3;
-
-
-            //  const worldLayer = map.createStaticLayer("Below player", tileset, 0, 0);
-     //   const aboveLayer = map.createStaticLayer("Above player", tileset, 0, 0);
-
-
         aboveLayer1.depth = tempAboveTileLayer;
         aboveLayer2.depth = tempAboveTileLayer + 1;
         aboveLayer3.depth = tempAboveTileLayer + 2;
+
+        audioPlayer.bgMusic.play(); // choose a song in the map data
     }
 
     removeCurrentMap() {
@@ -140,6 +192,12 @@ class GameScene extends Phaser.Scene {
     }
 
 
+    reloadEntity(id, base, layers){
+        let entity =  this.mapEntities[id];
+        entity.base = base;
+        entity.layers = layers;
+    }
+    // TODO: change to some kind of config
     newEntity(id, x, y, facing, state, base, layers, health, mHealth){
         if(layers) {
             this.mapEntities[id] = new Player(this, {x: x, y: y}, facing, state, base, layers, health, mHealth);
@@ -196,17 +254,29 @@ class GameScene extends Phaser.Scene {
 
     update(){
         Object.keys(this.mapEntities).forEach((key)=>{
-            this.mapEntities[key].update()
+
+            let entity = this.mapEntities[key];
+            if(entity){
+                entity.update()
+            }
         });
+        this.tick += 0.05;
+        this.shinyRender.setFloat1("time", this.tick);
     }
 
     loadInventory(items){
-        let inv = this.scene.get("inventory")
+        let inv = this.scene.get("inventory");
         inv.items = items.inventory;
-        let pD = this.scene.get("paperdoll")
+        let pD = this.scene.get("paperdoll");
         pD.items = items.paperDoll;
     }
 
+    toggleInventory(){
+        let pD = this.scene.get("paperdoll");
+        let inv = this.scene.get("inventory");
+        pD.hide = !pD.hide;
+        inv.hide = !inv.hide;
+    }
 }
 
 
@@ -214,15 +284,19 @@ class GameScene extends Phaser.Scene {
 
 class Controller{
     constructor(scene, client){
-        let leftKey = scene.input.keyboard.addKey("LEFT");
-        let rightKey = scene.input.keyboard.addKey("RIGHT");
-        let upKey = scene.input.keyboard.addKey("UP");
-        let downKey = scene.input.keyboard.addKey("DOWN");
+        let leftKey = scene.input.keyboard.addKey("A");
+        let rightKey = scene.input.keyboard.addKey("D");
+        let upKey = scene.input.keyboard.addKey("W");
+        let downKey = scene.input.keyboard.addKey("S");
         //    let spaceKey = scene.input.keyboard.addKey("SPACE");
         let spaceKey = scene.input.keyboard.addKey("SPACE");
         let ctrlKey = scene.input.keyboard.addKey("CTRL");
+        let iKey = scene.input.keyboard.addKey("I");
 
         this.client = client;
+
+        //this.directionKeys = {left:leftKey, right:rightKey, up:upKey, down:downKey}
+        this.directionKeys = [leftKey, rightKey, upKey, downKey]
 
         ctrlKey.on('down', (event)=> {
             let itemID = scene.getClosestItem();
@@ -234,12 +308,21 @@ class Controller{
             client.sender.attack();
         });
 
+        iKey.on('down', (event)=> {
+            scene.toggleInventory();
+        });
+
+
         leftKey.on('down', (event)=> {
             client.sender.move({x: -1, y:0});
         });
 
-        leftKey.on('up', function(event) {
-            client.sender.stop();
+        leftKey.on('up', (event)=> {
+
+            if (!this.isAnotherDirectionKeyDown()){
+                client.sender.stop();
+            }
+
         });
 
 
@@ -247,24 +330,40 @@ class Controller{
             client.sender.move({x:1, y:0});
         });
 
-        rightKey.on('up', function(event) {
-            client.sender.stop();
+        rightKey.on('up', (event)=> {
+            if (!this.isAnotherDirectionKeyDown()){
+                client.sender.stop();
+            }
         });
 
         upKey.on('down', (event)=> {
             client.sender.move({x:0, y:-1});
         });
 
-        upKey.on('up', function(event) {
-            client.sender.stop();
+        upKey.on('up', (event)=> {
+            if (!this.isAnotherDirectionKeyDown()){
+                client.sender.stop();
+            }
         });
 
         downKey.on('down', (event)=> {
             client.sender.move({x:0, y:1});
         });
-        downKey.on('up', function(event) {
-            client.sender.stop();
+        downKey.on('up', (event)=> {
+            if (!this.isAnotherDirectionKeyDown()){
+                client.sender.stop();
+            }
         });
     }
 
+    isAnotherDirectionKeyDown(){
+        let isDown = false;
+        this.directionKeys.forEach((key)=>{
+            if(key.isDown){
+                let button = this.directionKeys[key];
+                isDown = true;
+            }
+        })
+        return isDown;
+    }
 }

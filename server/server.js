@@ -19,36 +19,58 @@ const xDbManager = require('./persistance-manager.js')
 //     console.log("I dided it?: " + done)
 // })
 
-
 players = {
     0:{
         base:"basecharacter",
         paperDoll:{
-            HEAD: {
-                base: items.bronzehelm,
-                plus:0
-            },
-            BODY: {
-                base: items.jacket,
-                plus:1
-            },
-            WEAPON: {
-                base: items.dspear,
-                plus:1
-            },
+            HEAD: undefined,
+            BODY:undefined,
+            WEAPON: undefined,
             OFFHAND: undefined,
-            LEGS: {base: items.goldlegs,
-                plus: 1
-            },
+            BELT:undefined,
+            LEGS: undefined,
             BOOTS: undefined
         }
     }
 };
 
+// players = {
+//     0:{
+//         base:"basecharacter",
+//         paperDoll:{
+//             HEAD: {
+//                 base: items.bronzehelm,
+//                 plus:0
+//             },
+//             BODY: {
+//                 base: items.jacket,
+//                 plus:1
+//             },
+//             WEAPON: {
+//                 base: items.dspear,
+//                 plus:1
+//             },
+//             OFFHAND: undefined,
+//             LEGS: {base: items.goldlegs,
+//                 plus: 1
+//             },
+//             BOOTS: undefined
+//         }
+//     }
+// };
+
 inventories ={
     0:[{base:items.seeradish,quantity:1, plus:0},
-        {base:items.goldhelm,quantity:1, plus:6}
-    ]
+        {base:items.goldhelm,quantity:1, plus:6},
+        {base:items.goldhelm,quantity:1, plus:600},
+        {base:items.goldmask,quantity:1, plus:3},
+        {base:items.goldmask,quantity:1, plus:4},
+        {base:items.jacket,quantity:1, plus:2},
+        {base:items.bronzehelm,quantity:1, plus:600},
+        {base:items.jacket,quantity:1, plus:4},
+        {base:items.jacket,quantity:1, plus:6}
+    ],
+    111110:[ ]
 }
 
 
@@ -56,17 +78,68 @@ class PlayerStats {
     constructor(health, experience, defence, attack) {
         this.maxHealth = health;
         this.health = health;
-        this.experience = experience;
+        this.experience = {};
         this.defence = defence;
+        this.attackSpeed = 600; //temp
         this.attack = attack;
+        this.speed = 10;//temp
     }
-
+    addExperience(json){
+        let keys = Object.keys(json);
+        keys.forEach(expKey=>{
+            let current = this.experience[expKey] || 0;
+            let additional = json[expKey];
+            let total = current + additional;
+            this.experience[expKey] = total;
+        })
+    }
 }
 
+// this could be used along with id to get the room etc
 class PlayerLocation{
     constructor(zone, pos){
         this.zone = zone;
         this.pos = pos;
+    }
+}
+
+
+// TODO: move messaging to a class via this
+global.serverSender = {
+    wholeRoom:function(hook, data, playerLocation) {
+        this.getRoom(playerLocation).roomMessage(hook, data);
+    },
+
+    getRoom:function(playerLocation) {
+        let zone = ZONES[playerLocation.zone];
+        return zone.zoneSender.room;
+    },
+
+    getZone:function(playerLocation) {
+        let zone = ZONES[playerLocation.zone];
+        return zone;
+    },
+
+    zoneMessage:function(hook,data,playerLocation){
+       // this.getSender(playerLocation);
+        //zoneSender.notfiyEnitityReload();
+    },
+    //temp
+        //// temp/////
+    propigateReload: function(key, playerLocation){
+        let zone = this.getZone(playerLocation);
+        zone.triggerEntityReload(key);
+    },
+
+
+    broadCastRoom:function(hook,data, playerLocation, id){
+        this.getRoom(playerLocation).broadcastMessageViaID(id,hook, data);
+    },
+
+    clientMessage:function(hook, data, playerLocation, id){
+        let room = this.getRoom(playerLocation);
+        let client = room.clientLookup[id];
+        client.emit(hook, data);
     }
 }
 
@@ -85,10 +158,11 @@ io.on('connect', function(client) {
 
     client.on('login',function(username,password){
         curr_username = username
-        let playerStats = new PlayerStats(200,200, 5, 30);
+        // for some reason this prints at 30 but is clearly nothing before the paperdoll is rebuilt
+        let playerStats = new PlayerStats(200,200, 5, 30); //these now recalculate
         client.character = {};
         client.playerStats = playerStats;
-        client.playerLocation = new PlayerLocation(0, {x:150,y:150})
+        client.playerLocation = new PlayerLocation(0, {x:150,y:150});
         tryLogin(client, username, password);
     });
 
@@ -96,11 +170,11 @@ io.on('connect', function(client) {
         firstJoin(client, curr_username, client.playerLocation);
 
         client.on('stop',function() {
-            client.player.stop();
+            client.player.movementComponent.stop();
         });
 
         client.on('move',function(data) {
-            client.player.addMovement({x:data.x, y:data.y});
+            client.player.movementComponent.addMovement({x:data.x, y:data.y});
         });
 
         client.on('attack',function(data) {
@@ -116,7 +190,7 @@ io.on('connect', function(client) {
             let slot = data.slot;
             let action = data.action; //TODO: use messaging action
             client.character.invent.actOnPaperDollSlot(slotActions.CLICK, slot);
-            client.emit("myInventory", client.character.invent.message);
+          //  client.emit("myInventory", client.character.invent.message);
         });
 
         client.on('clickInventorySlot',function(data) {
@@ -125,13 +199,12 @@ io.on('connect', function(client) {
             let zone = ZONES[client.playerLocation.zone];
             let playerPos = client.playerLocation.pos;
             client.character.invent.actOnInventorySlot(action, slot, zone, playerPos);
-            client.emit("myInventory", client.character.invent.message);
+          //  client.emit("myInventory", client.character.invent.message);
         });
     });
 
     client.on('createaccount', function(username,password){
         xDbManager.databaseConnection.createAccount(username,password).then(accountCreated => {
-            console.log(accountCreated);
             if(accountCreated){
                 console.log("Account created!")
             }else{
@@ -190,9 +263,9 @@ function setupCharacter(client,username){
                                 //Do something with chars2
                                 console.log("Character made!");
                                 //TODO: register appearance as animkey, plus/effect and base
-                                client.character.paperDoll = chars2[0].character.paperDoll;
-                                client.character.appearance = chars2[0].base // more in here later
-                                client.character._id = chars2[0]._id || randomInteger(0, 9999999); //temp
+                                //client.character.paperDoll = chars2[0].character.paperDoll;
+                                //client.character.appearance = chars2[0].base // more in here later
+                               // client.character._id = chars2[0]._id || randomInteger(0, 9999999); //temp
                                 return resolve(true);
                             })
                         }else{
@@ -213,11 +286,10 @@ function setupCharacter(client,username){
                 }
             })
         }else{
-            let invManager = new invent.InventoryManager(inventories[0], players[0].paperDoll);
-            client.character.invent = invManager;
             client.character.appearance = players[0].base;// more in here later
             client.character._id =  randomInteger(0, 9999999); //temp
-            //   console.log(client.character)
+            let invManager = new invent.InventoryManager(inventories[0], players[0].paperDoll, client.playerLocation,  client.character._id, client.playerStats);
+            client.character.invent = invManager;
             return resolve(true)
         }
 
@@ -254,4 +326,8 @@ global.distance = function(pointA, pointB){
 
     let c = Math.sqrt( a*a + b*b );
     return c;
+}
+
+global.sendAOEDebug = function(zoneid, pos, width, height){
+    serverSender.wholeRoom('AOEDebug', {pos:pos,width:width, height:height},{zone:zoneid})
 }

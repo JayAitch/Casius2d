@@ -1,69 +1,16 @@
-const roomManager = require('./room-manager.js');
+const zoneSender = require('./zone-sender.js')
 const systems = require('./systems.js');
-const characters = require('./server-characters.js');
-const fs = require('fs');
+const gameObjects = require('./game-object-factory.js');
+const mapBuilder = require('./map-builder.js')
 const dropManager = require('./drop-manager.js');
 systems.startUpdate();
 
 
 
 
-function getZoneData(zone){
-    let file = ZONEMAPS[zone];
-    let rawdata = fs.readFileSync('./tilemaps/'+ file);
-    let tilemap = JSON.parse(rawdata);
-    return tilemap;
-}
-
-
-ZONEMAPS= {0:"zone1.json",1:"zone2.json", 2:"zone3.json"}
-
-SPAWNS= {0:{x:150,y:150},1:{x:400,y:400}, 2:{x:600,y:400}} //temp
-
-
-function getWorldObjects(id){
-    let worldData = getZoneData(id);
-    let worldObjects = [];
-    worldData.forEach(function(layer){
-        layer.objects.forEach(function(object){
-            let newObject = {
-                width:object.width,
-                height:object.height,
-                pos: {x: object.x,y:object.y},
-                type:object.type,
-            }
-            let newzone = getProperty(object.properties, "zone");
-            if(newzone !== undefined) newObject.zone = newzone;
-
-            let xpos = getProperty(object.properties, "x");
-            if(xpos !== undefined) newObject.x = xpos;
-
-            let ypos = getProperty(object.properties, "y");
-            if(ypos !== undefined) newObject.y = ypos;
-
-
-
-            worldObjects.push(newObject);
-        });
-    })
-    return worldObjects;
-}
-
-function getProperty(properties, prop){
-    let value = undefined
-    if(!properties) return value;
-    properties.forEach(function (property) {
-        if(prop === property.name){
-            value =  property.value;
-        }
-    })
-    return value;
-}
-
-
 // move physics world into a seperate class after reducing coupling
 class ItemWorld{
-    constructor(sender, phyW) {
+    constructor(sender) {
         this.sender = sender;
         this.floorItems = {};
         this.lastItemId = 0;
@@ -71,19 +18,13 @@ class ItemWorld{
 
     addItem(pos,item){
         let itemPos = this.lastItemId;
-        let position = pos;
-        let newItem = {base:items.goldhelm, pos:position, quantity: 1, plus:5};//stubbed TODO: get this from the drop table
 
-        if(item){
-            newItem = JSON.parse(JSON.stringify(item));//stubbed TODO: get this from the drop table
-            newItem.pos = JSON.parse(JSON.stringify(pos));
-        }
-
+        let newItem = JSON.parse(JSON.stringify(item));
+        newItem.pos = JSON.parse(JSON.stringify(pos));
         this.floorItems[itemPos] = newItem;
-        //let newItem = {id:items.seeradish.id,pos:position, quantity: 1};//stubbed TODO: get this from the drop table
 
-        this.sender.notifyNewItem(itemPos, newItem);
         this.lastItemId++
+        this.sender.notifyNewItem(itemPos, newItem);
     }
 
     removeItem(id){
@@ -107,28 +48,54 @@ class ItemWorld{
 // receive mapped map!
 class Zone{
     constructor(zoneid) {
-        this.zoneSender = new ZoneSender(zoneid);
-        this.physicsWorld = new PhysicsWorld(zoneid, this.zoneSender);
-        this.itemWorld = new ItemWorld(this.zoneSender,this.physicsWorld )
+        this.zoneSender = new zoneSender.ZoneSender(zoneid);
+        this.physicsWorld = new PhysicsWorld(this.zoneSender);
+        this.itemWorld = new ItemWorld(this.zoneSender,this.physicsWorld);
         this.zoneID = zoneid;
-
+        this.factory = new gameObjects.Factory(this.physicsWorld.collisionManager, this.itemWorld);
+        mapBuilder.build(this.factory, this.zoneID,  this.physicsWorld); // more concrete management of nodes, will remove physics world from this
         systems.addToUpdate(this);
         this.testCreateMobLots(5);
+
     }
 
+// todo: move to mob factor, promote more stats/ai configuration
+//       spawn from zones added to map use A*
     testCreateMobLots(times){
         for(let i = 0; i < times; i++){
+
+
             let callBack = (pos)=>{
                 this.itemWorld.addItem(pos,dropManager.roleDrop(0));
                 let timedcallback = setTimeout(() => {
                     this.testCreateMobLots(1);
                     clearTimeout(timedcallback);
-                }, 2000)
+                }, 2000);
             }
-            this.physicsWorld.testCreateMob(callBack);
 
+            let config = {
+                deathCallback: callBack,
+                stats:{health: 100, maxHealth:100, defence:0, attack:2, speed:3 },
+                zone: this.zoneID
+            }
+
+            let entityConfig = {
+                type: entityTypeLookup.PIG,
+                config: config
+            }
+
+
+            let newMob = this.factory.new(entityConfig);
+            this.physicsWorld.addNewMob(newMob);
         }
     }
+
+    triggerEntityReload(key){
+       let entity = this.physicsWorld.entities[key];
+       this.zoneSender.notifyEntityReload(entity, key);
+    }
+
+
 
     join(clientID, playerLocation, previousZoneID, client, newPosition){
         if(previousZoneID != undefined){
@@ -154,10 +121,9 @@ class Zone{
         if(!item) return;
 
         let hasPickedUp =  client.character.invent.pickupItem(item);
-        // TODO: check pickup range serverrside (50)
         if(hasPickedUp){
             this.itemWorld.removeItem(id);
-            client.emit("myInventory",client.character.invent.message)
+            client.emit("myInventory",client.character.invent.message);
         }
     }
 
@@ -168,16 +134,34 @@ class Zone{
         let deathCallback  = () =>{
             client.playerLocation.pos = Object.assign({}, SPAWNS[this.zoneID]);
             this.addPlayerCharacter(client);
+        };
+
+        let playerConfig = {
+            inventory: client.character.invent,
+            appearance: client.character.appearance,
+            paperDoll: client.character.invent.paperDoll,
+            key: client.character._id,
+            stats: client.playerStats,
+            location: client.playerLocation,
+            _id: client.character._id,
+            deathCallback: deathCallback //temp
         }
 
 
-        let newPlayer = this.physicsWorld.addPlayerCharacter(client, deathCallback)
+        let entityConfig = {
+            type: entityTypeLookup.PLAYER,
+            config:playerConfig
+        }
+
+        let newPlayer = this.factory.new(entityConfig);
+
+
+        this.physicsWorld.addPlayerCharacter(newPlayer, client.character._id)
         client.playerLocation.zone = this.zoneID;
         client.player = newPlayer;
 
-
         this.zoneSender.notifyClientPlayer(client, newPlayer);
-        this.zoneSender.initMessage(client, this.physicsWorld.entities, this.itemWorld.floorItems, newPlayer.config.key);
+        this.zoneSender.initMessage(client, this.physicsWorld.entities, this.itemWorld.floorItems, newPlayer.key);
     }
 
     update(){
@@ -186,115 +170,12 @@ class Zone{
 }
 
 
-class ZoneSender{
-    constructor(zoneid) {
-        this.room = roomManager.roomManager.createRoom();
-        this.zoneID = zoneid;
-    }
 
-    removeItem(id) {
-        this.room.roomMessage('removeItem', {id:id});
-    }
-
-    notifyNewItem(key,newItem){
-        this.room.roomMessage('newItem', {key:key,item:newItem});
-    }
-
-    subscribe(client){
-        this.room.join(client);
-        client.emit("loadMap", {id:this.zoneID});
-    }
-
-    unsubscribe(client){
-        this.room.leave(client);
-    }
-
-    initMessage(client, enities, items) {
-        client.emit("entityList", this.sendEntities(enities));
-        client.emit("itemList", items);
-        client.emit("myPlayer", {id: client.player.config.key});
-        client.emit("myInventory", {inventory:client.character.invent.inventory,paperDoll: client.character.invent.paperDoll });
-    }
-
-    sendEntities(entites) {
-        let tempEntities = {};
-        let entityKeys = Object.keys(entites);
-        entityKeys.forEach( (key)=> {
-
-            let entity = entites[key];
-            tempEntities[key] = {
-                position:key,
-                x:entity.pos.x,
-                y:entity.pos.y,
-                facing: entity.direction,
-                state:entity.state,
-                base: entity.animationComponent.baseSprite,
-                layers: entity.animationComponent.spriteLayers,
-                health: entity.health,
-                mHealth: entity.maxHealth
-            };
-        });
-        return tempEntities;
-    }
-
-    notifyNewEntity(entity, key){
-        this.room.roomMessage('newEntity', {
-            id:key,
-            x:entity.pos.x,
-            y:entity.pos.y,
-            facing: entity.direction,
-            state:entity.state,
-            base: entity.animationComponent.baseSprite,
-            layers: entity.animationComponent.spriteLayers,
-            health: entity.health,
-            mHealth: entity.maxHealth
-        })
-    }
-
-    notifyEntityUpdate(entity, key){
-        this.room.roomMessage('moveEntity', {
-            id:entity.entityPos || key,
-            x:entity.pos.x,
-            y:entity.pos.y,
-            facing: entity.direction,
-            state:entity.state,
-            health: entity.health,
-            mHealth: entity.maxHealth
-        })
-    }
-
-    notifyEntityRemove(entityPos){
-        this.room.roomMessage('removeEntity', {
-            id:entityPos
-        })
-    }
-
-    notifyItemRemove(id){
-        this.room.roomMessage('removeItem', {id:id})
-    }
-
-    notifyClientPlayer(client, entity){
-        this.room.broadcastMessage(client,'newEntity', {
-            id:entity.entityPos,
-            x:entity.pos.x,
-            y:entity.pos.y,
-            facing: entity.direction,
-            state:entity.state,
-            base: entity.animationComponent.baseSprite,
-            layers: entity.animationComponent.spriteLayers,
-            health: entity.health,
-            mHealth: entity.maxHealth
-        })
-    }
-
-}
 class PhysicsWorld{
 
-    constructor(zoneid,  sender){
+    constructor(sender){
         this.sender = sender;
         this.collisionManager = new systems.CollisionManager();
-        this.worldObjects = getWorldObjects(zoneid); // use this to target specfic zone
-        this.createNonPassibles(this.worldObjects);
         this.entities = {};
         this.lastEntityId = 0;
     }
@@ -315,48 +196,16 @@ class PhysicsWorld{
         this.collisionManager.update();
     }
 
-    createNonPassibles(objects){
-        objects.forEach((object)=>{
-            let x = object.pos.x + object.width/2;//temp
-            let y = object.pos.y + object.height/2;
-            let correctPos = {x:x,y:y};
-            switch(object.type){
-                case "NONPASSIBLE":
-                    let testNonPassible = new characters.NonPassibleTerrain(correctPos, object.width,object.height,this.collisionManager);
-                    break;
-                case "TRIGGER_ZONE_CHANGE":
-                    let testZonePortal = new characters.ZonePortal(correctPos, object.width,object.height,this.collisionManager, object.zone, object.x,object.y);
 
-            }
-
-        })
-
+    addPlayerCharacter(entity, key){
+        this.entities[key] = entity;
+        return entity;
     }
 
-    addPlayerCharacter(client, deathcallback){
-        let entityKey = this.lastEntityId;
-        let playerConfig = {
-            appearance: client.character.appearance,
-            paperDoll: client.character.invent.paperDoll,
-            key: entityKey,
-            stats: client.playerStats,
-            location: client.playerLocation,
-            _id: client.character._id,
-            deathCallback: deathcallback //temp
-        }
-
-        let newPlayer = new characters.ServerPlayer(playerConfig, this.collisionManager);
-        this.entities[entityKey] = newPlayer;
+    addNewMob(mob){
+        this.entities[this.lastEntityId] = mob;
+        this.sender.notifyNewEntity(mob, this.lastEntityId);
         this.lastEntityId++
-        return newPlayer;
-    }
-
-    testCreateMob(droptest){
-        this.testMob = new characters.BasicMob(this.collisionManager,droptest);
-        this.entities[this.lastEntityId] = this.testMob;
-        this.sender.notifyNewEntity(this.testMob, this.lastEntityId);
-        this.lastEntityId++
-
     }
 
     removeEntity(id){
