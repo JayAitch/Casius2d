@@ -28,13 +28,12 @@ class ZoneSender{
         client.emit("entityList", this.sendEntities(entities));
         client.emit("itemList", items);
         client.emit("myPlayer", {id: client.player.key});
-        client.emit("myInventory", {inventory:client.character.invent.inventory,paperDoll: client.character.invent.paperDoll });
+        client.emit("myInventory", client.character.invent.message);
         client.emit("shopList", this.sendShops(shops));
     }
 
     sendShops(shops) {
         let tempShops = {};
-        console.log(shops);
         let entityKeys = Object.keys(shops);
         entityKeys.forEach( (key)=> {
             let shop = shops[key];

@@ -307,11 +307,14 @@ class GameScene extends Phaser.Scene {
         this.shinyRender.setFloat1("time", this.tick);
     }
 
-    loadInventory(items){
+    loadInventory(inventorymessage){
+        console.log(inventorymessage)
         let inv = this.scene.get("inventory");
-        inv.items = items.inventory;
+        inv.items = inventorymessage.inventory;
+        inv.gold = inventorymessage.gold;
+        console.log(items);
         let pD = this.scene.get("paperdoll");
-        pD.items = items.paperDoll;
+        pD.items = inventorymessage.paperDoll;
     }
 
     hideMenus(){

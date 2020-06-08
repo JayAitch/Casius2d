@@ -151,8 +151,8 @@ class Sender{
     clickPaperDollSlot(slot,action){
         this.socket.emit('clickPaperDoll', {slot: slot, action: action});
     }
-    clickInventorySlot(slot, action){
-        this.socket.emit('clickInventorySlot', {slot: slot, action: action});
+    clickInventorySlot(data){
+        this.socket.emit('clickInventorySlot', data);
     }
 }
 

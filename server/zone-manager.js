@@ -3,6 +3,7 @@ const systems = require('./systems.js');
 const gameObjects = require('./game-object-factory.js');
 const mapBuilder = require('./map-builder.js')
 const dropManager = require('./drop-manager.js');
+const shopInventory = require('./shop-inventory.js')
 systems.startUpdate();
 
 
@@ -65,7 +66,6 @@ class Zone{
         // temp
         let config = {
             position: {x: 150, y: 150},
-            baseStock: shops[0],
             zone: this.zoneID
         }
 
@@ -77,16 +77,24 @@ class Zone{
 
         let newMob = this.factory.new(entityConfig);
         this.physicsWorld.addNewMob(newMob);
-        this.shops[this.physicsWorld.lastEntityId - 1] = newMob; //temp
+        this.shops[this.physicsWorld.lastEntityId - 1] =  new shopInventory.ShopInventory(0); //temp
+    }
+
+
+    sellItem(client, shopid, slot){
+
+        // temp do this in inventories
+        //todo: check range
+        let shop = this.shops[shopid];
+        shop.sell(slot, client.character.invent);
     }
 
 
     buyItem(client, shopid, slot){
-        // todo:
-        let item = this.shops[shopid].stock[slot].item//;[slot];
-
-        client.character.invent.pickupItem(item)
-        console.log(client);
+        //todo: check range
+        let shopInv = this.shops[shopid];
+        if(shopInv);
+        shopInv.buy(slot, client.character.invent);
     }
     //
     // shopTrade(client, id){
@@ -170,7 +178,7 @@ class Zone{
 
     addPlayerCharacter(client){
 
-        // respawn player with max health at zone spawn when they die
+        // respawn player with max health at zone spawn when they diea
         // TODO: add a global respawn point in town or something
         let deathCallback  = () =>{
             client.playerLocation.pos = Object.assign({}, SPAWNS[this.zoneID]);
@@ -205,8 +213,12 @@ class Zone{
         this.zoneSender.initMessage(client, this.physicsWorld.entities, this.itemWorld.floorItems, this.shops);
     }
 
-    update(){
+    update() {
         this.physicsWorld.update();
+        Object.keys(this.shops).forEach((shopKey) => {
+            let shop = this.shops[shopKey];
+            shop.update();
+        })
     }
 }
 

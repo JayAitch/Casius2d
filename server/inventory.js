@@ -4,9 +4,10 @@ global.slotActions = {"EQUIPT":"EQUIPT","DROP":"DROP","CLICK":"CLICK"}
 
 
 class Inventory{
-    constructor(invent) {
-        this.inventoryItems = JSON.parse(JSON.stringify(invent));
-        this.maxSize = 24;
+    constructor(invent, mSize) {
+        console.log(invent);
+        this.inventoryItems = invent//JSON.parse(JSON.stringify(invent));
+        this.maxSize = mSize || 24;
     }
 
     addItem(item){
@@ -63,8 +64,10 @@ class PaperDoll{
 
 class InventoryManager{
     constructor(inventory, paperDoll, ownerLocation, ownerID, playerStats){
-        this.inv = new Inventory(inventory);
+        console.log(inventory);
+        this.inv = new Inventory(inventory.items);
         this.ppD = new PaperDoll(paperDoll);
+        this.gold = inventory.gold;
         this.ownerID = ownerID;
         this.ownerLocation = ownerLocation;
         this.playerStats = playerStats;
@@ -79,7 +82,7 @@ class InventoryManager{
         return this.inv.inventoryItems;
     }
     get message(){
-        return {inventory: this.inventory, paperDoll: this.paperDoll};
+        return {inventory: this.inventory, paperDoll: this.paperDoll, gold:this.gold};
     }
 
     pickupItem(item){
@@ -135,6 +138,10 @@ class InventoryManager{
         }
     }
 
+    getItem(slot){
+        // todo chek if ppd or inv
+        return this.inv.getItem(slot);
+    }
 
 
     actOnInventorySlot(action, slot, zone, pos) {
@@ -202,4 +209,4 @@ class InventoryManager{
         serverSender.clientMessage("myInventory", this.message,  this.ownerLocation, this.ownerID);
     }
 }
-module.exports = {InventoryManager};
+module.exports = {InventoryManager, Inventory};

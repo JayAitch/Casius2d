@@ -5,6 +5,11 @@ const textStyles = {
         fontFamily: "arial",
         fontSize: "48px",
     },
+    "gold": {
+        fill: '#333',
+        fontFamily: "arial",
+        fontSize: "24px",
+    },
     "menu-header": {
         fill: '#777',
         fontFamily: "arial",
@@ -235,35 +240,44 @@ class ActionsList{
 
 
         actionsList.forEach((action)=>{
-
-            let rect = new Phaser.Geom.Rectangle(
-                this.x - this.slotWidth/2,
-                this.y - this.slotHeight/2 + this.itemOffset,
-                this.slotWidth,
-                this.slotHeight
-            );
-
-            let graphics = this.scene.add.graphics({ fillStyle: { color: 0xffffff,alpha:0.9 } });
-            let zone = this.scene.add.zone(
-                this.x,
-                this.y + this.itemOffset,
-                this.slotWidth,
-                this.slotHeight
-            );
-            graphics.depth = UILayer + 999999;
-            let actionText = this.scene.add.text(this.x,this.y + this.itemOffset,action,textStyles.button);
-            actionText.setDepth( UILayer + 999999);
-            offsetByWidth(actionText);
-            this.texts.push(actionText);
-            this.zones.push(zone);
-            this.graphics.push(graphics);
-            this.itemOffset += this.slotHeight + 2
-            graphics.fillRectShape(rect);
-            zone.setInteractive().on('pointerdown', ()=>{
-                this.handleAction(action);
-            })
+            this.createAction(action);
         })
 
+        let sScene = this.scene.scene.get("shop");
+        ////  temp
+        if(sScene.id){
+            this.createAction("SELL");
+        }
+    }
+
+
+    createAction(action){
+        let rect = new Phaser.Geom.Rectangle(
+            this.x - this.slotWidth/2,
+            this.y - this.slotHeight/2 + this.itemOffset,
+            this.slotWidth,
+            this.slotHeight
+        );
+
+        let graphics = this.scene.add.graphics({ fillStyle: { color: 0xffffff,alpha:0.9 } });
+        let zone = this.scene.add.zone(
+            this.x,
+            this.y + this.itemOffset,
+            this.slotWidth,
+            this.slotHeight
+        );
+        graphics.depth = UILayer + 999999;
+        let actionText = this.scene.add.text(this.x,this.y + this.itemOffset,action,textStyles.button);
+        actionText.setDepth( UILayer + 999999);
+        offsetByWidth(actionText);
+        this.texts.push(actionText);
+        this.zones.push(zone);
+        this.graphics.push(graphics);
+        this.itemOffset += this.slotHeight + 2
+        graphics.fillRectShape(rect);
+        zone.setInteractive().on('pointerdown', ()=>{
+            this.handleAction(action);
+        })
     }
     showItemInspector(slot){
         let item = slot.slottedItem;
@@ -358,6 +372,7 @@ class InventorySlot{
         this.zone.setInteractive().on('pointerdown', () => {
             this.clickSlot();
         })
+
     }
 
     set amount(val){
@@ -411,6 +426,7 @@ class ClientInventory{
         if(slots % row){
             this.createRow(slots % row);
         }
+
     }
 
     getItem(slot){
@@ -474,6 +490,9 @@ class ShopScene extends Phaser.Scene {
     set id(id){
        this.shopId = id;
     }
+    get id(){
+        return this.shopId;
+    }
     set stock(val){
         this.inventory.hide = false;
         this.inventory.items = val;
@@ -510,15 +529,21 @@ class InventoryScene extends  Phaser.Scene {
     }
 
     set hide(val){
+        this.goldText.setAlpha(val ? 0: 1);
         this.inventory.hide = val;
         this.isHide = val;
-        console.log(val);
         this.actionsList.hide = val;
     }
+    set gold(val){
+        this.goldText.setText(val);
+    }
+
     get hide(){
+
         return this.isHide;
     }
     create() {
+        this.goldText = this.add.text(510 ,560, "0", textStyles.gold);
         this.inventory = new ClientInventory(this, 510, 610, 24, 4,slotNumber=>{this.clickSlot(slotNumber)});
         this.hide = true;
     }
@@ -529,7 +554,15 @@ class InventoryScene extends  Phaser.Scene {
 
         // maybe get actions from item?
         this.actionsList.setCallBack((action)=>{
-            this.sender.clickInventorySlot(slot, action);
+            let data ={
+                slot:slot, action:action
+            }
+            //     temp
+            if(action === "SELL") {
+                let sScene = this.scene.get("shop");
+                data.id = sScene.id;
+            }
+            this.sender.clickInventorySlot(data);
             this.actionsList.cleanUp();
         });
 

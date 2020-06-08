@@ -1,5 +1,5 @@
 let updateTimeout;
-
+let tickRate = 80;
 function addToUpdate(obj) {
     let updaterID = Updater.addToUpdate(obj);
     return updaterID;
@@ -27,6 +27,9 @@ function update() {
         update();
     }, 80);
 }
+
+global.deltaTime = function(time){return time *  tickRate}
+
 
 const Updater = {
     updateables:[],

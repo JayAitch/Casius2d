@@ -302,28 +302,8 @@ class ShopKeeper extends GameObject{
         let animLayers = {base:"basecharacter"};
         this.movementComponent = new characterComponents.MovementComponent(this.pos, stats);
         this.animationComponent = new characterComponents.AnimationComponent(animLayers, this.movementComponent);
-        this.baseStock = config.baseStock;
-        this.stock = this.baseStock;
         this.tick = 0;
         this.createCollider(collisionManager);
-    }
-
-
-    update() {
-        super.update();
-        this.tick =+0.5;
-        if(!(this.tick % 500)){
-            this.modifyStock();
-        }
-    }
-
-    getPrice(key){
-        let amount = this.stock[key] || 0;
-        return amount;
-    }
-
-    get prices(){
-
     }
 
     get direction(){
@@ -333,12 +313,6 @@ class ShopKeeper extends GameObject{
     get state(){
         return this.animationComponent.currentState;
     }
-
-    modifyStock(){
-        console.log("changing stock");
-    }
-
-
 
     createCollider(collisionManager){
         let colliderConfig = {

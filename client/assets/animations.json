@@ -712,51 +712,51 @@
                                     "frameRate": 10
                             },
                             "thrustleft": {
-                                    "frames": { "key": "dspear","start" : 8, "end" : 15},
+                                    "frames": { "key": "dspear","start" : 9, "end" : 16},
                                     "frameRate": 10
                             },
                             "thrustdown": {
-                                    "frames": { "key": "dspear","start" : 16, "end" : 23},
+                                    "frames": { "key": "dspear","start" : 18, "end" : 25},
                                     "frameRate": 10
                             },
                             "thrustright": {
-                                    "frames": { "key": "dspear","start" : 24, "end" : 31},
+                                    "frames": { "key": "dspear", "start" : 27, "end" : 34},
                                     "frameRate": 10
                             },
                             "walkup": {
-                                    "frames": { "key": "dspear","start" : 32, "end" : 38},
+                                    "frames": { "key": "dspear","start" : 36, "end" : 44},
                                     "frameRate": 10,
                                     "repeat": -1
                             },
                             "walkleft": {
-                                    "frames": { "key": "dspear","start" : 32, "end" : 38},
+                                    "frames": { "key": "dspear","start" : 45, "end" : 53},
                                     "frameRate": 10,
                                     "repeat": -1
                             },
                             "walkdown": {
-                                    "frames": { "key": "dspear","start" : 32, "end" : 38},
+                                    "frames": { "key": "dspear","start" : 54, "end" : 62},
                                     "frameRate": 10,
                                     "repeat": -1
                             },
                             "walkright": {
-                                    "frames": { "key": "dspear","start" : 32, "end" : 38},
+                                    "frames": { "key": "dspear","start" : 63, "end" : 71},
                                     "frameRate": 10,
                                     "repeat": -1
                             },
                             "stopup": {
-                              "frames": { "key": "dspear","frame" : 32},
+                              "frames": { "key": "dspear","frame" : 36},
                               "frameRate": 10
                             },
                             "stopleft": {
-                              "frames": { "key": "dspear","frame" : 32},
+                              "frames": { "key": "dspear","frame" : 45},
                               "frameRate": 10
                             },
                             "stopdown": {
-                              "frames": { "key": "dspear","frame" : 32},
+                              "frames": { "key": "dspear","frame" : 54},
                               "frameRate": 10
                             },
                             "stopright": {
-                              "frames": { "key": "dspear","frame" : 32},
+                              "frames": { "key": "dspear","frame" : 63},
                               "frameRate": 10
                             }
 
