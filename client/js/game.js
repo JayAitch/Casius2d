@@ -101,6 +101,7 @@ class GameScene extends Phaser.Scene {
         this.scene.launch("paperdoll", this.client.sender);
         this.scene.launch("inventory", this.client.sender);
         this.scene.launch("shop", this.client.sender);
+
         items = this.cache.json.get('items'); // unused
         this.controller = new Controller(this,this.client);
     }
@@ -211,9 +212,12 @@ class GameScene extends Phaser.Scene {
         }else{
 
         }
+    }
 
-       // return entityKey;
-
+    recipeList(data){
+        let crafting = this.scene.get("crafting-menu");
+        crafting.recipes = data;
+        this.scene.launch("crafting-menu", this.client.sender);
     }
 
     newItem(i,item,pos){
@@ -312,7 +316,6 @@ class GameScene extends Phaser.Scene {
         let inv = this.scene.get("inventory");
         inv.items = inventorymessage.inventory;
         inv.gold = inventorymessage.gold;
-        console.log(items);
         let pD = this.scene.get("paperdoll");
         pD.items = inventorymessage.paperDoll;
     }
@@ -330,10 +333,13 @@ class GameScene extends Phaser.Scene {
         let pD = this.scene.get("paperdoll");
         let inv = this.scene.get("inventory");
         let shop = this.scene.get("shop");
+        let craft = this.scene.get("crafting-menu");
         pD.hide = !pD.hide;
         inv.hide = !inv.hide;
+        craft.hide = !craft.hide;
         if(inv.hide){
             shop.hide = true;
+            craft.hide = true;
         }
 
     }

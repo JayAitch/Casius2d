@@ -93,6 +93,7 @@ class InventoryManager{
         //     quantity: item.quantity
         // }
         // TODO: add to paperdoll first
+
         let addedItem =this.inv.addItem(item)
         this.clientUpdate();
         return addedItem;

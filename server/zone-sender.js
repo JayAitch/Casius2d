@@ -1,5 +1,5 @@
 const roomManager = require('./room-manager.js');
-
+const craftManager = require('./crafting-manager.js')
 
 class ZoneSender{
     constructor(zoneid) {
@@ -30,6 +30,7 @@ class ZoneSender{
         client.emit("myPlayer", {id: client.player.key});
         client.emit("myInventory", client.character.invent.message);
         client.emit("shopList", this.sendShops(shops));
+        client.emit("recipes", craftManager.recipesManager.getRecipes())
     }
 
     sendShops(shops) {

@@ -1,3 +1,7 @@
+const COLOR_PRIMARY = 0x444444;
+const COLOR_DARK = 0x000000;
+const COLOR_LIGHT = 0xffffff;
+
 
 const textStyles = {
     "header": {
@@ -469,11 +473,21 @@ class ClientInventory{
     }
 }
 
+
+
+
+
+
+
+
+
+
 class ShopScene extends Phaser.Scene {
     constructor() {
         super({key: 'shop'});
         this.actionsList = new ActionsList(this);
     }
+
     init(data){
         this.sender = data;
     }
@@ -510,7 +524,6 @@ class ShopScene extends Phaser.Scene {
 
     }
 }
-
 
 
 

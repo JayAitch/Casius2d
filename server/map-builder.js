@@ -11,7 +11,7 @@ function getZoneData(zone){
 ZONEMAPS= {0:"zone1.json",1:"zone2.json", 2:"zone3.json"}
 
 SPAWNS= {0:{x:150,y:150},1:{x:400,y:400}, 2:{x:600,y:400}} //temp
-global.skillLevels = {"WOODCUTTING":"WOODCUTTING","MINING":"MINING","BLACKSMITH":"BLACKSMITH", "COMBAT":"COMBAT"}
+
 
 nodeLookup = {
     "rock_iron":{

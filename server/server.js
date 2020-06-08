@@ -2,7 +2,7 @@ const dotenv = require('dotenv').config({path: '../config/config.env'});
 
 const PORT =process.env.SERVER_PORT;
 
-
+global.skillLevels = {"WOODCUTTING":"WOODCUTTING","MINING":"MINING","BLACKSMITH":"BLACKSMITH", "COMBAT":"COMBAT", "ALCHEMY":"ALCHEMY"}
 const server = require('http').createServer();
 const itms = require('./items.js'); //consider converting
 const zoneManager = require('./zone-manager.js');
@@ -214,6 +214,12 @@ io.on('connect', function(client) {
             client.character.invent.actOnPaperDollSlot(slotActions.CLICK, slot);
           //  client.emit("myInventory", client.character.invent.message);
         });
+
+
+        client.on('craftRecipe',function(lookup) {
+            recipesManager.craft(lookup, client.character.invent, client.playerStats)
+        });
+
 
         client.on('clickInventorySlot',function(data) {
 
