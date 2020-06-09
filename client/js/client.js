@@ -79,6 +79,9 @@ class Receiver{
             this.gameScene.removeItem(data.id);
         });
 
+        this.socket.on('benchList', (data)=>{
+            this.gameScene.loadBenches(data);
+        });
 
         this.socket.on('newItem', (data)=>{
             this.gameScene.newItem(data.key,data.item.base, data.item.pos);
@@ -131,6 +134,7 @@ class Sender{
     joinZone(zone){
         this.socket.emit('joinzone', zone);
     }
+
     stop(){
         this.socket.emit('stop');
     }

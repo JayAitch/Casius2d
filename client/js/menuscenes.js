@@ -1,8 +1,9 @@
-const COLOR_PRIMARY = 0x444444;
+const COLOR_PRIMARY = 0x222222;
 const COLOR_DARK = 0x000000;
 const COLOR_LIGHT = 0xffffff;
-
-
+const COLOR_HIGHTLIGHT = 0x03ff5f;
+const COLOR_ACTION_POSSITIVE = 0x058eff
+const COLOR_ACTION_NEGATIVE = 0xff0509
 const textStyles = {
     "header": {
         fill: '#777',
@@ -504,9 +505,11 @@ class ShopScene extends Phaser.Scene {
     set id(id){
        this.shopId = id;
     }
+
     get id(){
         return this.shopId;
     }
+
     set stock(val){
         this.inventory.hide = false;
         this.inventory.items = val;
@@ -552,12 +555,11 @@ class InventoryScene extends  Phaser.Scene {
     }
 
     get hide(){
-
         return this.isHide;
     }
     create() {
-        this.goldText = this.add.text(510 ,560, "0", textStyles.gold);
-        this.inventory = new ClientInventory(this, 510, 610, 24, 4,slotNumber=>{this.clickSlot(slotNumber)});
+        this.goldText = this.add.text(810 ,560, "0", textStyles.gold);
+        this.inventory = new ClientInventory(this, 810, 610, 24, 4,slotNumber=>{this.clickSlot(slotNumber)});
         this.hide = true;
     }
 

@@ -58,7 +58,33 @@ class Zone{
         systems.addToUpdate(this);
         this.testCreateMobLots(5);
         this.testCreateShopKeeper();
+        this.wBenchInc = 0;
+        this.wBenches = {};
+        this.testCreateWorkbench();
+
     }
+
+    testCreateWorkbench() {
+
+
+        // temp
+        let config = {
+            position: {x: 250, y: 150},
+            zone: this.zoneID,
+            type: skillLevels.BLACKSMITH
+        }
+
+        let entityConfig = {
+            type: entityTypeLookup.WORKBENCH,
+            config: config
+        }
+
+        let newMob = this.factory.new(entityConfig);
+        //this.physicsWorld.addNewMob(newMob); //might want a collider??
+        this.wBenches[this.wBenchInc] = newMob;
+        this.wBenchInc++;
+    }
+
 
     testCreateShopKeeper() {
         this.shops = {};
@@ -210,7 +236,7 @@ class Zone{
         client.player = newPlayer;
 
         this.zoneSender.notifyClientPlayer(client, newPlayer);
-        this.zoneSender.initMessage(client, this.physicsWorld.entities, this.itemWorld.floorItems, this.shops);
+        this.zoneSender.initMessage(client, this.physicsWorld.entities, this.itemWorld.floorItems, this.shops, this.wBenches);
     }
 
     update() {

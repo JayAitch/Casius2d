@@ -5,15 +5,15 @@ const recipes = {
         experience: 150,
         items:[{item: items.goldbar, amount:10}],
         result:[items.goldhelm],
-        time: 50
+        time: 100
     },
         {
             skill: skillLevels.BLACKSMITH,
             level:0,
             experience: 150,
-            items:[{item: items.goldore, amount:5}, {item: items.seeradish, amount:10}, {item: items.gem, amount:2}],
+            items:[{item: items.jacket, amount:1}],
             result:[items.goldmask],
-            time: 50
+            time: 100
         },
         {
             skill: skillLevels.BLACKSMITH,
@@ -21,7 +21,7 @@ const recipes = {
             experience: 150,
             items:[{item: items.goldbar, amount:10}],
             result:[items.goldlegs],
-            time: 50
+            time: 5000
         },
         {
             skill: skillLevels.BLACKSMITH,
@@ -29,7 +29,7 @@ const recipes = {
             experience: 150,
             items:[{item: items.goldore, amount:10}, {item: items.goldbar, amount:20}, {item: items.gem, amount:2}, {item:items.spear, amount:1}],
             result:[items.dspear],
-            time: 50
+            time: 5000
         }
         ],
     [skillLevels.ALCHEMY]:[{
@@ -38,7 +38,7 @@ const recipes = {
         experience: 150,
         items:[{item: items.seeradish, amount:5}],
         result:[items.seeradish],
-        time: 50
+        time: 5000
     },
     ],
     [skillLevels.WOODCUTTING]:[{
@@ -47,34 +47,70 @@ const recipes = {
         experience: 150,
         items:[{item: items.log, amount:1}],
         result:[items.plank],
-        time: 50
+        time: 5000
     },
     ]
 
 }
 
-
 global.recipesManager = {
     getRecipes: function(){
-        console.log(recipes);
+
         return recipes;
-    },
-    craft: function(lookup, inv, stats){
+    }
+    ,
+    tryToCraft: function(lookup, inv, stats){
         let recipe = recipes[lookup.skill][lookup.key];
         let itemBase  = recipe.result[0];
-        let reward = recipe.experience; // add to experience somehow
-        let currentExp = stats[lookup.skill] || 0;
-        //todo: write the experience level relationship
-        stats[lookup.skill] = currentExp + reward;
 
+        let craftSpeed = 30;
+
+        // TEMP preventing mutliple crafts
+        if(!inv.craftingTimeout)
+        inv.craftingTimeout = setTimeout(() =>{
+
+            let invQ = this.canCraft(recipe,inv, stats);
+            if(invQ.result){
+                inv.removeItems(invQ.slots);
+                let item = this.craft(itemBase, stats);
+                this.awardExperience(recipe, stats);
+                inv.pickupItem(item);
+            }
+
+            inv.craftingTimeout = undefined;
+            clearTimeout(inv.craftingTimeout);
+
+            }, recipe.time);
+    },
+
+    awardExperience: function(recipe, stats){
+        let reward = recipe.experience; // add to experience somehow
+        let currentExp = stats[recipe.skill] || 0;
+        //todo: write the experience level relationship
+        stats[recipe.skill] = currentExp + reward;
+    },
+
+    craft: function(base){
         let item = {
-            base:itemBase,
+            base:base,
             quantity: 1,
             plus: randomInteger(0, 3)
         }
-        console.log(item);
-        inv.pickupItem(item);
-    }
+        return item;
+    },
+
+    canCraft: function (recipe, inv, stats) {
+      //check level against stats
+        let canCraft = false;
+        let tempIngredientsID = [];
+        recipe.items.forEach(function(ingred){
+            tempIngredientsID.push({id:ingred.item.id, amount:ingred.amount});
+        })
+        let invQuery = inv.queryItems(recipe.items);
+        return invQuery;
+    },
+
+
 }
 
 module.exports = {recipesManager}

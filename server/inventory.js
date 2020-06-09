@@ -5,7 +5,6 @@ global.slotActions = {"EQUIPT":"EQUIPT","DROP":"DROP","CLICK":"CLICK"}
 
 class Inventory{
     constructor(invent, mSize) {
-        console.log(invent);
         this.inventoryItems = invent//JSON.parse(JSON.stringify(invent));
         this.maxSize = mSize || 24;
     }
@@ -13,8 +12,7 @@ class Inventory{
     addItem(item){
         if(this.inventoryItems.length >= this.maxSize) return false;
         this.inventoryItems.push(item);
-        delete item.pos
-
+        console.log(this.inventoryItems.length);
         return true;
     }
     removeItem(pos){
@@ -64,8 +62,7 @@ class PaperDoll{
 
 class InventoryManager{
     constructor(inventory, paperDoll, ownerLocation, ownerID, playerStats){
-        console.log(inventory);
-        this.inv = new Inventory(inventory.items);
+        this.mInv = new Inventory(inventory.items);
         this.ppD = new PaperDoll(paperDoll);
         this.gold = inventory.gold;
         this.ownerID = ownerID;
@@ -79,10 +76,43 @@ class InventoryManager{
 
     get inventory(){
 
-        return this.inv.inventoryItems;
+        return this.mInv.inventoryItems;
     }
     get message(){
         return {inventory: this.inventory, paperDoll: this.paperDoll, gold:this.gold};
+    }
+
+    queryItems(items){
+        let foundAll = true;
+        let itemSlots = [];
+
+        items.forEach(qItem=>{
+            let itemSearchInc = 0;
+            let itemFound = false;
+            let foundCount = 0;
+                this.inventory.forEach(item=>{
+                    if(!itemFound){
+                        if(item.base.id === qItem.item.id) {
+                            itemSlots.push(itemSearchInc);
+                            foundCount++;
+                            if(foundCount === qItem.amount){
+                                itemFound = true;
+                            }
+
+                        }
+                        itemSearchInc++;
+                    }
+
+                })
+            if(foundAll !=false){
+                foundAll = itemFound;
+            }
+        })
+        let result = {
+            result: foundAll,
+            slots:itemSlots
+        }
+        return result;
     }
 
     pickupItem(item){
@@ -93,10 +123,12 @@ class InventoryManager{
         //     quantity: item.quantity
         // }
         // TODO: add to paperdoll first
+        if(item){
+            let addedItem = this.mInv.addItem(item)
+            this.clientUpdate();
+            return addedItem;
+        }
 
-        let addedItem =this.inv.addItem(item)
-        this.clientUpdate();
-        return addedItem;
     }
 
     equiptItem(key, item){
@@ -106,24 +138,28 @@ class InventoryManager{
         if(removedItem){
             //todo:
             // doesnt check invent space!!
-            this.inv.addItem(removedItem);
+            this.mInv.addItem(removedItem);
         }
         this.ppD.addItem(key, item);
         return removedItem;
     }
-
+    removeItems(slotarr){
+        slotarr.forEach(slot=>{
+            this.mInv.removeItem(slot);
+        })
+    }
     unequiptItem(key){
         let removedItem = this.ppD.removeItem(key);
         if(removedItem){
             // doesnt check invent space!!
-            this.inv.addItem(removedItem);
+            this.mInv.addItem(removedItem);
             this.ppD.removeItem(key);
         }
         return removedItem;
     }
 
     dropItem(slot){
-        let item = this.inv.removeItem(slot);
+        let item = this.mInv.removeItem(slot);
         return item;//this needs adding to item world
     }
 
@@ -141,26 +177,26 @@ class InventoryManager{
 
     getItem(slot){
         // todo chek if ppd or inv
-        return this.inv.getItem(slot);
+        return this.mInv.getItem(slot);
     }
 
 
     actOnInventorySlot(action, slot, zone, pos) {
         switch (action) {
             case slotActions.EQUIPT:
-                let clickedItem = this.inv.getItem(slot);
+                let clickedItem = this.mInv.getItem(slot);
                 if(clickedItem && clickedItem.base.slot) {
                     this.equiptItem(clickedItem.base.slot, clickedItem);
-                    this.inv.removeItem(slot);
+                    this.mInv.removeItem(slot);
                     this.paperDollUpdate();
                     this.clientUpdate();
                     this.testCalculateStats();//tempoooo
                 }
                 break;
             case slotActions.DROP:
-                let dropItem = this.inv.getItem(slot)
+                let dropItem = this.mInv.getItem(slot)
                 if(dropItem) {
-                    let item = this.inv.removeItem(slot);
+                    let item = this.mInv.removeItem(slot);
                     zone.itemWorld.addItem(pos, item);
                     this.clientUpdate();
                 }

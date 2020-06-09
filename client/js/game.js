@@ -200,11 +200,14 @@ class GameScene extends Phaser.Scene {
         let keys = Object.keys(this.interactables);
         let mapEntity = undefined;
         keys.forEach((key)=>{
-            mapEntity = this.interactables[key];
-            let distance = Phaser.Math.Distance.Between(mapEntity.x,mapEntity.y,myPlayer.pos.x,myPlayer.pos.y);
+            let potential =  this.interactables[key];
+            let distance = Phaser.Math.Distance.Between(potential.x,potential.y,myPlayer.pos.x,myPlayer.pos.y);
             // soft check temporry
+console.log(distance);
             if( distance < range){
                 entityKey = key;
+                mapEntity = potential;
+                console.log(mapEntity);
             }
         })
         if(mapEntity){
@@ -329,21 +332,40 @@ class GameScene extends Phaser.Scene {
         shop.hide = true;
     }
 
-    toggleInventory(){
+    loadBenches(benches){
+        Object.keys(benches).forEach(bench=>{
+            let mBench = benches[bench];
+            let wb =  new WorkBench(mBench.position, mBench.type, this)
+            this.interactables[bench]=wb;
+            wb.interact = function(){console.log("a workbecnh")};
+        })
+    }
+
+    toggleCrafting(){
+        let craft = this.scene.get("crafting-menu");
+        craft.hide = !craft.hide;
+    }
+//TODO - move to seperate class
+    closeAllWindows(){
         let pD = this.scene.get("paperdoll");
         let inv = this.scene.get("inventory");
         let shop = this.scene.get("shop");
         let craft = this.scene.get("crafting-menu");
+        pD.hide = true;
+        inv.hide = true;
+        craft.hide = true;
+        shop.hide = true;
+        craft.hide = true;
+    }
+
+    toggleInventory(){
+        let pD = this.scene.get("paperdoll");
+        let inv = this.scene.get("inventory");
         pD.hide = !pD.hide;
         inv.hide = !inv.hide;
-        craft.hide = !craft.hide;
-        if(inv.hide){
-            shop.hide = true;
-            craft.hide = true;
-        }
-
     }
 }
+
 
 
 
@@ -359,8 +381,8 @@ class Controller{
         let ctrlKey = scene.input.keyboard.addKey("CTRL");
         let iKey = scene.input.keyboard.addKey("I");
         let eKey = scene.input.keyboard.addKey("E");
-
-
+        let cKey = scene.input.keyboard.addKey("C");
+        let escKey = scene.input.keyboard.addKey("ESC");
         this.client = client;
 
         //this.directionKeys = {left:leftKey, right:rightKey, up:upKey, down:downKey}
@@ -374,13 +396,18 @@ class Controller{
 
 
         eKey.on('down', (event)=> {
+            let shop = this.scene.get("shop");
             let interactableID = scene.interactWithClosest();
-
-            // console.log(interactableID);
-            // if(interactableID)
-            //     client.sender.interact(interactableID);
         });
 
+
+        cKey.on('down', (event)=> {
+            scene.toggleCrafting();
+        });
+
+        escKey.on('down', (event)=> {
+            scene.closeAllWindows();
+        });
         spaceKey.on('down', (event)=> {
             client.sender.attack();
         });

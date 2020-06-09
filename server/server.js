@@ -74,13 +74,7 @@ inventories = {
     0:{
         gold: 10000000000000000000,
         items: [
-            {base:items.seeradish,quantity:1, plus:0},
-            {base:items.goldhelm,quantity:1, plus:6},
-            {base:items.goldhelm,quantity:1, plus:600},
-            {base:items.goldmask,quantity:1, plus:3},
-            {base:items.goldmask,quantity:1, plus:4},
             {base:items.jacket,quantity:1, plus:2},
-            {base:items.bronzehelm,quantity:1, plus:600},
             {base:items.jacket,quantity:1, plus:4},
             {base:items.jacket,quantity:1, plus:6}
         ]
@@ -217,7 +211,7 @@ io.on('connect', function(client) {
 
 
         client.on('craftRecipe',function(lookup) {
-            recipesManager.craft(lookup, client.character.invent, client.playerStats)
+            recipesManager.tryToCraft(lookup, client.character.invent, client.playerStats)
         });
 
 

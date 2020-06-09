@@ -24,14 +24,30 @@ class ZoneSender{
         this.room.leave(client);
     }
 
-    initMessage(client, entities, items, shops) {
+    initMessage(client, entities, items, shops, workBenches) {
         client.emit("entityList", this.sendEntities(entities));
         client.emit("itemList", items);
         client.emit("myPlayer", {id: client.player.key});
         client.emit("myInventory", client.character.invent.message);
         client.emit("shopList", this.sendShops(shops));
+        client.emit("benchList", this.sendWorkBenches(workBenches));
         client.emit("recipes", craftManager.recipesManager.getRecipes())
     }
+
+
+    sendWorkBenches(benches) {
+        let tempBench = {};
+        let benchKeys = Object.keys(benches);
+        benchKeys.forEach( (key)=> {
+            let bench = benches[key];
+            tempBench[key] = {
+                position:bench.pos,
+                type:bench.type
+            };
+        });
+        return tempBench;
+    }
+
 
     sendShops(shops) {
         let tempShops = {};
@@ -76,7 +92,7 @@ class ZoneSender{
             y:entity.pos.y,
             facing: entity.direction,
             state:entity.state,
-            base: entity.animationComponent.baseSprite ,
+            base: entity.animationComponent.baseSprite,
             layers: entity.animationComponent.spriteLayers,
             health: entity.health,
             mHealth: entity.maxHealth
