@@ -1,65 +1,127 @@
 const recipes = {
-    [skillLevels.BLACKSMITH]:[{
+    [skillLevels.MINING]: [{
+        skill: skillLevels.MINING,
+        level: 0,
+        experience: 250,
+        items: [{
+            item: items.goldore,
+            amount: 3
+        }],
+        result: [items.goldbar],
+        time: 100
+    }],
+    [skillLevels.BLACKSMITH]: [{
         skill: skillLevels.BLACKSMITH,
-        level:0,
+        level: 0,
         experience: 150,
-        items:[{item: items.goldbar, amount:10}],
-        result:[items.goldhelm],
+        items: [{
+            item: items.goldbar,
+            amount: 10
+        }],
+        result: [items.goldhelm],
         time: 100
     },
         {
             skill: skillLevels.BLACKSMITH,
-            level:0,
+            level: 0,
             experience: 150,
-            items:[{item: items.jacket, amount:1}],
-            result:[items.goldmask],
+            items: [{
+                item: items.goldbar,
+                amount: 10
+            }],
+            result: [items.goldmask],
             time: 100
         },
         {
             skill: skillLevels.BLACKSMITH,
-            level:0,
+            level: 10,
             experience: 150,
-            items:[{item: items.goldbar, amount:10}],
-            result:[items.goldlegs],
+            items: [{
+                item: items.goldbar,
+                amount: 10
+            }],
+            result: [items.goldlegs],
             time: 5000
         },
         {
             skill: skillLevels.BLACKSMITH,
-            level:0,
+            level: 0,
             experience: 150,
-            items:[{item: items.goldore, amount:10}, {item: items.goldbar, amount:20}, {item: items.gem, amount:2}, {item:items.spear, amount:1}],
-            result:[items.dspear],
+            items: [{
+                item: items.goldore,
+                amount: 10
+            }, {
+                item: items.goldbar,
+                amount: 20
+            }, {
+                item: items.gem,
+                amount: 2
+            }, {
+                item: items.spear,
+                amount: 1
+            }],
+            result: [items.dspear],
             time: 5000
         }
-        ],
-    [skillLevels.ALCHEMY]:[{
-        skill: skillLevels.ALCHEMY,
-        level:0,
-        experience: 150,
-        items:[{item: items.seeradish, amount:5}],
-        result:[items.seeradish],
-        time: 5000
-    },
     ],
-    [skillLevels.WOODCUTTING]:[{
-        skill: skillLevels.WOODCUTTING,
-        level:0,
+    [skillLevels.ALCHEMY]: [{
+        skill: skillLevels.ALCHEMY,
+        level: 0,
         experience: 150,
-        items:[{item: items.log, amount:1}],
-        result:[items.plank],
+        items: [{
+            item: items.seeradish,
+            amount: 5
+        }],
+        result: [items.seeradish],
         time: 5000
-    },
-    ]
+    },],
+    [skillLevels.WOODCUTTING]: [{
+        skill: skillLevels.WOODCUTTING,
+        level: 0,
+        experience: 150,
+        items: [{
+            item: items.log,
+            amount: 1
+        }],
+        result: [items.plank],
+        time: 5000
+    }, ],
+    [skillLevels.CRAFTING]: [{
+        skill: skillLevels.CRAFTING,
+        level: 0,
+        experience: 150,
+        items: [{
+            item: items.leather,
+            amount: 5
+        }],
+        result: [items.jacket],
+        time: 5000
+    }]
 
 }
 
-global.recipesManager = {
-    getRecipes: function(){
 
-        return recipes;
+global.workBenches = {
+
+    "basicAnvil":{
+        [skillLevels.BLACKSMITH]:recipes[skillLevels.BLACKSMITH],
+        [skillLevels.MINING]:recipes[skillLevels.MINING],
+    },
+    "tailorTable": {
+        [skillLevels.WOODCUTTING]: recipes[skillLevels.WOODCUTTING],
+        [skillLevels.MINING]: recipes[skillLevels.MINING]
+    }
+}
+
+
+global.recipesManager = {
+    getRecipes: function(key){
+        if(!key)
+            return recipes;
+        return workBenches[key];
     }
     ,
-    tryToCraft: function(lookup, inv, stats){
+    tryToCraft: function(lookup, inv, stats, rangeCheck){
         let recipe = recipes[lookup.skill][lookup.key];
         let itemBase  = recipe.result[0];
 
@@ -70,7 +132,7 @@ global.recipesManager = {
         inv.craftingTimeout = setTimeout(() =>{
 
             let invQ = this.canCraft(recipe,inv, stats);
-            if(invQ.result){
+            if(rangeCheck() && invQ.result){
                 inv.removeItems(invQ.slots);
                 let item = this.craft(itemBase, stats);
                 this.awardExperience(recipe, stats);
@@ -106,7 +168,7 @@ global.recipesManager = {
         recipe.items.forEach(function(ingred){
             tempIngredientsID.push({id:ingred.item.id, amount:ingred.amount});
         })
-        let invQuery = inv.queryItems(recipe.items);
+        let invQuery = inv.queryItems(tempIngredientsID);
         return invQuery;
     },
 

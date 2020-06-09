@@ -42,7 +42,8 @@ class ZoneSender{
             let bench = benches[key];
             tempBench[key] = {
                 position:bench.pos,
-                type:bench.type
+                type:bench.type,
+                recipes:bench.recipes
             };
         });
         return tempBench;

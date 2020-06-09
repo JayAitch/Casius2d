@@ -1,14 +1,14 @@
 dropLookup = {
     "rock_iron_1":{
         0:{
-            item:{base: items.copperore},
+            item:{base: items.goldore},
             chance: 50
         },
-        0:{
+        1:{
             item:{base: items.gem},
             chance: 5
         },
-        0:{
+        2:{
             item:{base: items.copperore},
             chance: 50
         }
@@ -26,7 +26,7 @@ dropLookup = {
             item:{base: items.petal},
             chance: 15
         },
-        0:{
+        4:{
             item:{base: items.feather},
             chance: 2
         }

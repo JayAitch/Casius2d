@@ -12,7 +12,6 @@ class Inventory{
     addItem(item){
         if(this.inventoryItems.length >= this.maxSize) return false;
         this.inventoryItems.push(item);
-        console.log(this.inventoryItems.length);
         return true;
     }
     removeItem(pos){
@@ -92,7 +91,7 @@ class InventoryManager{
             let foundCount = 0;
                 this.inventory.forEach(item=>{
                     if(!itemFound){
-                        if(item.base.id === qItem.item.id) {
+                        if(item.base.id === qItem.id) {
                             itemSlots.push(itemSearchInc);
                             foundCount++;
                             if(foundCount === qItem.amount){
@@ -144,6 +143,10 @@ class InventoryManager{
         return removedItem;
     }
     removeItems(slotarr){
+        // go through the array backwards so the items are removed in the correct order
+        slotarr.sort(function(a, b){return a - b});
+        slotarr.reverse();
+        console.log(slotarr);
         slotarr.forEach(slot=>{
             this.mInv.removeItem(slot);
         })

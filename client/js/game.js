@@ -54,7 +54,7 @@ class AudioPlayer{
     }
     playFootstep(){
         let footstepNumber = randomInteger(0, 8)
-        console.log(this.footsteps);
+
         let foostep = this.footsteps[footstepNumber];
         foostep.play();
     }
@@ -110,7 +110,6 @@ class GameScene extends Phaser.Scene {
         let pos = data.pos;
         let width = data.width;
         let height = data.height;
-        console.log("PRINTING DEBUG");
         let rect = new MyRectangle(this, pos.x,pos.y, width, height);
         audioPlayer.swing.play();
 
@@ -203,11 +202,9 @@ class GameScene extends Phaser.Scene {
             let potential =  this.interactables[key];
             let distance = Phaser.Math.Distance.Between(potential.x,potential.y,myPlayer.pos.x,myPlayer.pos.y);
             // soft check temporry
-console.log(distance);
             if( distance < range){
                 entityKey = key;
                 mapEntity = potential;
-                console.log(mapEntity);
             }
         })
         if(mapEntity){
@@ -219,6 +216,7 @@ console.log(distance);
 
     recipeList(data){
         let crafting = this.scene.get("crafting-menu");
+        crafting.allRecipes = data;
         crafting.recipes = data;
         this.scene.launch("crafting-menu", this.client.sender);
     }
@@ -335,9 +333,17 @@ console.log(distance);
     loadBenches(benches){
         Object.keys(benches).forEach(bench=>{
             let mBench = benches[bench];
-            let wb =  new WorkBench(mBench.position, mBench.type, this)
-            this.interactables[bench]=wb;
-            wb.interact = function(){console.log("a workbecnh")};
+            let wb =  new WorkBench(mBench.position, mBench.type, this, mBench.recipes)
+            this.interactables[bench] = wb;
+            wb.interact = ()=>{
+                console.log(wb.recipes)
+                let recipes = wb.recipes;
+                let craft = this.scene.get("crafting-menu");
+                craft.recipes = recipes;
+                craft.availableRecipes = recipes;
+                craft.create();
+                craft.hide = false;
+            };
         })
     }
 
@@ -345,6 +351,7 @@ console.log(distance);
         let craft = this.scene.get("crafting-menu");
         craft.hide = !craft.hide;
     }
+
 //TODO - move to seperate class
     closeAllWindows(){
         let pD = this.scene.get("paperdoll");
@@ -396,7 +403,7 @@ class Controller{
 
 
         eKey.on('down', (event)=> {
-            let shop = this.scene.get("shop");
+            let shop = scene.scene.get("shop");
             let interactableID = scene.interactWithClosest();
         });
 

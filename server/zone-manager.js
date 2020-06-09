@@ -71,8 +71,10 @@ class Zone{
         let config = {
             position: {x: 250, y: 150},
             zone: this.zoneID,
-            type: skillLevels.BLACKSMITH
+            type: skillLevels.BLACKSMITH,
+            recipes: workBenches.basicAnvil
         }
+
 
         let entityConfig = {
             type: entityTypeLookup.WORKBENCH,
@@ -105,7 +107,21 @@ class Zone{
         this.physicsWorld.addNewMob(newMob);
         this.shops[this.physicsWorld.lastEntityId - 1] =  new shopInventory.ShopInventory(0); //temp
     }
-
+    ///     TEMP
+    isInRangeOfCrafting(category, player){
+        let range = 100;
+        let wBenchs = this.wBenches;
+        let mBench;
+        Object.keys(wBenchs).forEach(benKey =>{
+            let bench = wBenchs[benKey];
+            let dist = distance(bench.pos,player.pos);
+            if(dist < range){
+                //todo check for workbench type;
+                mBench = bench;
+            }
+        })
+        if(mBench) return true;
+    }
 
     sellItem(client, shopid, slot){
 

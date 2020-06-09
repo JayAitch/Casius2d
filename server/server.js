@@ -2,7 +2,7 @@ const dotenv = require('dotenv').config({path: '../config/config.env'});
 
 const PORT =process.env.SERVER_PORT;
 
-global.skillLevels = {"WOODCUTTING":"WOODCUTTING","MINING":"MINING","BLACKSMITH":"BLACKSMITH", "COMBAT":"COMBAT", "ALCHEMY":"ALCHEMY"}
+global.skillLevels = {"WOODCUTTING":"WOODCUTTING","MINING":"MINING","BLACKSMITH":"BLACKSMITH", "COMBAT":"COMBAT", "ALCHEMY":"ALCHEMY", "CRAFTING":"CRAFTING"}
 const server = require('http').createServer();
 const itms = require('./items.js'); //consider converting
 const zoneManager = require('./zone-manager.js');
@@ -74,9 +74,16 @@ inventories = {
     0:{
         gold: 10000000000000000000,
         items: [
-            {base:items.jacket,quantity:1, plus:2},
-            {base:items.jacket,quantity:1, plus:4},
-            {base:items.jacket,quantity:1, plus:6}
+            {base:items.goldbar,quantity:1, plus:0},
+            {base:items.goldbar,quantity:1, plus:0},
+            {base:items.goldbar,quantity:1, plus:0},
+            {base:items.goldbar,quantity:1, plus:0},
+            {base:items.goldbar,quantity:1, plus:0},
+            {base:items.goldbar,quantity:1, plus:0},
+            {base:items.goldbar,quantity:1, plus:0},
+            {base:items.goldbar,quantity:1, plus:0},
+            {base:items.goldbar,quantity:1, plus:0},
+            {base:items.goldbar,quantity:1, plus:0}
         ]
     }
 }
@@ -211,7 +218,16 @@ io.on('connect', function(client) {
 
 
         client.on('craftRecipe',function(lookup) {
-            recipesManager.tryToCraft(lookup, client.character.invent, client.playerStats)
+            let zoneid = client.playerLocation.zone;
+            let zone = ZONES[zoneid];
+
+            let inRangeCheck = ()=>{
+                let inRange = zone.isInRangeOfCrafting("category", client.player);
+                return inRange;
+            }
+            recipesManager.tryToCraft(lookup, client.character.invent, client.playerStats, inRangeCheck);
+
+
         });
 
 

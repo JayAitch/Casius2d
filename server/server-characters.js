@@ -302,6 +302,7 @@ class WorkBench extends GameObject{
         this.width = 32; // temp
         this.height = 32; // temp
         this.type = config.type
+        this.recipes = config.recipes;
     }
 }
 

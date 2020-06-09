@@ -98,17 +98,17 @@ class CraftingScene extends Phaser.Scene {
         super({key: 'crafting-menu'});
         this.actionsList = new ActionsList(this);
     }
+
     init(data, recipes){
         this.sender = data;
-        //   this.recipes = recipes;
     }
+
     preload() {
         this.load.scenePlugin({
             key: 'rexuiplugin',
             url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js',
             sceneKey: 'rexUI'
         });
-        // this.showMenu();
 
     }
 
@@ -135,14 +135,20 @@ class CraftingScene extends Phaser.Scene {
                 i++;
             });
             data[recipeCategory] = tempRecipes;
-        });
 
+        });
+        console.log(data);
         this.data = data;
     }
 
     set hide(val){
         this.isHide = val;
-        this.tabs.setVisible(!val)
+        if(this.tabs)
+            this.tabs.setVisible(!val)
+        if(this.dialog)
+            this.dialog.setVisible(false);
+        if(this.progressBar)
+            this.progressBar.setVisible(false);
     }
 
     get hide(){
@@ -151,7 +157,6 @@ class CraftingScene extends Phaser.Scene {
 
     create() {
         this.buildDataFromRecipes();
-        var data = this.data;
         this.print = this.add.text(0, 0, '');
 
         let leftButtons = []
@@ -160,8 +165,10 @@ class CraftingScene extends Phaser.Scene {
             let button = this.createButton(this, 0, category)
             leftButtons.push(button);
         })
-
-        let tabs = this.rexUI.add.tabs({
+        if(this.tabs) {
+            this.tabs.setVisible(false);
+        }
+        this.tabs = this.rexUI.add.tabs({
             x: 800,
             y: 400,
 
@@ -227,8 +234,8 @@ class CraftingScene extends Phaser.Scene {
             .layout()
         //.drawBounds(this.add.graphics(), 0xff0000);
 
-        tabs
-            .on('button.click', function (button, groupName, index) {
+        this.tabs
+            .on('button.click',  function(button, groupName, index) {
                 switch (groupName) {
                     case 'right':
                         // Highlight button
@@ -254,14 +261,13 @@ class CraftingScene extends Phaser.Scene {
                         }
                         break;
                 }
-
                 // Load items into grid table
-                var items = data[this._prevTypeButton.text];
-                this.getElement('panel').setItems(items).scrollToTop();
-            }, tabs);
+                var items = this.data[this._prevTypeButton.text];
+                this.tabs.getElement('panel').setItems(items).scrollToTop();
+            },this);
 
         // Grid table
-        tabs.getElement('panel')
+        this.tabs.getElement('panel')
             .on('cell.click', function (cellContainer, cellIndex) {
                 this.print.text += cellIndex + ': ' + cellContainer.text + '\n'
                 let icon = cellContainer.getElement('icon');
@@ -278,8 +284,8 @@ class CraftingScene extends Phaser.Scene {
                     .setDepth(0);
             }, this);
 
-        tabs.emitButtonClick('left', 0).emitButtonClick('right', 0);
-        this.tabs = tabs;
+        this.tabs.emitButtonClick('left', 0).emitButtonClick('right', 0);
+
         this.hide = true;
     }
 
@@ -327,7 +333,6 @@ class CraftingScene extends Phaser.Scene {
     set recipes(val) {
         this.currentRecipes = val;
         this.buildDataFromRecipes();
-
     }
 
     createDialogueLabel (scene, text, isPossertive) {
@@ -355,11 +360,11 @@ class CraftingScene extends Phaser.Scene {
     createDialogue(item, index){
         if(this.dialog) {
             this.dialog.setVisible(false);
-            this.sizer.setVisible();
+            this.sizer.setVisible(false);
         }
         let text = "\n\n";
         items = item.recipe.items;
-        let progressBar = new ProgressBar(this, 300,100, 350, 50, 1,0);
+        this.progressBar = new ProgressBar(this, 300,100, 350, 50, 1,0);
 
 
         items.forEach(item=>{
@@ -429,16 +434,16 @@ class CraftingScene extends Phaser.Scene {
                 if(button.text === "close") {
                     dialog.setVisible(false);
                     this.dialog = false;
-                    progressBar.setVisible(false);
+                    this.progressBar.setVisible(false);
                 }
                 if(button.text === "1"){
                     let callback = ()=>{
                         clearInterval(window.craftingInterval);
                         window.craftingInterval = undefined;
                         console.log("callback()");
-                        progressBar.setValue = 0;
+                        this.progressBar.setValue = 0;
                     }
-                    progressBar.timerUp(dialog.item.recipe.time, callback);
+                    this.progressBar.timerUp(dialog.item.recipe.time, callback);
                     this.sender.craftRecipe(lookup);
                     //dialog.setVisible(false);
                     //this.dialog = false;
@@ -475,7 +480,7 @@ class CraftingScene extends Phaser.Scene {
             }
         );
 
-        sizer.add(progressBar.bar,
+        sizer.add(this.progressBar.bar,
             {
                 proportion: 0,
                 align: 'center',

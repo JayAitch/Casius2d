@@ -431,8 +431,10 @@ class Player extends MovingMultiSprite{
 }
 
 class WorkBench{
-   constructor(pos, type, scene) {
+   constructor(pos, type, scene, recipes) {
        this.sprite = scene.add.sprite(pos.x, pos.y, type);//temp
+       this.type = type;
+       this.recipes = recipes
    }
    get pos(){
        return {x: this.sprite.x,y: this.sprite.y }
