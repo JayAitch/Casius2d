@@ -7,7 +7,7 @@ const server = require('http').createServer();
 const itms = require('./items.js'); //consider converting
 const zoneManager = require('./zone-manager.js');
 const invent = require('./inventory.js');
-
+const playerStats = require('./player-stats.js')
 const dbDisabled = true;
 
 global.io = require('socket.io')(server);
@@ -89,27 +89,6 @@ inventories = {
 }
 
 
-class PlayerStats {
-    constructor(health, experience, defence, attack) {
-        this.maxHealth = health;
-        this.health = health;
-        this.experience = {};
-        this.defence = defence;
-        this.attackSpeed = 600; //temp
-        this.attack = attack;
-        this.speed = 10;//temp
-    }
-    addExperience(json){
-        let keys = Object.keys(json);
-        keys.forEach(expKey=>{
-            let current = this.experience[expKey] || 0;
-            let additional = json[expKey];
-            let total = current + additional;
-            this.experience[expKey] = total;
-        })
-    }
-}
-
 // this could be used along with id to get the room etc
 class PlayerLocation{
     constructor(zone, pos){
@@ -167,6 +146,9 @@ let thirdZone = new zoneManager.Zone(2);
 
 global.ZONES = {0:firstZone,1:secondZone, 2:thirdZone}
 
+
+
+
 io.on('connect', function(client) {
 
     let curr_username;
@@ -174,9 +156,35 @@ io.on('connect', function(client) {
     client.on('login',function(username,password){
         curr_username = username
         // for some reason this prints at 30 but is clearly nothing before the paperdoll is rebuilt
-        let playerStats = new PlayerStats(200,200, 5, 30); //these now recalculate
+
+
+        // temp0
+
+        let skills = {
+            [skillLevels.MINING]:4000,
+            [skillLevels.CRAFTING]:4000,
+            [skillLevels.COMBAT]:10,
+            [skillLevels.BLACKSMITH]:4000,
+            [skillLevels.ALCHEMY]:4000,
+            [skillLevels.WOODCUTTING]:4000,
+        }
+        let callbacks = {
+            levelUp: function(skill){
+                tempLevelMessage(client,skill);
+            },
+            gainedEXP: function(skill){
+                tempEXPGainMessage(client,skill);
+            }
+        }
+        //
+        let mplayerStats = new playerStats.PlayerStats(200,skills, 5, 30, callbacks); //these now recalculate
+
+
+
+
+
         client.character = {};
-        client.playerStats = playerStats;
+        client.playerStats = mplayerStats;
         client.playerLocation = new PlayerLocation(0, {x:150,y:150});
         tryLogin(client, username, password);
     });
@@ -349,6 +357,21 @@ function firstJoin(client, username, playerLocation){
     zone.join(client, playerLocation.zone, undefined, client);
 }
 
+
+// temp
+function tempLevelMessage(client, skill){
+    let zone = ZONES[client.playerLocation.zone];
+    let hook = "levelUp";
+    let data = skill;
+    data.key = client.character._id;
+    serverSender.wholeRoom(hook, data, client.playerLocation);
+
+}
+
+// temp
+function tempEXPGainMessage(client, skill){
+    serverSender.clientMessage("experience", skill, client.playerLocation, client.character._id);
+}
 
 
 function tryJoinZone(clientID, targetZoneID, playerLocation, position){

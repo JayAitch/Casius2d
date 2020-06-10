@@ -96,7 +96,13 @@ class Receiver{
             })
 
         });
+        this.socket.on('experience', (data)=>{
+            console.log(data);
+        });
 
+        this.socket.on('levelUp', (data)=>{
+            this.gameScene.levelUpFanfare(data);
+        });
 
         this.socket.on('removeEntity',(data)=>{
             this.gameScene.removeEntity(data.id);

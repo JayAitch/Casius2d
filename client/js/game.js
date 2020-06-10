@@ -40,7 +40,7 @@ class AudioPlayer{
         this.bgMusic.volume = 0.01;
         this.bgMusic.setLoop(true);
         this.mobPain = game.sound.add("pig-grunt"); // use a config
-
+        this.levelUp = game.sound.add("level-sound"); // use a config
         this.footsteps = [];
         this.testFoosteps();
         this.mobPain = game.sound.add("pig-grunt");
@@ -181,6 +181,30 @@ class GameScene extends Phaser.Scene {
         return itemKey;
     }
 
+    levelUpFanfare(data){
+        let entityId = data.key;
+        let player = this.mapEntities[entityId];
+        let fftext = this.add.text(player.x, player.y,`${data.type}  ${data.level}`);
+        fftext.setDepth(UILayer + 999);
+
+        var tween = this.tweens.add({
+            targets: fftext,
+            alpha: { from: 0, to: 1 },
+            // alpha: { start: 0, to: 1 },
+            // alpha: 1,
+            // alpha: '+=1',
+            onUpdate: function(){
+              fftext.x = player.x -20;
+              fftext.y = player.y - 40;
+            },
+            ease: 'Linear',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
+            duration: 1000,
+            repeat: 0,            // -1: infinity
+            yoyo: true
+        });
+        audioPlayer.levelUp.play();
+    }
+
     updateShops(key, stock){
         this.shopList[key] = stock;
         let potentialEntity = this.mapEntities[key];
@@ -188,9 +212,6 @@ class GameScene extends Phaser.Scene {
             potentialEntity.shop = stock;
             let shop = this.scene.get("shop");
 
-            console.log(shop);
-            console.log(key);
-            console.log(shop.hide);
             if(shop.id === key && !(shop.hide)) {
                 shop.stock = stock;
             }

@@ -104,6 +104,11 @@
       "pig-grunt": {
         "path": "assets/sounds/pig_grunt.wav"
       },
+      "level-sound": {
+        "path": "assets/sounds/Ancient_Game_Ability_Cast_3.wav"
+      },
+
+
       "footstep0": {
         "path": "assets/sounds/footstep00.ogg"
       },
