@@ -32,6 +32,16 @@ class ZoneSender{
         client.emit("shopList", this.sendShops(shops));
         client.emit("benchList", this.sendWorkBenches(workBenches));
         client.emit("recipes", craftManager.recipesManager.getRecipes())
+
+        ////// TEMP  ////
+        this.testSetUpdateShops(shops);
+    }
+    ////// TEMP  ////
+    testSetUpdateShops(shops){
+        if(!this.shopUpdate)
+            this.shopUpdate = setInterval(()=>{
+            this.room.roomMessage("shopList", this.sendShops(shops));
+        }, 1000)
     }
 
 

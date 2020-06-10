@@ -500,6 +500,11 @@ class ShopScene extends Phaser.Scene {
 
     set hide(val){
         this.inventory.hide = val;
+        this.isHide = val;
+    }
+
+    get hide(){
+        return this.isHide;
     }
 
     set id(id){
@@ -511,7 +516,7 @@ class ShopScene extends Phaser.Scene {
     }
 
     set stock(val){
-        this.inventory.hide = false;
+        this.hide = false;
         this.inventory.items = val;
     }
 
@@ -557,6 +562,7 @@ class InventoryScene extends  Phaser.Scene {
     get hide(){
         return this.isHide;
     }
+
     create() {
         this.goldText = this.add.text(810 ,560, "0", textStyles.gold);
         this.inventory = new ClientInventory(this, 810, 610, 24, 4,slotNumber=>{this.clickSlot(slotNumber)});

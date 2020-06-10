@@ -208,7 +208,7 @@
 {
 "name":"node_id",
 "type":"string",
-"value":"rock_iron"
+"value":"rock_gold"
 }],
 "rotation":0,
 "type":"NODE",
@@ -225,7 +225,7 @@
 {
 "name":"node_id",
 "type":"string",
-"value":"rock_iron"
+"value":"rock_copper"
 }],
 "rotation":0,
 "type":"NODE",

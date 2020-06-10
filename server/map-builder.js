@@ -20,6 +20,16 @@ nodeLookup = {
         "reward": {"type": skillLevels.MINING, "amount":15}
 
     },
+    "rock_gold":{
+        "drop": "rock_gold_1",
+        "reward": {"type": skillLevels.MINING, "amount":55}
+
+    },
+    "rock_copper":{
+        "drop": "rock_copper_1",
+        "reward": {"type": skillLevels.MINING, "amount":25}
+
+    },
     "wood_magic":{
         "drop": "wood_magic_1",
         "reward": {"type": skillLevels.WOODCUTTING, "amount":15}

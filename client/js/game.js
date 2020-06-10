@@ -184,6 +184,17 @@ class GameScene extends Phaser.Scene {
     updateShops(key, stock){
         this.shopList[key] = stock;
         let potentialEntity = this.mapEntities[key];
+        if(potentialEntity.shop){
+            potentialEntity.shop = stock;
+            let shop = this.scene.get("shop");
+
+            console.log(shop);
+            console.log(key);
+            console.log(shop.hide);
+            if(shop.id === key && !(shop.hide)) {
+                shop.stock = stock;
+            }
+        }
         if(potentialEntity){
             potentialEntity.shop = stock;
             this.interactables[key] = potentialEntity;

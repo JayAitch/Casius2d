@@ -1,15 +1,38 @@
 const recipes = {
     [skillLevels.MINING]: [{
         skill: skillLevels.MINING,
-        level: 0,
-        experience: 250,
+        level: 25,
+        experience: 550,
         items: [{
             item: items.goldore,
             amount: 3
         }],
         result: [items.goldbar],
-        time: 100
-    }],
+        time: 1000
+    },
+    {
+        skill: skillLevels.MINING,
+        level: 10,
+        experience: 250,
+        items: [{
+            item: items.copperore,
+            amount: 3
+        }],
+        result: [items.copperbar],
+        time: 900
+    },
+    {
+        skill: skillLevels.MINING,
+        level: 0,
+        experience: 250,
+        items: [{
+            item: items.ironore,
+            amount: 3
+        }],
+        result: [items.ironbar],
+        time: 800
+    }
+    ],
     [skillLevels.BLACKSMITH]: [{
         skill: skillLevels.BLACKSMITH,
         level: 0,
@@ -21,6 +44,21 @@ const recipes = {
         result: [items.goldhelm],
         time: 100
     },
+        {
+            skill: skillLevels.BLACKSMITH,
+            level: 0,
+            experience: 150,
+            items: [{
+                item: items.ironbar,
+                amount: 5
+            },{
+                item: items.plank,
+                amount: 5
+            }],
+            result: [items.spear],
+            time: 100
+        },
+
         {
             skill: skillLevels.BLACKSMITH,
             level: 0,

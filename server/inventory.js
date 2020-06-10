@@ -143,6 +143,11 @@ class InventoryManager{
         return removedItem;
     }
     removeItems(slotarr){
+        console.log(slotarr.length)
+        if(slotarr != undefined && !slotarr.length) {
+            this.mInv.removeItem(slotarr);
+            return;
+        }
         // go through the array backwards so the items are removed in the correct order
         slotarr.sort(function(a, b){return a - b});
         slotarr.reverse();

@@ -84,9 +84,21 @@ shops = {
     ],
     1: [
         {
-        item: {base:items.leatherbelt, plus: 8},
-        amount: 12
-        }
+        item: {base:items.leather, plus: 0},
+        amount: 1200
+        },
+        {
+            item: {base:items.plank, plus: 0},
+            amount: 1200
+        },
+        {
+            item: {base:items.goldore, plus: 0},
+            amount: 1200
+        },
+        {
+            item: {base:items.seeradish, plus: 0},
+            amount: 1200
+        },
         ]
 }
 
@@ -96,24 +108,25 @@ class ShopInventory{
         this.baseStock =  JSON.parse(JSON.stringify(shopStock));
         this.stock = shopStock; // this is PBR
         this.tick = 0;
-        this.reStockRate = deltaTime(50);
-    }
+        this.reStockRate = deltaTime(500);
+    }a
 
-    buy(slot, inv){
+    buy(slot, inv) {
         let stock = this.stock[slot];
-        if(stock && stock.amount > 0){
-            if(inv.gold >= stock.item.base.value){
-                inv.gold -= stock.item.base.value; ////   temp
+        if (stock && stock.amount > 0) {
+            if (inv.gold >= stock.item.base.value) {
+                inv.gold -= stock.item.base.value; ////   TODO:calculate price
                 this.stock[slot].amount -= 1;
                 inv.pickupItem(stock.item);
+                this.removeFromStock(slot);
+
             }
         }
     }
-
     sell(slot,inv){
         let item = inv.getItem(slot);
         inv.gold += item.base.value;
-        inv.inv.removeItem(slot);
+        inv.removeItems(slot);
         this.addItemToStock(item);
     }
 
@@ -121,7 +134,7 @@ class ShopInventory{
         // todo: make this stack
         let stock = {
             item: {base: item.base, plus:item.plus},
-            amount:item.quantity
+            amount:item.quantity || 1
         }
         this.stock.push(stock);
     }
@@ -141,27 +154,26 @@ class ShopInventory{
                 }
             }else{
                 this.reduceStock(this.stock[stockkey]);
-                this.removeFromStock( stockkey)
+                this.removeFromStock(stockkey)
             }
         });
     }
 
     removeFromStock(stockkey){
         let stock = this.stock[stockkey];
-        if(stock.amount <= 0){
+        if(!this.baseStock.hasOwnProperty(stockkey) && stock === undefined || stock.amount <= 0){
             this.stock.splice(stockkey, 1);
             //delete this.baseStock[stockkey] //todo change to json??
         }
     }
 
     reduceStock(stock){
-        stock.amount--;
+        if(stock)
+            stock.amount--;
     }
 
     increaseStock(stock){
         stock.amount++;
-        console.log("increasing stock");
-        console.log(stock);
     }
 
     update(){
