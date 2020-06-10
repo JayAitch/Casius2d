@@ -161,7 +161,7 @@ io.on('connect', function(client) {
         // temp0
 
         let skills = {
-            [skillLevels.MINING]:4000,
+            [skillLevels.MINING]:0,
             [skillLevels.CRAFTING]:4000,
             [skillLevels.COMBAT]:10,
             [skillLevels.BLACKSMITH]:4000,

@@ -215,6 +215,10 @@ global.recipesManager = {
       //check level against stats
         let canCraft = false;
         let tempIngredientsID = [];
+        ///temp todo: this sucks
+        console.log(`skil: ${stats.skills.skills[recipe.skill].level} req: ${recipe.level}`)
+        let currentLevel = stats.skills.skills[recipe.skill].level || 0;
+        if(currentLevel < recipe.level) return {result: false};
         recipe.items.forEach(function(ingred){
             tempIngredientsID.push({id:ingred.item.id, amount:ingred.amount});
         })

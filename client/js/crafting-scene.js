@@ -207,7 +207,7 @@ class CraftingScene extends Phaser.Scene {
                         height: height,
                         background: scene.rexUI.add.roundRectangle(0, 0, 20, 20, 0).setStrokeStyle(2, COLOR_DARK),
                         icon: icon,
-                        text: scene.add.text(0, 0, item.name + " - " + item.recipe.experience + "exp"),
+                        text: scene.add.text(0, 0, item.recipe.level +": " + item.name + " - " + item.recipe.experience + "exp", textStyles["list-item"] ),
 
                         space: {
                             icon: 10,
@@ -310,9 +310,7 @@ class CraftingScene extends Phaser.Scene {
             width: 50,
             height:40,
             background: scene.rexUI.add.roundRectangle(0, 0, 50, 50, radius, COLOR_DARK),
-            text: scene.add.text(0, 0, text, {
-                fontSize: '18pt'
-            }),
+            text: scene.add.text(0, 0, text, textStyles["tab-title"]),
             space: {
                 left: 10
             }
@@ -343,9 +341,7 @@ class CraftingScene extends Phaser.Scene {
 
             background: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 20, color),
 
-            text: scene.add.text(0, 0, text, {
-                fontSize: '24px'
-            }),
+            text: scene.add.text(0, 0, text, textStyles["dialog-buttons"]),
 
             space: {
                 left: 10,
@@ -380,9 +376,7 @@ class CraftingScene extends Phaser.Scene {
 
             title: this.rexUI.add.label({
                 background: this.rexUI.add.roundRectangle(0, 0, 100, 40, 20,COLOR_DARK),
-                text: this.add.text(0, 0, item.name, {
-                    fontSize: '24px'
-                }),
+                text: this.add.text(0, 0, item.name, textStyles["dialog-head"]),
                 space: {
                     left: 15,
                     right: 15,
@@ -390,9 +384,7 @@ class CraftingScene extends Phaser.Scene {
                     bottom: 10
                 }
             }),
-            content: this.add.text(0, 0, text, {
-                fontSize: '24px'
-            }),
+            content: this.add.text(0, 0, text, textStyles["dialog-body"]),
 
             actions: [
                 this.createDialogueLabel(this, '1', true),

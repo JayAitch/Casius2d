@@ -29,7 +29,33 @@ const textStyles = {
         fill: '#777',
         fontFamily: "arial",
         fontSize: "14px",
+    },
+    "list-item":{
+        fill: '#777',
+        fontFamily: "arial",
+        fontSize: "14px",
+    },
+    "tab-title":{
+        fill: '#777',
+        fontFamily: "arial",
+        fontSize: "14px",
+    },
+    "dialog-head":{
+        fill: '#fff',
+        fontFamily: "arial",
+        fontSize: "24px",
+    },
+    "dialog-body":{
+        fill: '#999',
+        fontFamily: "arial",
+        fontSize: "14px",
+    },
+    "dialog-buttons":{
+        fill: '#fff',
+        fontFamily: "arial",
+        fontSize: "20px",
     }
+
 }
 
 
