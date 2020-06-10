@@ -3,7 +3,6 @@ const systems = require('./systems.js');
 const gameObjects = require('./game-object-factory.js');
 const mapBuilder = require('./map-builder.js')
 const dropManager = require('./drop-manager.js');
-const shopInventory = require('./shop-inventory.js')
 systems.startUpdate();
 
 
@@ -53,33 +52,47 @@ class Zone{
         this.physicsWorld = new PhysicsWorld(this.zoneSender);
         this.itemWorld = new ItemWorld(this.zoneSender,this.physicsWorld);
         this.zoneID = zoneid;
-        this.factory = new gameObjects.Factory(this.physicsWorld.collisionManager, this.itemWorld);
-        mapBuilder.build(this.factory, this.zoneID,  this.physicsWorld); // more concrete management of nodes, will remove physics world from this
-        systems.addToUpdate(this);
-        this.testCreateMobLots(5);
-        this.testCreateShopKeeper();
-    }
-
-    testCreateShopKeeper() {
+        this.wBenchInc = 0;
+        this.wBenches = {};
         this.shops = {};
+        this.factory = new gameObjects.Factory(this.physicsWorld.collisionManager, this.itemWorld);
+        mapBuilder.build(this.factory, this,  this.physicsWorld); // more concrete management of nodes, will remove physics world from this
 
-        // temp
-        let config = {
-            position: {x: 150, y: 150},
-            zone: this.zoneID
-        }
-
-        let entityConfig = {
-            type: entityTypeLookup.SHOPKEEPER,
-            config: config
-        }
-
-
-        let newMob = this.factory.new(entityConfig);
-        this.physicsWorld.addNewMob(newMob);
-        this.shops[this.physicsWorld.lastEntityId - 1] =  new shopInventory.ShopInventory(0); //temp
+        this.testCreateMobLots(5);
+        systems.addToUpdate(this);
+  //      this.testCreateShopKeeper();
     }
 
+
+
+    addWorkBench(wBench){
+        this.wBenches[this.wBenchInc] = wBench;
+        this.wBenchInc++;
+    }
+
+
+    addToShops(shop, entity){
+        this.physicsWorld.addNewMob(entity);
+        this.shops[this.physicsWorld.lastEntityId - 1] = shop ;
+    }
+
+
+
+    ///     TEMP
+    isInRangeOfCrafting(category, player){
+        let range = 100;
+        let wBenchs = this.wBenches;
+        let mBench;
+        Object.keys(wBenchs).forEach(benKey =>{
+            let bench = wBenchs[benKey];
+            let dist = distance(bench.pos,player.pos);
+            if(dist < range){
+                //todo check for workbench type;
+                mBench = bench;
+            }
+        })
+        if(mBench) return true;
+    }
 
     sellItem(client, shopid, slot){
 
@@ -210,7 +223,7 @@ class Zone{
         client.player = newPlayer;
 
         this.zoneSender.notifyClientPlayer(client, newPlayer);
-        this.zoneSender.initMessage(client, this.physicsWorld.entities, this.itemWorld.floorItems, this.shops);
+        this.zoneSender.initMessage(client, this.physicsWorld.entities, this.itemWorld.floorItems, this.shops, this.wBenches);
     }
 
     update() {

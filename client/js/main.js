@@ -1,7 +1,7 @@
 
 const config = {
     type: Phaser.AUTO,
-    width:800,
+    width:1200,
     height: 800,
     parent:'phaser',
     scale: {
@@ -12,7 +12,7 @@ const config = {
     dom: {
         createContainer: true
     },
-    scene: [BootScene, PreloadScene, LoginScene, GameScene, PaperDollScene,InventoryScene, ShopScene],
+    scene: [BootScene, PreloadScene, LoginScene, GameScene, PaperDollScene,InventoryScene, ShopScene, CraftingScene],
 };
 let game;
 
@@ -28,3 +28,4 @@ window.addEventListener('load', (event) => {
 randomInteger = function(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+

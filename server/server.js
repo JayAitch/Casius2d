@@ -2,7 +2,7 @@ const dotenv = require('dotenv').config({path: '../config/config.env'});
 
 const PORT =process.env.SERVER_PORT;
 
-
+global.skillLevels = {"WOODCUTTING":"WOODCUTTING","MINING":"MINING","BLACKSMITH":"BLACKSMITH", "COMBAT":"COMBAT", "ALCHEMY":"ALCHEMY", "CRAFTING":"CRAFTING"}
 const server = require('http').createServer();
 const itms = require('./items.js'); //consider converting
 const zoneManager = require('./zone-manager.js');
@@ -74,15 +74,16 @@ inventories = {
     0:{
         gold: 10000000000000000000,
         items: [
-            {base:items.seeradish,quantity:1, plus:0},
-            {base:items.goldhelm,quantity:1, plus:6},
-            {base:items.goldhelm,quantity:1, plus:600},
-            {base:items.goldmask,quantity:1, plus:3},
-            {base:items.goldmask,quantity:1, plus:4},
-            {base:items.jacket,quantity:1, plus:2},
-            {base:items.bronzehelm,quantity:1, plus:600},
-            {base:items.jacket,quantity:1, plus:4},
-            {base:items.jacket,quantity:1, plus:6}
+            {base:items.goldbar,quantity:1, plus:0},
+            {base:items.goldbar,quantity:1, plus:0},
+            {base:items.goldbar,quantity:1, plus:0},
+            {base:items.goldbar,quantity:1, plus:0},
+            {base:items.goldbar,quantity:1, plus:0},
+            {base:items.goldbar,quantity:1, plus:0},
+            {base:items.goldbar,quantity:1, plus:0},
+            {base:items.goldbar,quantity:1, plus:0},
+            {base:items.goldbar,quantity:1, plus:0},
+            {base:items.goldbar,quantity:1, plus:0}
         ]
     }
 }
@@ -214,6 +215,21 @@ io.on('connect', function(client) {
             client.character.invent.actOnPaperDollSlot(slotActions.CLICK, slot);
           //  client.emit("myInventory", client.character.invent.message);
         });
+
+
+        client.on('craftRecipe',function(lookup) {
+            let zoneid = client.playerLocation.zone;
+            let zone = ZONES[zoneid];
+
+            let inRangeCheck = ()=>{
+                let inRange = zone.isInRangeOfCrafting("category", client.player);
+                return inRange;
+            }
+            recipesManager.tryToCraft(lookup, client.character.invent, client.playerStats, inRangeCheck);
+
+
+        });
+
 
         client.on('clickInventorySlot',function(data) {
 

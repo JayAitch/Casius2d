@@ -54,7 +54,7 @@ class AudioPlayer{
     }
     playFootstep(){
         let footstepNumber = randomInteger(0, 8)
-        console.log(this.footsteps);
+
         let foostep = this.footsteps[footstepNumber];
         foostep.play();
     }
@@ -101,6 +101,7 @@ class GameScene extends Phaser.Scene {
         this.scene.launch("paperdoll", this.client.sender);
         this.scene.launch("inventory", this.client.sender);
         this.scene.launch("shop", this.client.sender);
+
         items = this.cache.json.get('items'); // unused
         this.controller = new Controller(this,this.client);
     }
@@ -109,7 +110,6 @@ class GameScene extends Phaser.Scene {
         let pos = data.pos;
         let width = data.width;
         let height = data.height;
-        console.log("PRINTING DEBUG");
         let rect = new MyRectangle(this, pos.x,pos.y, width, height);
         audioPlayer.swing.play();
 
@@ -184,6 +184,17 @@ class GameScene extends Phaser.Scene {
     updateShops(key, stock){
         this.shopList[key] = stock;
         let potentialEntity = this.mapEntities[key];
+        if(potentialEntity.shop){
+            potentialEntity.shop = stock;
+            let shop = this.scene.get("shop");
+
+            console.log(shop);
+            console.log(key);
+            console.log(shop.hide);
+            if(shop.id === key && !(shop.hide)) {
+                shop.stock = stock;
+            }
+        }
         if(potentialEntity){
             potentialEntity.shop = stock;
             this.interactables[key] = potentialEntity;
@@ -199,11 +210,12 @@ class GameScene extends Phaser.Scene {
         let keys = Object.keys(this.interactables);
         let mapEntity = undefined;
         keys.forEach((key)=>{
-            mapEntity = this.interactables[key];
-            let distance = Phaser.Math.Distance.Between(mapEntity.x,mapEntity.y,myPlayer.pos.x,myPlayer.pos.y);
+            let potential =  this.interactables[key];
+            let distance = Phaser.Math.Distance.Between(potential.x,potential.y,myPlayer.pos.x,myPlayer.pos.y);
             // soft check temporry
             if( distance < range){
                 entityKey = key;
+                mapEntity = potential;
             }
         })
         if(mapEntity){
@@ -211,9 +223,13 @@ class GameScene extends Phaser.Scene {
         }else{
 
         }
+    }
 
-       // return entityKey;
-
+    recipeList(data){
+        let crafting = this.scene.get("crafting-menu");
+        crafting.allRecipes = data;
+        crafting.recipes = data;
+        this.scene.launch("crafting-menu", this.client.sender);
     }
 
     newItem(i,item,pos){
@@ -312,7 +328,6 @@ class GameScene extends Phaser.Scene {
         let inv = this.scene.get("inventory");
         inv.items = inventorymessage.inventory;
         inv.gold = inventorymessage.gold;
-        console.log(items);
         let pD = this.scene.get("paperdoll");
         pD.items = inventorymessage.paperDoll;
     }
@@ -326,18 +341,49 @@ class GameScene extends Phaser.Scene {
         shop.hide = true;
     }
 
-    toggleInventory(){
+    loadBenches(benches){
+        Object.keys(benches).forEach(bench=>{
+            let mBench = benches[bench];
+            let wb =  new WorkBench(mBench.position, mBench.type, this, mBench.recipes)
+            this.interactables[bench] = wb;
+            wb.interact = ()=>{
+                console.log(wb.recipes)
+                let recipes = wb.recipes;
+                let craft = this.scene.get("crafting-menu");
+                craft.recipes = recipes;
+                craft.availableRecipes = recipes;
+                craft.create();
+                craft.hide = false;
+            };
+        })
+    }
+
+    toggleCrafting(){
+        let craft = this.scene.get("crafting-menu");
+        craft.hide = !craft.hide;
+    }
+
+//TODO - move to seperate class
+    closeAllWindows(){
         let pD = this.scene.get("paperdoll");
         let inv = this.scene.get("inventory");
         let shop = this.scene.get("shop");
+        let craft = this.scene.get("crafting-menu");
+        pD.hide = true;
+        inv.hide = true;
+        craft.hide = true;
+        shop.hide = true;
+        craft.hide = true;
+    }
+
+    toggleInventory(){
+        let pD = this.scene.get("paperdoll");
+        let inv = this.scene.get("inventory");
         pD.hide = !pD.hide;
         inv.hide = !inv.hide;
-        if(inv.hide){
-            shop.hide = true;
-        }
-
     }
 }
+
 
 
 
@@ -353,8 +399,8 @@ class Controller{
         let ctrlKey = scene.input.keyboard.addKey("CTRL");
         let iKey = scene.input.keyboard.addKey("I");
         let eKey = scene.input.keyboard.addKey("E");
-
-
+        let cKey = scene.input.keyboard.addKey("C");
+        let escKey = scene.input.keyboard.addKey("ESC");
         this.client = client;
 
         //this.directionKeys = {left:leftKey, right:rightKey, up:upKey, down:downKey}
@@ -368,13 +414,18 @@ class Controller{
 
 
         eKey.on('down', (event)=> {
+            let shop = scene.scene.get("shop");
             let interactableID = scene.interactWithClosest();
-
-            // console.log(interactableID);
-            // if(interactableID)
-            //     client.sender.interact(interactableID);
         });
 
+
+        cKey.on('down', (event)=> {
+            scene.toggleCrafting();
+        });
+
+        escKey.on('down', (event)=> {
+            scene.closeAllWindows();
+        });
         spaceKey.on('down', (event)=> {
             client.sender.attack();
         });

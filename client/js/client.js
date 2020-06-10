@@ -48,6 +48,11 @@ class Receiver{
             })
         });
 
+        this.socket.on('recipes', (data)=>{
+            this.gameScene.recipeList(data);
+        })
+
+
         this.socket.on('AOEDebug',(data)=>{
             this.gameScene.printAOEDebug(data);
         });
@@ -74,6 +79,9 @@ class Receiver{
             this.gameScene.removeItem(data.id);
         });
 
+        this.socket.on('benchList', (data)=>{
+            this.gameScene.loadBenches(data);
+        });
 
         this.socket.on('newItem', (data)=>{
             this.gameScene.newItem(data.key,data.item.base, data.item.pos);
@@ -126,6 +134,7 @@ class Sender{
     joinZone(zone){
         this.socket.emit('joinzone', zone);
     }
+
     stop(){
         this.socket.emit('stop');
     }
@@ -142,12 +151,10 @@ class Sender{
     clickShopSlot(slot,action,shopid){
         this.socket.emit('clickShopSlot', {key:shopid,action:action, slot:slot});
     }
+    craftRecipe(lookup){
+        this.socket.emit('craftRecipe', lookup);
+    }
 
-
-    //
-    // buyItem(shopid, slot){
-    //     this.socket.emit('buy', {id:shopid, slot:slot});
-    // }
     clickPaperDollSlot(slot,action){
         this.socket.emit('clickPaperDoll', {slot: slot, action: action});
     }

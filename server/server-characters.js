@@ -190,7 +190,7 @@ class BasicResource extends  DamageableCharacter{
 }
 
 
-class BasicMob extends  DamageableCharacter{
+class BasicMob extends  DamageableCharacter {
 
     constructor(collisionManager, config) {
         let layers = {base: "pig"};
@@ -199,7 +199,7 @@ class BasicMob extends  DamageableCharacter{
         super(pos, config.stats, config.zone);
         this.width = 32; // temp
         this.height = 32; // temp
-        this.stats = stats ;
+        this.stats = stats;
         this.deathCallback = config.deathCallback;
         this.createCollider(collisionManager);
         this.movementComponent = new characterComponents.MovementComponent(this.pos, config.stats.speed);
@@ -209,27 +209,27 @@ class BasicMob extends  DamageableCharacter{
         this.components.push(this.animationComponent);
     }
 
-    get direction(){
+    get direction() {
         return this.animationComponent.direction;
     }
 
-    get state(){
+    get state() {
         return this.animationComponent.currentState;
     }
 
-    createCollider(collisionManager){
+    createCollider(collisionManager) {
         let colliderConfig = {
-            width:this.width,
+            width: this.width,
             height:
             this.height,
             pos: this.pos,
-            layer:2,
-          //  interacts:[0,1,3,4],
-            interacts:[0],
-            callback: (other)=>{
+            layer: 2,
+            //  interacts:[0,1,3,4],
+            interacts: [0],
+            callback: (other) => {
                 return this.collisionCallback(other);
             },
-            message: (message)=>{
+            message: (message) => {
                 this.message(message)
             },
             type: colliderTypes.MONSTER
@@ -241,7 +241,7 @@ class BasicMob extends  DamageableCharacter{
 
 
     kill() {
-        if(!this.isDelete){
+        if (!this.isDelete) {
             //
 
             this.deathCallback(this.pos);
@@ -255,8 +255,9 @@ class BasicMob extends  DamageableCharacter{
             this.animationComponent = undefined;
         }
     }
-    sendDamageMessage(other){
-        let message ={
+
+    sendDamageMessage(other) {
+        let message = {
             type: messageTypes.DAMAGE,
             damage: this.stats.attack
         }
@@ -269,8 +270,9 @@ class BasicMob extends  DamageableCharacter{
         switch (message.type) {
             case messageTypes.DAMAGE:
                 let reward = this.takeDamage(message.damage);
-                let rewardMessage = {type:messageTypes.REWARD,
-                    experience: {[skillLevels.COMBAT]:reward}
+                let rewardMessage = {
+                    type: messageTypes.REWARD,
+                    experience: {[skillLevels.COMBAT]: reward}
                 }
                 message.rewardCB(rewardMessage);
                 break;
@@ -279,8 +281,8 @@ class BasicMob extends  DamageableCharacter{
     }
 
 
-    collisionCallback(other){
-        switch(other.type){
+    collisionCallback(other) {
+        switch (other.type) {
             case colliderTypes.NONPASSIBLE:
                 this.movementComponent.backStep();
                 this.movementComponent.stop();
@@ -289,20 +291,33 @@ class BasicMob extends  DamageableCharacter{
                 this.sendDamageMessage(other);
                 break;
         }
+
     }
 }
 
+class WorkBench extends GameObject{
+    constructor(collisionManager, config) {
+        super(config.pos,config.zone);
+        this.width = 32; // temp
+        this.height = 32; // temp
+        this.type = config.type
+        this.recipes = config.recipes;
+    }
+}
+
+
+
 class ShopKeeper extends GameObject{
     constructor(collisionManager, config) {
-        super(config.zone, config.pos);
+        super(config.pos, config.zone);
         let stats = {speed:10}
-        this.pos = config.position;
         this.width = 32; // temp
         this.height = 32; // temp
         let animLayers = {base:"basecharacter"};
         this.movementComponent = new characterComponents.MovementComponent(this.pos, stats);
         this.animationComponent = new characterComponents.AnimationComponent(animLayers, this.movementComponent);
         this.tick = 0;
+        console.log(this);
         this.createCollider(collisionManager);
     }
 
@@ -524,4 +539,4 @@ class ServerPlayer extends DamageableCharacter{
     }
 }
 
-module.exports = {ServerPlayer, NonPassibleTerrain, ZonePortal, BasicMob, BasicResource, ShopKeeper}
+module.exports = {ServerPlayer, NonPassibleTerrain, ZonePortal, BasicMob, BasicResource, ShopKeeper, WorkBench}
