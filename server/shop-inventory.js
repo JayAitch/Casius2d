@@ -81,7 +81,13 @@ shops = {
             item: {base:items.leatherbelt, plus: 8},
             amount: 12
         }
-    ]
+    ],
+    1: [
+        {
+        item: {base:items.leatherbelt, plus: 8},
+        amount: 12
+        }
+        ]
 }
 
 class ShopInventory{

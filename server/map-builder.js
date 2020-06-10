@@ -1,4 +1,5 @@
 const fs = require('fs');
+const shopInventory = require('./shop-inventory.js')
 
 function getZoneData(zone){
     let file = ZONEMAPS[zone];
@@ -51,6 +52,12 @@ function getWorldObjects(id){
             let id = getProperty(object.properties, "node_id");
             if(id !== undefined) newObject.node_id = id;
 
+            let benchType = getProperty(object.properties, "bench_type");
+            if(benchType !== undefined) newObject.bench_type = benchType;
+
+            let shopID = getProperty(object.properties, "shop_id");
+            if(shopID !== undefined) newObject.shop_id = shopID;
+
 
             worldObjects.push(newObject);
         });
@@ -74,12 +81,12 @@ function getProperty(properties, prop){
 }
 
 
-function build(factory, id, physicsWorld){
-    let worldObjects = getWorldObjects(id);
-    createFromJSON(worldObjects, factory, id, physicsWorld);
+function build(factory, zone, physicsWorld){
+    let worldObjects = getWorldObjects(zone.zoneID);
+    createFromJSON(worldObjects, factory, zone, physicsWorld);
 }
 
-function createFromJSON(objects, factory, zoneid, phyWorld){
+function createFromJSON(objects, factory, zone, phyWorld){
     objects.forEach((object)=>{
 
         let x = object.pos.x + object.width /2;//temp
@@ -119,7 +126,7 @@ function createFromJSON(objects, factory, zoneid, phyWorld){
                 config.layers = {base: "rock"};
                 config.stats = { health: 100, maxHealth:100, defence:5};
                 config.drop = lookup.drop;
-                config.zone = zoneid;
+                config.zone = zone.zoneID;
                 config.reward = lookup.reward;
 
                 let nConfig = {
@@ -129,6 +136,33 @@ function createFromJSON(objects, factory, zoneid, phyWorld){
 
                 let node = factory.new(nConfig);
                 phyWorld.addNewMob(node); // temp
+                break;
+
+            case "WORKBENCH":
+                let wLookup = workBenches[object.bench_type]
+
+                config.zone = zone.zoneID;
+                config.type = wLookup.type; // used for appearance
+                config.recipes = wLookup.recipes
+
+                let bentityConfig = {
+                    type: entityTypeLookup.WORKBENCH,
+                    config: config
+                }
+
+                let wBench = factory.new(bentityConfig);
+                zone.addWorkBench(wBench);
+                break;
+            case "SHOPKEEPER":
+                let shopInv = new shopInventory.ShopInventory(object.shop_id)
+                config.zone = zone.zoneID
+                let shEntityConfig = {
+                    type: entityTypeLookup.SHOPKEEPER,
+                    config: config
+                }
+
+                let shopEntity = factory.new(shEntityConfig);
+                zone.addToShops(shopInv, shopEntity)
         }
 
     })

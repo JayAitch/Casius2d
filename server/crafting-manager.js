@@ -104,13 +104,25 @@ const recipes = {
 global.workBenches = {
 
     "basicAnvil":{
-        [skillLevels.BLACKSMITH]:recipes[skillLevels.BLACKSMITH],
-        [skillLevels.MINING]:recipes[skillLevels.MINING],
+        type:"ANVIL",
+        recipes: {
+            [skillLevels.BLACKSMITH]: recipes[skillLevels.BLACKSMITH],
+            [skillLevels.MINING]: recipes[skillLevels.MINING],
+        }
     },
-    "tailorTable": {
-        [skillLevels.WOODCUTTING]: recipes[skillLevels.WOODCUTTING],
-        [skillLevels.MINING]: recipes[skillLevels.MINING]
+    "carpenterTable": {
+        type:"CARPENTER",
+        recipes: {
+            [skillLevels.WOODCUTTING]: recipes[skillLevels.WOODCUTTING]
+        }
+    },
+    "tailorsBench":{
+        type:"TAILOR",
+        recipes: {
+            [skillLevels.CRAFTING]: recipes[skillLevels.CRAFTING]
+        }
     }
+
 }
 
 

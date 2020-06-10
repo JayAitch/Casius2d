@@ -297,8 +297,7 @@ class BasicMob extends  DamageableCharacter {
 
 class WorkBench extends GameObject{
     constructor(collisionManager, config) {
-        super(config.zone, config.pos);
-        this.pos = config.position;
+        super(config.pos,config.zone);
         this.width = 32; // temp
         this.height = 32; // temp
         this.type = config.type
@@ -310,15 +309,15 @@ class WorkBench extends GameObject{
 
 class ShopKeeper extends GameObject{
     constructor(collisionManager, config) {
-        super(config.zone, config.pos);
+        super(config.pos, config.zone);
         let stats = {speed:10}
-        this.pos = config.position;
         this.width = 32; // temp
         this.height = 32; // temp
         let animLayers = {base:"basecharacter"};
         this.movementComponent = new characterComponents.MovementComponent(this.pos, stats);
         this.animationComponent = new characterComponents.AnimationComponent(animLayers, this.movementComponent);
         this.tick = 0;
+        console.log(this);
         this.createCollider(collisionManager);
     }
 
