@@ -377,7 +377,14 @@ class GameScene extends Phaser.Scene {
 
     toggleCrafting(){
         let craft = this.scene.get("crafting-menu");
-        craft.hide = !craft.hide;
+        let isGoingToShow = !craft.hide
+
+        if(isGoingToShow){
+            // show all recipes if it has been oppened manually
+            craft.recipes = craft.allRecipes;
+        }
+
+        craft.hide = isGoingToShow;
     }
 
 //TODO - move to seperate class
