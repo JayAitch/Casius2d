@@ -18,7 +18,7 @@ const config = {
     dom: {
         createContainer: true
     },
-    scene: [BootScene, PreloadScene, LoginScene, GameScene, PaperDollScene,InventoryScene, ShopScene, CraftingScene, SkillMenu],
+    scene: [BootScene, PreloadScene, LoginScene, GameScene, PaperDollScene,InventoryScene, ShopScene, CraftingScene, SkillMenu, InventoryMenu],
 };
 let game;
 
@@ -28,6 +28,7 @@ const tempCharacterLayer = 6;
 const tempAboveTileLayer = 50000;
 
 window.addEventListener('load', (event) => {
+    document.addEventListener('contextmenu', event => event.preventDefault());
     game = new Phaser.Game(config);
 });
 

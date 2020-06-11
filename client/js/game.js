@@ -107,6 +107,7 @@ class GameScene extends Phaser.Scene {
     create(){
         this.scene.launch("paperdoll", this.client.sender);
         this.scene.launch("inventory", this.client.sender);
+        this.scene.launch("inventory-menu", this.client.sender);
         this.scene.launch("shop", this.client.sender);
         this.scene.launch("skill-menu", this.client.sender);
         items = this.cache.json.get('items'); // unused
@@ -369,9 +370,12 @@ class GameScene extends Phaser.Scene {
 
     loadInventory(inventorymessage){
         console.log(inventorymessage)
-        let inv = this.scene.get("inventory");
-        inv.items = inventorymessage.inventory;
-        inv.gold = inventorymessage.gold;
+    //    let inv = this.scene.get("inventory");
+        let inv2 = this.scene.get("inventory-menu");
+    //    inv.items = inventorymessage.inventory;
+     //   inv.gold = inventorymessage.gold;
+        inv2.items = inventorymessage.inventory;
+        inv2.gold = inventorymessage.gold;
         let pD = this.scene.get("paperdoll");
         pD.items = inventorymessage.paperDoll;
     }
@@ -424,12 +428,14 @@ class GameScene extends Phaser.Scene {
 //TODO - move to seperate class
     closeAllWindows(){
         let pD = this.scene.get("paperdoll");
-        let inv = this.scene.get("inventory");
+     //   let inv = this.scene.get("inventory");
+        let inv2 = this.scene.get("inventory-menu");
         let shop = this.scene.get("shop");
         let craft = this.scene.get("crafting-menu");
         let skillMenu = this.scene.get("skill-menu");
         pD.hide = true;
-        inv.hide = true;
+      //  inv.hide = true;
+        inv2.hide = true;
         craft.hide = true;
         shop.hide = true;
         skillMenu.hide = true;
@@ -438,9 +444,11 @@ class GameScene extends Phaser.Scene {
 
     toggleInventory(){
         let pD = this.scene.get("paperdoll");
-        let inv = this.scene.get("inventory");
+   //     let inv = this.scene.get("inventory");
+        let inv2 = this.scene.get("inventory-menu");
         pD.hide = !pD.hide;
-        inv.hide = !inv.hide;
+  //      inv.hide = !inv.hide;
+        inv2.hide = !inv2.hide;
     }
 
     toggleSkillMenu(){

@@ -438,6 +438,8 @@ class InventorySlot{
 
 
 
+
+
 class ClientInventory{
     constructor(scene, x, y, slots, row,slotClickHandler) {
         this.inventorySlots = [];

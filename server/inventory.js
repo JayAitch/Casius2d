@@ -1,7 +1,7 @@
 
-global.slotActions = {"EQUIPT":"EQUIPT","DROP":"DROP","CLICK":"CLICK"}
+global.slotActions = {"EQUIP":"EQUIP","DROP":"DROP","CLICK":"CLICK"}
 
-
+global.PLAYER_INVENT_MAX = 84
 
 class Inventory{
     constructor(invent, mSize) {
@@ -61,7 +61,7 @@ class PaperDoll{
 
 class InventoryManager{
     constructor(inventory, paperDoll, ownerLocation, ownerID, playerStats){
-        this.mInv = new Inventory(inventory.items);
+        this.mInv = new Inventory(inventory.items,PLAYER_INVENT_MAX);
         this.ppD = new PaperDoll(paperDoll);
         this.gold = inventory.gold;
         this.ownerID = ownerID;
@@ -191,7 +191,7 @@ class InventoryManager{
 
     actOnInventorySlot(action, slot, zone, pos) {
         switch (action) {
-            case slotActions.EQUIPT:
+            case slotActions.EQUIP:
                 let clickedItem = this.mInv.getItem(slot);
                 if(clickedItem && clickedItem.base.slot) {
                     this.equiptItem(clickedItem.base.slot, clickedItem);
