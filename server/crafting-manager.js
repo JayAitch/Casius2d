@@ -35,7 +35,7 @@ const recipes = {
     ],
     [skillLevels.BLACKSMITH]: [{
         skill: skillLevels.BLACKSMITH,
-        level: 0,
+        level: 15,
         experience: 150,
         items: [{
             item: items.goldbar,
@@ -47,6 +47,17 @@ const recipes = {
         {
             skill: skillLevels.BLACKSMITH,
             level: 0,
+            experience: 150,
+            items: [{
+                item: items.ironbar,
+                amount: 10
+            }],
+            result: [items.bronzehelm],
+            time: 100
+        },
+        {
+            skill: skillLevels.BLACKSMITH,
+            level: 5,
             experience: 150,
             items: [{
                 item: items.ironbar,
@@ -83,8 +94,8 @@ const recipes = {
         },
         {
             skill: skillLevels.BLACKSMITH,
-            level: 0,
-            experience: 150,
+            level: 50,
+            experience: 550,
             items: [{
                 item: items.goldore,
                 amount: 10
@@ -99,7 +110,7 @@ const recipes = {
                 amount: 1
             }],
             result: [items.dspear],
-            time: 5000
+            time: 25000
         }
     ],
     [skillLevels.ALCHEMY]: [{
@@ -115,8 +126,8 @@ const recipes = {
     },],
     [skillLevels.WOODCUTTING]: [{
         skill: skillLevels.WOODCUTTING,
-        level: 0,
-        experience: 150,
+        level: 5,
+        experience: 250,
         items: [{
             item: items.log,
             amount: 1
@@ -196,10 +207,11 @@ global.recipesManager = {
     },
 
     awardExperience: function(recipe, stats){
-        let reward = recipe.experience; // add to experience somehow
-        let currentExp = stats[recipe.skill] || 0;
-        //todo: write the experience level relationship
-        stats[recipe.skill] = currentExp + reward;
+        // let reward = recipe.experience; // add to experience somehow
+        // let currentExp = stats[recipe.skill] || 0;
+        // //todo: write the experience level relationship
+        // stats[recipe.skill] = currentExp + reward;
+        stats.skills.addExperience({[recipe.skill]: recipe.experience})
     },
 
     craft: function(base){

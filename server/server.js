@@ -155,18 +155,17 @@ io.on('connect', function(client) {
 
     client.on('login',function(username,password){
         curr_username = username
-        // for some reason this prints at 30 but is clearly nothing before the paperdoll is rebuilt
 
 
-        // temp0
+        ////// TEMP
 
         let skills = {
             [skillLevels.MINING]:0,
-            [skillLevels.CRAFTING]:4000,
+            [skillLevels.CRAFTING]:0,
             [skillLevels.COMBAT]:10,
-            [skillLevels.BLACKSMITH]:4000,
-            [skillLevels.ALCHEMY]:4000,
-            [skillLevels.WOODCUTTING]:4000,
+            [skillLevels.BLACKSMITH]:0,
+            [skillLevels.ALCHEMY]:0,
+            [skillLevels.WOODCUTTING]:0,
         }
         let callbacks = {
             levelUp: function(skill){
