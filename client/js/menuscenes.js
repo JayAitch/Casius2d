@@ -1,19 +1,33 @@
-const COLOR_PRIMARY = 0x222222;
-const COLOR_DARK = 0x000000;
+const COLOR_PRIMARY = 0xeeeeee;
+const COLOR_DARK = 0xcccccc;
 const COLOR_LIGHT = 0xffffff;
 const COLOR_HIGHTLIGHT = 0x03ff5f;
 const COLOR_ACTION_POSSITIVE = 0x058eff
 const COLOR_ACTION_NEGATIVE = 0xff0509
+
+// const COLOR_PRIMARY = 0x222222;
+// const COLOR_DARK = 0x000000;
+// const COLOR_LIGHT = 0xffffff;
+// const COLOR_HIGHTLIGHT = 0x03ff5f;
+// const COLOR_ACTION_POSSITIVE = 0x058eff
+// const COLOR_ACTION_NEGATIVE = 0xff0509
+
+
 const textStyles = {
     "header": {
-        fill: '#777',
+        fill: '#eee',
         fontFamily: "arial",
         fontSize: "48px",
     },
     "gold": {
-        fill: '#333',
+        fill: '#888',
         fontFamily: "arial",
         fontSize: "24px",
+    },
+    "action-text":{
+        fill: '#333',
+        fontFamily: "arial",
+        fontSize: "16px",
     },
     "menu-header": {
         fill: '#777',

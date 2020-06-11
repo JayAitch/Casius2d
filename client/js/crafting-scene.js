@@ -171,7 +171,7 @@ class CraftingScene extends Phaser.Scene {
             y: 400,
 
             panel: this.rexUI.add.gridTable({
-                background: this.rexUI.add.roundRectangle(0, 0, 20, 10, 10, COLOR_PRIMARY),
+                background: this.rexUI.add.roundRectangle(0, 0, 20, 10, 10, COLOR_PRIMARY,  0.3),
 
                 table: {
                     width: 300,
@@ -373,7 +373,7 @@ class CraftingScene extends Phaser.Scene {
             x: 300,
             y: 300,
 
-            background: this.rexUI.add.roundRectangle(0, 0, 100, 100, 20,  COLOR_PRIMARY),
+            background: this.rexUI.add.roundRectangle(0, 0, 100, 100, 20,  COLOR_PRIMARY, 0.3),
 
             title: this.rexUI.add.label({
                 background: this.rexUI.add.roundRectangle(0, 0, 100, 40, 20,COLOR_DARK),

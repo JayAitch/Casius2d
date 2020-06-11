@@ -59,22 +59,22 @@ class InventoryMenu extends Phaser.Scene {
         let columns = 6;
         //if(this.items.length === 0) columns = undefined;
         this.itemGrid = this.rexUI.add.gridTable({
-            background: this.rexUI.add.roundRectangle(0, 0, 20, 10, 10, COLOR_PRIMARY),
+            background: this.rexUI.add.roundRectangle(0, 0, 20, 10, 10, COLOR_PRIMARY, 0.3),
             x: 300,
             y:600,
             width: 450,
             height: 280,
-
-            header: this.rexUI.add.label({
-                width: undefined,
-                height: 30,
-                space: {
-                    left: 15,
-                    right: 15
-                },
-                background: this.rexUI.add.roundRectangle(0, 0, 20, 20, 0, COLOR_DARK),
-                text: this.add.text(0, 0, 'Inventory'),
-            }),
+            //
+            // header: this.rexUI.add.label({
+            //     width: undefined,
+            //     height: 30,
+            //     space: {
+            //         left: 15,
+            //         right: 15
+            //     },
+            //     background: this.rexUI.add.roundRectangle(0, 0, 20, 20, 0, COLOR_DARK),
+            //     text: this.add.text(0, 0, 'Inventory', textStyles["menu-header"]),
+            // }),
             footer: this.rexUI.add.label({
                 width: undefined,
                 height: 30,
@@ -83,7 +83,7 @@ class InventoryMenu extends Phaser.Scene {
                     right: 15
                 },
                 background: this.rexUI.add.roundRectangle(0, 0, 20, 20, 0, COLOR_DARK),
-                text: this.add.text(0, 0, 'GOLD:' + this.currentGold),
+                text: this.add.text(0, 0, 'GOLD:' + this.currentGold, textStyles.gold),
             }),
             table: {
 
@@ -100,6 +100,7 @@ class InventoryMenu extends Phaser.Scene {
                 header:false,
                 footer:false
             },
+
             space: {
                 left: 15,
                 right: 15,
@@ -110,14 +111,14 @@ class InventoryMenu extends Phaser.Scene {
                    top: 10,
                    bottom: 10,
                    left: 10,
-                   right: 10,
+                   right: 10
                 },
                 header: 0,
                 footer: 15,
             },
             slider: {
-                track: this.rexUI.add.roundRectangle(0, 0, 20, 10, 10, COLOR_DARK),
-                thumb: this.rexUI.add.roundRectangle(0, 0, 0, 0, 13, COLOR_LIGHT),
+                track: this.rexUI.add.roundRectangle(0, 0, 20, 10, 10, COLOR_DARK, 0.5),
+                thumb: this.rexUI.add.roundRectangle(0, 0, 0, 0, 13, COLOR_LIGHT,0.8),
             },
             items:  this.items,
             // scroller: true,
@@ -137,8 +138,11 @@ class InventoryMenu extends Phaser.Scene {
                     return scene.rexUI.add.label({
                         width: width,
                         height: height,
-                        background: scene.rexUI.add.roundRectangle(0, 0, 20, 20, 0).setStrokeStyle(2, COLOR_DARK),
+                        background: scene.rexUI.add.roundRectangle(0, 0, 20, 20, 5).setStrokeStyle(1, COLOR_DARK, 0.5),
                         icon: icon,
+                        space:{
+                            left:26
+                        }
                     });
 
                 }
@@ -181,7 +185,11 @@ class InventoryMenu extends Phaser.Scene {
 
                 this.popupMenu.createMenu(pointer.x,pointer.y, callback);
 
-        })
+        }).on('cell.over', function (button, groupName, index) {
+            button.getElement('background').setFillStyle(COLOR_DARK, 0.2);
+        }).on('cell.out', function (button, groupName, index) {
+                button.getElement('background').setFillStyle();
+            });
 
         this.hide = true;
     }
@@ -222,9 +230,7 @@ class PopupMenu{
             createButtonCallback: function (item, i) {
                 let label = scene.rexUI.add.label({
                     background: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 0, COLOR_PRIMARY),
-                    text: scene.add.text(0, 0, item.name, {
-                        fontSize: '20px'
-                    }),
+                    text: scene.add.text(0, 0, item.name,textStyles["action-text"]),
                     icon: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 10, COLOR_DARK),
                     space: {
                         left: 10,
