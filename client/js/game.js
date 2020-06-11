@@ -90,11 +90,18 @@ class GameScene extends Phaser.Scene {
     loadPlayerData(id){
         this.playerID = id;
         let myPlayer = this.mapEntities[this.playerID];
+        this.playerPhys.add(myPlayer.sprite);
         this.cameras.main.zoomTo(1.9,0);
         this.cameras.main.startFollow(myPlayer.sprite);
 
         // set background color, so the sky is not black
         this.cameras.main.setBackgroundColor('#ccccff');
+
+    }
+
+
+    showInteractable(){
+
     }
 
     create(){
@@ -104,6 +111,8 @@ class GameScene extends Phaser.Scene {
         this.scene.launch("skill-menu", this.client.sender);
         items = this.cache.json.get('items'); // unused
         this.controller = new Controller(this,this.client);
+        this.interactableGroup = this.physics.add.group();
+        this.playerPhys = this.physics.add.group();
     }
 
     printAOEDebug(data){
@@ -216,9 +225,17 @@ class GameScene extends Phaser.Scene {
                 shop.stock = stock;
             }
         }
-        if(potentialEntity){
+        else if(potentialEntity){
             potentialEntity.shop = stock;
             this.interactables[key] = potentialEntity;
+
+            this.interactableGroup.add(potentialEntity.sprite);
+            let text = "shop E"
+            let myPlayer = this.mapEntities[this.playerID];
+            let display = new InteractDisplay(this, text);
+            this.physics.add.overlap(myPlayer.sprite, potentialEntity.sprite,function(){display.showInteract(potentialEntity.pos)}, null, this);
+
+
             potentialEntity.interact = ()=>{ this.showStock(stock, key);}
         }
     }
@@ -230,6 +247,7 @@ class GameScene extends Phaser.Scene {
         let entityKey = undefined
         let keys = Object.keys(this.interactables);
         let mapEntity = undefined;
+        this.playerPhys.add(myPlayer.sprite);
         keys.forEach((key)=>{
             let potential =  this.interactables[key];
             let distance = Phaser.Math.Distance.Between(potential.x,potential.y,myPlayer.pos.x,myPlayer.pos.y);
@@ -360,12 +378,20 @@ class GameScene extends Phaser.Scene {
 
 
     loadBenches(benches){
+
         Object.keys(benches).forEach(bench=>{
             let mBench = benches[bench];
-            let wb =  new WorkBench(mBench.position, mBench.type, this, mBench.recipes)
+            let wb =  new WorkBench(mBench.position, mBench.type, this, mBench.recipes);
             this.interactables[bench] = wb;
+            this.interactableGroup.add(wb.sprite);
+
+            let text = wb.interactText;
+            let myPlayer = this.mapEntities[this.playerID];
+            let display = new InteractDisplay(this, text);
+            this.physics.add.overlap(myPlayer.sprite, wb.sprite,function(){display.showInteract(wb.pos)}, null, this);
+
+
             wb.interact = ()=>{
-                console.log(wb.recipes)
                 let recipes = wb.recipes;
                 let craft = this.scene.get("crafting-menu");
                 craft.recipes = recipes;
@@ -373,7 +399,15 @@ class GameScene extends Phaser.Scene {
                 craft.hide = false;
             };
         })
+
     }
+
+
+
+
+
+
+
 
     toggleCrafting(){
         let craft = this.scene.get("crafting-menu");

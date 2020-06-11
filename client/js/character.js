@@ -333,7 +333,7 @@ class MovingMultiSprite extends MovingSprite{
         });
 
         val.forEach((elem)=>{
-            let sprite = this.scene.add.sprite(this.pos.x, this.pos.y);;
+            let sprite = this.scene.add.sprite(this.pos.x, this.pos.y);
             this.spriteList[elem.base] = sprite;
             sprite.z = tempCharacterLayer +2;
             addSpriteEffect(sprite,this.scene, elem.effect); //temp
@@ -432,9 +432,11 @@ class Player extends MovingMultiSprite{
 
 class WorkBench{
    constructor(pos, type, scene, recipes) {
-       this.sprite = scene.add.sprite(pos.x, pos.y, type);//temp
+       this.sprite = scene.add.image(pos.x, pos.y, "basecharacter");//temp
        this.type = type;
        this.recipes = recipes
+       this.scene = scene;
+       this.countingDown = false;
    }
    get pos(){
        return {x: this.sprite.x,y: this.sprite.y }
@@ -446,4 +448,52 @@ class WorkBench{
         return this.pos.x;
 
     }
+    get interactText(){
+       return `press E to use ${this.type}`
+    }
+
+}
+
+class InteractDisplay{
+    constructor(scene, text) {
+        this.scene = scene;
+        this.text = text;
+    }
+
+    countdownVisibility(){
+        this.countingDown = true;
+        this.time = setTimeout(()=>{this.countingDown = false}, 200);
+    }
+
+    showInteract(pos){
+        // leaving here because we could be abusing th tween engine too much
+      //  if(!this.countingDown){
+       //     clearTimeout(this.time);
+         //   this.countdownVisibility();
+
+            let fftext = this.scene.add.text(pos.x, pos.y - 50, this.text); // todo change to key image
+            fftext.setDepth(UILayer + 999);
+            offsetByWidth(fftext);
+            var tween = this.scene.tweens.add({
+                targets: fftext,
+                alpha: { from: 0.5, to: 1 },
+
+                ease: 'Linear',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
+                duration: 500,
+                repeat: 0,            // -1: infinity
+                yoyo: false
+            });
+
+            var tween = this.scene.tweens.add({
+                targets: fftext,
+                alpha: { from: 1, to: 0 },
+
+                ease: 'Linear',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
+                duration: 1000,
+                repeat: 0,            // -1: infinity
+                yoyo: false
+            });
+        }
+   // }
+
 }

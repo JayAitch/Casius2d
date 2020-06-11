@@ -34,10 +34,6 @@
         "map3": "assets/tilemaps/testmap3.json"
     },
     "spritesheet":{
-                "crafting": {
-                  "path":"assets/item_icons/crafting.png",
-                  "options":{"frameWidth":32,"frameHeight":32}
-                },
                 "boar": {
                   "path":"assets/character/boar.png",
                   "options":{"frameWidth":64,"frameHeight":64}
