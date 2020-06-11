@@ -32,7 +32,7 @@ class ZoneSender{
         client.emit("shopList", this.sendShops(shops));
         client.emit("benchList", this.sendWorkBenches(workBenches));
         client.emit("recipes", craftManager.recipesManager.getRecipes())
-
+        client.emit("skills", client.playerStats.skills.skills)
         ////// TEMP  ////
         this.testSetUpdateShops(shops);
     }

@@ -9,6 +9,7 @@ for(let i = 0; i < maxLevel; i++){
 console.log(levels);
 
 
+
 class PlayerStats {
     constructor(health, skills, defence, attack, callbacks) {
         this.maxHealth = health;

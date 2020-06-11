@@ -41,7 +41,6 @@ class ProgressBar {
     }
 
     timerUp(duration, callback){
-        console.log("timer");
         this.callback = callback
         let tickspeed = 30;
         let growthPerTick =  tickspeed/duration;
@@ -137,7 +136,6 @@ class CraftingScene extends Phaser.Scene {
             data[recipeCategory] = tempRecipes;
 
         });
-        console.log(data);
         this.data = data;
     }
 
@@ -317,20 +315,23 @@ class CraftingScene extends Phaser.Scene {
         });
     }
 
-    createResult(scene, item, iconWidth, iconHeight, id) {
-        var label = scene.rexUI.add.label({
-            orientation: 'y',
-            icon: scene.rexUI.add.roundRectangle(0, 0, iconWidth, iconHeight, 5, COLOR_LIGHT),
-            text: scene.add.text(0, 0, item.name),
-            space: { icon: 3 }
-        });
-        label.recipeLookup = {skill: item.recipe.skill, key: id}
-        return label;
-    };
 
     set recipes(val) {
         this.currentRecipes = val;
         this.buildDataFromRecipes();
+        if(this.tabs) {
+            this.tabs.clearRightButtons(true);
+            let firstCategory
+            this.catetgories.forEach(category=>{
+                let button = this.createButton(this, 0, category)
+                if(!firstCategory)
+                    firstCategory = category
+                this.tabs.addRightButton(button);
+            })
+
+            this.tabs.getElement('panel').setItems(this.data[firstCategory]);
+            this.tabs.layout();
+        }
     }
 
     createDialogueLabel (scene, text, isPossertive) {

@@ -35,6 +35,9 @@ class Receiver{
         this.socket.on('myPlayer', (data)=> {
             this.gameScene.loadPlayerData(data.id);
         });
+        this.socket.on('skills', (data)=> {
+            this.gameScene.updateSkills(data);
+        });
 
         this.socket.on('myInventory',(data)=>{
             this.gameScene.loadInventory(data);

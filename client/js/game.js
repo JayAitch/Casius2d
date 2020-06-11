@@ -101,7 +101,7 @@ class GameScene extends Phaser.Scene {
         this.scene.launch("paperdoll", this.client.sender);
         this.scene.launch("inventory", this.client.sender);
         this.scene.launch("shop", this.client.sender);
-
+        this.scene.launch("skill-menu", this.client.sender);
         items = this.cache.json.get('items'); // unused
         this.controller = new Controller(this,this.client);
     }
@@ -296,6 +296,11 @@ class GameScene extends Phaser.Scene {
         shop.id = key;
     }
 
+    updateSkills(data){
+        let skillsMenu = this.scene.get("skill-menu");
+        skillsMenu.skills = data;
+    }
+
 
     clearItems() {
         let itemKeys = Object.keys(this.floorItems);
@@ -353,14 +358,6 @@ class GameScene extends Phaser.Scene {
         pD.items = inventorymessage.paperDoll;
     }
 
-    hideMenus(){
-        let pD = this.scene.get("paperdoll");
-        let inv = this.scene.get("inventory");
-        let shop = this.scene.get("shop");
-        pD.hide = true;
-        inv.hide = true;
-        shop.hide = true;
-    }
 
     loadBenches(benches){
         Object.keys(benches).forEach(bench=>{
@@ -373,7 +370,6 @@ class GameScene extends Phaser.Scene {
                 let craft = this.scene.get("crafting-menu");
                 craft.recipes = recipes;
                 craft.availableRecipes = recipes;
-                craft.create();
                 craft.hide = false;
             };
         })
@@ -390,10 +386,12 @@ class GameScene extends Phaser.Scene {
         let inv = this.scene.get("inventory");
         let shop = this.scene.get("shop");
         let craft = this.scene.get("crafting-menu");
+        let skillMenu = this.scene.get("skill-menu");
         pD.hide = true;
         inv.hide = true;
         craft.hide = true;
         shop.hide = true;
+        skillMenu.hide = true;
         craft.hide = true;
     }
 
@@ -403,6 +401,12 @@ class GameScene extends Phaser.Scene {
         pD.hide = !pD.hide;
         inv.hide = !inv.hide;
     }
+
+    toggleSkillMenu(){
+        let skillMenu = this.scene.get("skill-menu");
+        skillMenu.hide = !skillMenu.hide
+    }
+
 }
 
 
@@ -421,6 +425,7 @@ class Controller{
         let iKey = scene.input.keyboard.addKey("I");
         let eKey = scene.input.keyboard.addKey("E");
         let cKey = scene.input.keyboard.addKey("C");
+        let kKey = scene.input.keyboard.addKey("K");
         let escKey = scene.input.keyboard.addKey("ESC");
         this.client = client;
 
@@ -443,7 +448,9 @@ class Controller{
         cKey.on('down', (event)=> {
             scene.toggleCrafting();
         });
-
+        kKey.on('down', (event)=> {
+            scene.toggleSkillMenu();
+        })
         escKey.on('down', (event)=> {
             scene.closeAllWindows();
         });

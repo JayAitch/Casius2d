@@ -369,7 +369,7 @@ function tempLevelMessage(client, skill){
 
 // temp
 function tempEXPGainMessage(client, skill){
-    serverSender.clientMessage("experience", skill, client.playerLocation, client.character._id);
+    serverSender.clientMessage("skills", client.playerStats.skills.skills , client.playerLocation, client.character._id);
 }
 
 
