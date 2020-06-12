@@ -150,40 +150,72 @@ class InventoryMenu extends Phaser.Scene {
 
             }
         }).layout();
-        this.popupMenu = new PopupMenu(this,
-            [
-                {
-                    name:"DROP",
-                    children:[
-                        {
-                            name:"ONE",
-                            command:{key:"DROP", option: {amount:1}}
 
-                        },
 
-                        {
-                            name:"ALL",
-                            command:{key:"DROP", option:{amount:1}}
-                        }
-                    ]
-                },
-                {
-                    name:"EQUIP",
-                    command:{key:"EQUIP"}
-                }
 
-            ]);
-        this.itemGrid.on('cell.click',  (cellContainer, cellIndex)=> {
+        this.popupMenu = new PopupMenu(this);
+        let actionItems = [
+            {
+                name:"DROP",
+                children:[
+                    {
+                        name:"ONE",
+                        command:{key:"DROP", option: {amount:1}}
 
-                let callback = (action)=>{
-                    let data ={
-                        slot:cellIndex, action:action
+                    },
+
+                    {
+                        name:"ALL",
+                        command:{key:"DROP", option:{amount:1}}
                     }
-                    this.sender.clickInventorySlot(data);
-                }
-                let pointer = this.input.activePointer
+                ]
+            },
+            {
+                name:"EQUIP",
+                command:{key:"EQUIP"}
+            }
 
-                this.popupMenu.createMenu(pointer.x,pointer.y, callback);
+        ]
+        // let sScene = this.scene.get("shop");
+        //
+        // ////  temp
+        // if(sScene.id) {
+        //     this.items.push({
+        //         name: "EQUIP",
+        //         command: {key: "EQUIP"}
+        //     })
+        // }else{
+        //     this.items.pop();
+        // }
+        //
+
+
+        this.itemGrid.on('cell.click',  (cellContainer, cellIndex)=> {
+            let actualActions = JSON.parse(JSON.stringify(actionItems));
+
+            let sScene = this.scene.get("shop");
+            if(sScene.id && !sScene.hide) {
+                actualActions.push({
+                    name: "SELL",
+                    command: {key: "SELL"}
+                })
+            }
+
+
+            let callback = (action)=>{
+                let data ={
+                    slot:cellIndex, action:action
+                }
+                //     temp
+                if(action === "SELL") {
+                    let sScene = this.scene.get("shop");
+                    data.id = sScene.id;
+                }
+                this.sender.clickInventorySlot(data);
+            }
+            let pointer = this.input.activePointer
+
+            this.popupMenu.createMenu(pointer.x,pointer.y, actualActions, callback);
 
         }).on('cell.over', function (button, groupName, index) {
             button.getElement('background').setFillStyle(COLOR_DARK, 0.2);
@@ -198,19 +230,18 @@ class InventoryMenu extends Phaser.Scene {
 
 
 class PopupMenu{
-    constructor(scene, actions){
+    constructor(scene){
         this.scene = scene;
-        this.items = actions
         this.menu = undefined;
     }
 
 
-    createMenu(x, y,callback){
+    createMenu(x, y,items,callback){
         if(this.menu){
             this.menu.collapse();
             this.menu = undefined;
         }
-        this.menu = this.newMenu(this.scene, x,y, this.items,  (button) =>{
+        this.menu = this.newMenu(this.scene, x,y, items,  (button) =>{
             let command = button.item.command;
             if(command) {
                 callback(command.key, command.option);
