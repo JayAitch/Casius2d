@@ -168,7 +168,7 @@ class CollisionManager {
     // }
 
 
-    boxScan(position, width, height, scanLayers,colReg){
+    boxScan(position, width, height, scanLayers){
         let scan = {
             x:position.x,
             y:position.y,
@@ -183,12 +183,10 @@ class CollisionManager {
             let colliders = this.layers[key];
             colliders.forEach((collider)=>{
                 // this wont work now self hitting must be done throguh layer manipulation
-                if(collider.collisionRegistration !== colReg || colReg === undefined){
                     
                     if (this.collides(scan, collider)) {
                         collision.push(collider);
                     }
-                }
             })
         })
 

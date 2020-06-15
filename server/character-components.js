@@ -79,17 +79,18 @@ class AnimationComponent{
 }
 
 class AttackingComponent{
-    constructor(collisionManager, origin, directionObject, stats, zoneid){
+    constructor(collisionManager, origin, directionObject, stats, zoneid, layers){
         this.collisionManager = collisionManager;
         this.origin = origin;
         this.directionObject = directionObject;
         this.stats = stats;
         this.zoneid = zoneid;
+        this.layers = layers;
     }
 
     scanForEntities(x,y,width,height){
         sendAOEDebug(this.zoneid,{x:x,y:y},width,height);
-        return this.collisionManager.boxScan({x:x,y:y},width,height,[2]);
+        return this.collisionManager.boxScan({x:x,y:y},width,height,this.layers);
     }
 
     attack(message){
@@ -166,14 +167,16 @@ class ColliderComponent{
 
 
 class AIComponent{
-    constructor(pos, velocity, movementComp){
+    constructor(pos, velocity, movementComp, attackComp){
         this.tick = 0;
         this.pos = pos;
         this.velocity = velocity;
         this.firstAction = 10;
         this.movementComp = movementComp;
+        this.attackComp = attackComp
     }
     remove(){delete this;}
+
     update(entity){
         this.tick++;
         switch (this.tick % this.firstAction) {
@@ -185,18 +188,34 @@ class AIComponent{
                 }
                 this.movementComp.stop();
                 this.movementComp.addMovement(velocity);
+                this.aiAttack();
                 break
             case 50:
                 this.changeDirection();
                 this.movementComp.stop();
+                //this.attackComp.attack();
+
                 break;
             default:
         }
+
+
     }
     remove(){
         this.isDelete = true;
         delete this;
     }
+
+    aiAttack(){
+        let attackMessage = {
+            type: messageTypes.DAMAGE,
+            damage: this.attackComp.stats.attack  || 0,
+            rewardCB: function(){}
+        }
+        console.log(this.attackComp.stats.attack)
+        this.attackComp.attack(attackMessage);
+    }
+
     changeDirection(){
         // if(this.flip){
         //     this.flip =!this.flip;

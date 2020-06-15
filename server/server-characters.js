@@ -101,7 +101,7 @@ class DamageableCharacter extends GameObject {
         if(damageTake <= 0) damageTake = 1;
         this.health -= damageTake;
         if(this.health <= 0) this.kill();
-        let reward = 30;
+        let reward = Math.floor(damageTake * 0.5);
         return reward;
     }
 
@@ -202,9 +202,11 @@ class BasicMob extends  DamageableCharacter {
         this.stats = stats;
         this.deathCallback = config.deathCallback;
         this.createCollider(collisionManager);
+
         this.movementComponent = new characterComponents.MovementComponent(this.pos, config.stats.speed);
         this.animationComponent = new characterComponents.AnimationComponent(layers, this.movementComponent);
-        this.components.push(new characterComponents.AIComponent(this.pos, this.velocity, this.movementComponent));
+        let attackingComp = new characterComponents.AttackingComponent(collisionManager, this.pos, this.animationComponent, stats, config.zone, [1]);
+        this.components.push(new characterComponents.AIComponent(this.pos, this.velocity, this.movementComponent, attackingComp));
         this.components.push(this.movementComponent);
         this.components.push(this.animationComponent);
     }
@@ -288,7 +290,7 @@ class BasicMob extends  DamageableCharacter {
                 this.movementComponent.stop();
                 break;
             case colliderTypes.PLAYER:
-                this.sendDamageMessage(other);
+              //  this.sendDamageMessage(other);
                 break;
         }
 
@@ -382,7 +384,8 @@ class ServerPlayer extends DamageableCharacter{
             this.pos,
             this.animationComponent,
             playerConfig.stats,
-            this.zone
+            this.zone,
+            [2]
             );
     }
 
@@ -479,7 +482,7 @@ class ServerPlayer extends DamageableCharacter{
             damage: this.config.stats.attack +damage || 0,
             rewardCB: rewardCB
         }
-        let attackCB = ()=>{this.attackingComponent.attack(attackMessage)};
+        let attackCB = ()=>{ this.attackingComponent.attack(attackMessage) };
         this.animationComponent.forceStateFor(this.config.stats.attackSpeed,this.config.stats.attackSpeed/2,states.THRUST, attackCB)
     }
 
@@ -497,8 +500,6 @@ class ServerPlayer extends DamageableCharacter{
             this.removeComponents();
             this.attackingComponent.remove();
             this.attackingComponent = undefined;
-            this.animationComponent.remove();
-            this.animationComponent = undefined;
         }
     }
 
@@ -509,22 +510,12 @@ class ServerPlayer extends DamageableCharacter{
                break;
             case colliderTypes.PLAYER:
                 break;
-            case colliderTypes.TRIGGER:
-            case messageTypes.DAMAGE: // todo move to an entity message method
-                let damage = other.damage;
-                this.takeDamage(damage)
-
-                break;
-            case colliderTypes.MONSTER:
-                break;
             case colliderTypes.ZONETRIGGER:
                 this.removeComponents();
                 let zoneTarget = other.zoneTarget;
                 let posTarget = other.posTarget;
                 global.testZoneJoin(this.config._id, this.config.location, zoneTarget, posTarget);
                 break;
-            case colliderTypes.ATTACKSCAN:
-                return this.takeDamage();
                 break;
         }
     }
@@ -534,6 +525,9 @@ class ServerPlayer extends DamageableCharacter{
         switch (message.type) {
             case messageTypes.REWARD:
                 this.reward(message)
+                break;
+            case messageTypes.DAMAGE:
+                this.takeDamage(message.damage)
                 break;
         }
     }
