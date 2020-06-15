@@ -132,7 +132,8 @@ class PaperDollScene extends  Phaser.Scene {
         //let slotKeys = this.slots;
         let slotKeys = Object.keys(this.slots);
         // maybe both clicks?
-        this.paperDoll = new PaperDoll(this, 100, 550, slotKeys.length, 2, slotNumber=>{this.clickSlot(slotNumber)});
+        this.paperDoll = new PaperDoll(this,
+            800, 550, slotKeys.length, 2, slotNumber=>{this.clickSlot(slotNumber)});
         this.hide = true;
     }
 
