@@ -109,7 +109,7 @@ class ShopInventory{
         this.stock = shopStock; // this is PBR
         this.tick = 0;
         this.reStockRate = deltaTime(500);
-    }a
+    }
 
     buy(slot, inv) {
         let stock = this.stock[slot];

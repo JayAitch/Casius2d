@@ -24,15 +24,17 @@ class ZoneSender{
         this.room.leave(client);
     }
 
-    initMessage(client, entities, items, shops, workBenches) {
+    initMessage(client, entities, items, shops, workBenches, banks) {
         client.emit("entityList", this.sendEntities(entities));
         client.emit("itemList", items);
         client.emit("myPlayer", {id: client.player.key});
         client.emit("myInventory", client.character.invent.message);
         client.emit("shopList", this.sendShops(shops));
         client.emit("benchList", this.sendWorkBenches(workBenches));
+        client.emit("bank", client.character.bank.message)
         client.emit("recipes", craftManager.recipesManager.getRecipes())
-        client.emit("skills", client.playerStats.skills.skills)
+        client.emit("skills", client.playerStats.skills.skills);
+        client.emit("banks", banks)
         ////// TEMP  ////
         this.testSetUpdateShops(shops);
     }
@@ -44,18 +46,19 @@ class ZoneSender{
         }, 1000)
     }
 
-
     sendWorkBenches(benches) {
         let tempBench = {};
         let benchKeys = Object.keys(benches);
         benchKeys.forEach( (key)=> {
             let bench = benches[key];
+
             tempBench[key] = {
                 position:bench.pos,
                 type:bench.type,
                 recipes:bench.recipes
             };
         });
+
         return tempBench;
     }
 

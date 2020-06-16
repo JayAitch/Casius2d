@@ -18,7 +18,7 @@ const config = {
     dom: {
         createContainer: true
     },
-    scene: [BootScene, PreloadScene, LoginScene, GameScene, PaperDollScene,InventoryScene, ShopScene, CraftingScene, SkillMenu, InventoryMenu],
+    scene: [BootScene, PreloadScene, LoginScene, GameScene, PaperDollScene,InventoryScene, ShopScene, CraftingScene, SkillMenu, InventoryMenu, BankMenu],
 };
 let game;
 

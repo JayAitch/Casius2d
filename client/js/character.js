@@ -429,6 +429,26 @@ class Player extends MovingMultiSprite{
         this.healthBar.draw();
     }
 }
+class Bank{
+    constructor(scene, pos) {
+        this.sprite = scene.add.image(pos.x, pos.y, "basecharacter");//temp
+        this.scene = scene;
+    }
+    get pos(){
+        return {x: this.sprite.x,y: this.sprite.y }
+    }
+    get y(){
+        return this.pos.y;
+    }
+    get x(){
+        return this.pos.x;
+
+    }
+    get interactText(){
+        return `press E to use bank`
+    }
+
+}
 
 class WorkBench{
    constructor(pos, type, scene, recipes) {
@@ -436,7 +456,7 @@ class WorkBench{
        this.type = type;
        this.recipes = recipes
        this.scene = scene;
-       this.countingDown = false;
+
    }
    get pos(){
        return {x: this.sprite.x,y: this.sprite.y }

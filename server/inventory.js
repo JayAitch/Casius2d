@@ -1,5 +1,5 @@
 
-global.slotActions = {"EQUIP":"EQUIP","DROP":"DROP","CLICK":"CLICK"}
+global.slotActions = {"EQUIP":"EQUIP","DROP":"DROP","CLICK":"CLICK", "WITHDRAW":"WITHDRAW", "DEPOSIT":"DEPOSIT"}
 
 global.PLAYER_INVENT_MAX = 84
 
@@ -74,7 +74,6 @@ class InventoryManager{
     }
 
     get inventory(){
-
         return this.mInv.inventoryItems;
     }
     get message(){
@@ -189,7 +188,7 @@ class InventoryManager{
     }
 
 
-    actOnInventorySlot(action, slot, zone, pos) {
+    actOnInventorySlot(action, slot, zone, pos, bank) {
         switch (action) {
             case slotActions.EQUIP:
                 let clickedItem = this.mInv.getItem(slot);
@@ -207,6 +206,20 @@ class InventoryManager{
                     let item = this.mInv.removeItem(slot);
                     zone.itemWorld.addItem(pos, item);
                     this.clientUpdate();
+                }
+                break;
+            case slotActions.BANK:
+                // TEMP
+                let zone = ZONES[this.ownerLocation.zone];
+                let client = zone.zoneSender.room.clientLookup[this.ownerID];
+                let inRange = zone.isInRangeOfBank(client.player);
+                if(inRange){
+                    let bankItem = this.mInv.getItem(slot);
+                    if(bankItem) {
+                        let item = this.mInv.removeItem(slot);
+                        bank.addItem(item);
+                        this.clientUpdate();
+                    }
                 }
                 break;
         }

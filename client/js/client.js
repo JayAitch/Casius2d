@@ -55,6 +55,14 @@ class Receiver{
             this.gameScene.recipeList(data);
         })
 
+        this.socket.on('bank', (data)=>{
+            this.gameScene.bankItems(data);
+        })
+
+        this.socket.on('banks', (data)=>{
+            this.gameScene.loadBanks(data);
+        })
+
 
         this.socket.on('AOEDebug',(data)=>{
             this.gameScene.printAOEDebug(data);
@@ -169,6 +177,9 @@ class Sender{
     }
     clickInventorySlot(data){
         this.socket.emit('clickInventorySlot', data);
+    }
+    clickBankSlot(data){
+        this.socket.emit('clickBankSlot', data);
     }
 }
 

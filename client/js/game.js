@@ -100,16 +100,13 @@ class GameScene extends Phaser.Scene {
     }
 
 
-    showInteractable(){
-
-    }
-
     create(){
         this.scene.launch("paperdoll", this.client.sender);
         this.scene.launch("inventory", this.client.sender);
         this.scene.launch("inventory-menu", this.client.sender);
         this.scene.launch("shop", this.client.sender);
         this.scene.launch("skill-menu", this.client.sender);
+        this.scene.launch("bank-menu", this.client.sender);
         items = this.cache.json.get('items'); // unused
         this.controller = new Controller(this,this.client);
         this.interactableGroup = this.physics.add.group();
@@ -228,7 +225,7 @@ class GameScene extends Phaser.Scene {
         }
         else if(potentialEntity){
             potentialEntity.shop = stock;
-            this.interactables[key] = potentialEntity;
+            this.interactables["shop" + key] = potentialEntity;
 
             this.interactableGroup.add(potentialEntity.sprite);
             let text = "shop E"
@@ -250,8 +247,10 @@ class GameScene extends Phaser.Scene {
         let mapEntity = undefined;
         this.playerPhys.add(myPlayer.sprite);
         keys.forEach((key)=>{
+
             let potential =  this.interactables[key];
             let distance = Phaser.Math.Distance.Between(potential.x,potential.y,myPlayer.pos.x,myPlayer.pos.y);
+            console.log(potential);
             // soft check temporry
             if( distance < range){
                 entityKey = key;
@@ -298,6 +297,12 @@ class GameScene extends Phaser.Scene {
         else{
             this.mapEntities[id] = new TestMonster(this, {x: x, y: y}, base,health,mHealth);
         }
+    }
+
+    bankItems(items){
+        let bank = this.scene.get("bank-menu");
+        bank.items = items.bank;
+        bank.gold = items.gold;
     }
 
     clearEnities() {
@@ -369,11 +374,7 @@ class GameScene extends Phaser.Scene {
     }
 
     loadInventory(inventorymessage){
-        console.log(inventorymessage)
-    //    let inv = this.scene.get("inventory");
         let inv2 = this.scene.get("inventory-menu");
-    //    inv.items = inventorymessage.inventory;
-     //   inv.gold = inventorymessage.gold;
         inv2.items = inventorymessage.inventory;
         inv2.gold = inventorymessage.gold;
         let pD = this.scene.get("paperdoll");
@@ -386,14 +387,13 @@ class GameScene extends Phaser.Scene {
         Object.keys(benches).forEach(bench=>{
             let mBench = benches[bench];
             let wb =  new WorkBench(mBench.position, mBench.type, this, mBench.recipes);
-            this.interactables[bench] = wb;
+            this.interactables["bench" + bench ] = wb;
             this.interactableGroup.add(wb.sprite);
 
             let text = wb.interactText;
             let myPlayer = this.mapEntities[this.playerID];
             let display = new InteractDisplay(this, text);
             this.physics.add.overlap(myPlayer.sprite, wb.sprite,function(){display.showInteract(wb.pos)}, null, this);
-
 
             wb.interact = ()=>{
                 let recipes = wb.recipes;
@@ -407,6 +407,27 @@ class GameScene extends Phaser.Scene {
     }
 
 
+
+    loadBanks(banks){
+        Object.keys(banks).forEach(bank=>{
+
+            let mBench = banks[bank];
+            let newBank =  new Bank(this, mBench.pos);
+            this.interactables["bank" + bank] = newBank;
+            this.interactableGroup.add(newBank.sprite);
+
+            let text = newBank.interactText;
+            let myPlayer = this.mapEntities[this.playerID];
+            let display = new InteractDisplay(this, text);
+            this.physics.add.overlap(myPlayer.sprite, newBank.sprite,function(){display.showInteract(newBank.pos)}, null, this);
+
+
+            newBank.interact = ()=>{
+                let craft = this.scene.get("bank-menu");
+                craft.hide = false;
+            };
+        })
+    }
 
 
 
@@ -433,6 +454,7 @@ class GameScene extends Phaser.Scene {
         let shop = this.scene.get("shop");
         let craft = this.scene.get("crafting-menu");
         let skillMenu = this.scene.get("skill-menu");
+        let bank = this.scene.get("bank-menu");
         pD.hide = true;
       //  inv.hide = true;
         inv2.hide = true;
@@ -440,8 +462,12 @@ class GameScene extends Phaser.Scene {
         shop.hide = true;
         skillMenu.hide = true;
         craft.hide = true;
+        bank.hide = true;
     }
-
+    toggleBank(){
+        let bank = this.scene.get("bank-menu");
+        bank.hide = !bank.hide
+    }
     toggleInventory(){
         let pD = this.scene.get("paperdoll");
    //     let inv = this.scene.get("inventory");
@@ -474,6 +500,7 @@ class Controller{
         let iKey = scene.input.keyboard.addKey("I");
         let eKey = scene.input.keyboard.addKey("E");
         let cKey = scene.input.keyboard.addKey("C");
+        let bKey = scene.input.keyboard.addKey("B");
         let kKey = scene.input.keyboard.addKey("K");
         let escKey = scene.input.keyboard.addKey("ESC");
         this.client = client;
@@ -492,8 +519,10 @@ class Controller{
             let shop = scene.scene.get("shop");
             let interactableID = scene.interactWithClosest();
         });
-
-
+/// TEMP
+        bKey.on('down', (event)=> {
+            scene.toggleBank();
+        });
         cKey.on('down', (event)=> {
             scene.toggleCrafting();
         });

@@ -86,7 +86,7 @@ function AABBtoBounds(obj){
     pbr = {x:x + (width/2), y:y + (height/2)};
     pbl = {x:x - (width/2), y:y + (height/2)};
     let points = [ptl,ptr,pbr,pbl];
-    console.log(points);
+ //   console.log(points);
     return points;
 }
 
@@ -177,6 +177,18 @@ function createFromJSON(objects, factory, zone, phyWorld){
                 let wBench = factory.new(bentityConfig);
                 zone.addWorkBench(wBench);
                 break;
+
+            case "BANK":
+                config.zone = zone.zoneID;
+                let banentityConfig = {
+                    type: entityTypeLookup.BANK,
+                    config: config
+                }
+
+                let bank = factory.new(banentityConfig);
+                zone.addBankPoint(bank);
+                break;
+
             case "SHOPKEEPER":
                 let shopInv = new shopInventory.ShopInventory(object.shop_id)
                 config.zone = zone.zoneID

@@ -9,6 +9,7 @@ const zoneManager = require('./zone-manager.js');
 const invent = require('./inventory.js');
 const playerStats = require('./player-stats.js')
 const dbDisabled = true;
+const bank = require('./bank-inventory.js')
 
 global.io = require('socket.io')(server);
 io = global.io;
@@ -59,6 +60,14 @@ players = {
 //     }
 // };
 // temp
+banks = {
+    0:{
+        gold: 10000000000000000000,
+        items: [
+            {base:items.goldhelm,quantity:1, plus:12},
+        ]
+    }
+}
 
 inventories = {
     01212:[{base:items.seeradish,quantity:1, plus:0},
@@ -229,7 +238,7 @@ io.on('connect', function(client) {
             let zone = ZONES[zoneid];
 
             let inRangeCheck = ()=>{
-                let inRange = zone.isInRangeOfCrafting("category", client.player);
+                let inRange = zone.isInRangeOfCrafting("category", client.player); // todo: check for specific bench types
                 return inRange;
             }
             recipesManager.tryToCraft(lookup, client.character.invent, client.playerStats, inRangeCheck);
@@ -243,17 +252,29 @@ io.on('connect', function(client) {
             let slot = data.slot;
             let action = slotActions[data.action];
             let zone = ZONES[client.playerLocation.zone];
-            console.log(data);
             if(data.action === "SELL") {
                 zone.sellItem(client, data.id, slot);
             }
             else{
                 let playerPos = client.playerLocation.pos;
-                client.character.invent.actOnInventorySlot(action, slot, zone, playerPos);
+                client.character.invent.actOnInventorySlot(action, slot, zone, playerPos, client.character.bank);
             }
 
-            client.emit("myInventory", client.character.invent.message);
+           // client.emit("myInventory", client.character.invent.message);
         });
+
+        client.on('clickBankSlot',function(data) {
+            let zoneid = client.playerLocation.zone;
+            let zone = ZONES[zoneid];
+            let inRange = zone.isInRangeOfBank(client.player);
+            if(inRange){
+                let slot = data.slot;
+                let action = slotActions[data.action];
+                client.character.bank.actOnBankSlot(action, slot, client.character.invent);
+            }
+        });
+
+
     });
 
     client.on('createaccount', function(username,password){
@@ -343,6 +364,8 @@ function setupCharacter(client,username){
             client.character._id =  randomInteger(0, 9999999); //temp
             let invManager = new invent.InventoryManager(inventories[0], players[0].paperDoll, client.playerLocation,  client.character._id, client.playerStats);
             client.character.invent = invManager;
+            let bankManager = new bank.BankManager(banks[0], client.playerLocation, client.character._id);
+            client.character.bank = bankManager;
             return resolve(true)
         }
 

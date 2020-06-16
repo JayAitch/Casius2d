@@ -117,7 +117,7 @@ class AIComponent{
 
     doMoveTowardsPlayer(points){
         let nextPos = points[1];
-        console.log(nextPos);
+        //console.log(nextPos);
         let direction = {};
         direction.x = nextPos.x - this.pos.x;
         direction.y = nextPos.y - this.pos.y;
@@ -129,7 +129,7 @@ class AIComponent{
             x: this.direction.x,
             y: this.direction.y
         }
-        console.log(this.direction);
+       // console.log(this.direction);
        // this.movementComp.stop();
         this.movementComp.addMovement(velocity);
 

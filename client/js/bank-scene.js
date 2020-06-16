@@ -1,9 +1,9 @@
-class InventoryMenu extends Phaser.Scene {
+class BankMenu extends Phaser.Scene {
     constructor() {
-        super({key: 'inventory-menu'});
+        super({key: 'bank-menu'});
         this.actionsList = new ActionsList(this);
         this.items = [];
-        this.expectedLength = 84;
+        this.expectedLength = 448;
     }
 
     init(data) {
@@ -31,7 +31,6 @@ class InventoryMenu extends Phaser.Scene {
     }
 
     set items(val){
-
         this.slottedItems = val;
         if(val.length < this.expectedLength) {
             let diff = this.expectedLength - val.length;
@@ -39,8 +38,8 @@ class InventoryMenu extends Phaser.Scene {
                 this.slottedItems.push(undefined)
             }
         }
-            if(this.itemGrid)
-                this.itemGrid.setItems(this.items);
+        if(this.itemGrid)
+            this.itemGrid.setItems(this.items);
     }
 
     get items(){
@@ -60,8 +59,8 @@ class InventoryMenu extends Phaser.Scene {
         //if(this.items.length === 0) columns = undefined;
         this.itemGrid = this.rexUI.add.gridTable({
             background: this.rexUI.add.roundRectangle(0, 0, 20, 10, 10, COLOR_PRIMARY, 0.3),
-            x: 300,
-            y:600,
+            x: 500,
+            y: 300,
             width: 450,
             height: 280,
             //
@@ -108,10 +107,10 @@ class InventoryMenu extends Phaser.Scene {
                 bottom: 15,
 
                 table: {
-                   top: 10,
-                   bottom: 10,
-                   left: 10,
-                   right: 10
+                    top: 10,
+                    bottom: 10,
+                    left: 10,
+                    right: 10
                 },
                 header: 0,
                 footer: 15,
@@ -156,23 +155,19 @@ class InventoryMenu extends Phaser.Scene {
         this.popupMenu = new PopupMenu(this);
         let actionItems = [
             {
-                name:"DROP",
+                name:"WITHDRAW",
                 children:[
                     {
                         name:"ONE",
-                        command:{key:"DROP", option: {amount:1}}
+                        command:{key:"WITHDRAW", option: {amount:1}}
 
                     },
 
                     {
                         name:"ALL",
-                        command:{key:"DROP", option:{amount:1}}
+                        command:{key:"WITHDRAW", option:{amount:1}}
                     }
                 ]
-            },
-            {
-                name:"EQUIP",
-                command:{key:"EQUIP"}
             }
 
         ]
@@ -193,42 +188,13 @@ class InventoryMenu extends Phaser.Scene {
         this.itemGrid.on('cell.click',  (cellContainer, cellIndex)=> {
             let actualActions = JSON.parse(JSON.stringify(actionItems));
 
-            let sScene = this.scene.get("shop");
-            if(sScene.id && !sScene.hide) {
-                actualActions.push({
-                    name: "SELL",
-                    command: {key: "SELL"}
-                })
-            }
 
-            let bScene = this.scene.get("bank-menu");
-            if(!bScene.hide) {
-                actualActions.push({
-                    name: "BANK",
-                    children:[
-                        {
-                            name:"ONE",
-                            command:{key:"BANK", option: {amount:1}}
-                        },
-
-                        {
-                            name:"ALL",
-                            command:{key:"BANK", option:{amount:1}}
-                        }
-                        ]
-                })
-            }
 
             let callback = (action)=>{
                 let data ={
                     slot:cellIndex, action:action
                 }
-                //     temp
-                if(action === "SELL") {
-                    let sScene = this.scene.get("shop");
-                    data.id = sScene.id;
-                }
-                this.sender.clickInventorySlot(data);
+                this.sender.clickBankSlot(data);
             }
             let pointer = this.input.activePointer
 
@@ -237,86 +203,11 @@ class InventoryMenu extends Phaser.Scene {
         }).on('cell.over', function (button, groupName, index) {
             button.getElement('background').setFillStyle(COLOR_DARK, 0.2);
         }).on('cell.out', function (button, groupName, index) {
-                button.getElement('background').setFillStyle();
-            });
+            button.getElement('background').setFillStyle();
+        });
 
         this.hide = true;
     }
 }
 
-
-
-class PopupMenu{
-    constructor(scene){
-        this.scene = scene;
-        this.menu = undefined;
-    }
-
-
-    createMenu(x, y,items,callback){
-        if(this.menu){
-            this.menu.collapse();
-            this.menu = undefined;
-        }
-        this.menu = this.newMenu(this.scene, x,y, items,  (button) =>{
-            let command = button.item.command;
-            if(command) {
-                callback(command.key, command.option);
-                this.menu.collapse();
-                this.menu = undefined;
-            }
-        });
-    }
-
-
-    newMenu(scene, x, y, items, onClick) {
-        let menu = scene.rexUI.add.menu({
-            x: x,
-            y: y,
-
-            items: items,
-            createButtonCallback: function (item, i) {
-                let label = scene.rexUI.add.label({
-                    background: scene.rexUI.add.roundRectangle(0, 0, 2, 2, 0, COLOR_PRIMARY),
-                    text: scene.add.text(0, 0, item.name,textStyles["action-text"]),
-                    icon: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 10, COLOR_DARK),
-                    space: {
-                        left: 10,
-                        right: 10,
-                        top: 10,
-                        bottom: 10,
-                        icon: 10
-                    }
-                })
-                label.item = item;
-                return label
-            },
-
-            easeIn: {
-                duration: 100,
-                orientation: 'y'
-            },
-
-            easeOut: {
-                duration: 100,
-                orientation: 'y'
-            },
-
-            // expandEvent: 'button.over'
-        });
-
-        menu
-            .on('button.over', function (button) {
-                button.getElement('background').setStrokeStyle(1, 0xffffff);
-            })
-            .on('button.out', function (button) {
-                button.getElement('background').setStrokeStyle();
-            })
-            .on('button.click', function (button) {
-                onClick(button);
-            })
-
-        return menu;
-    }
-}
 

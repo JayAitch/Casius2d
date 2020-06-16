@@ -56,17 +56,17 @@ class Zone{
         this.zoneID = zoneid;
         this.wBenchInc = 0;
         this.wBenches = {};
+        this.bankInc = 0;
+        this.banks = {};
         this.shops = {};
 
         this.factory = new gameObjects.Factory(this.physicsWorld.collisionManager, this.itemWorld);
         mapBuilder.build(this.factory, this,  this.physicsWorld); // more concrete management of nodes, will remove physics world from this
         this.testCreateMobLots(1);
         systems.addToUpdate(this);
-  //      this.testCreateShopKeeper();
     }
 
-    set navMesh(val){
-        console.log(val);
+    set navMesh(val){;
         this.navigation = new NavMesh(val);
     }
 
@@ -75,13 +75,31 @@ class Zone{
         this.wBenchInc++;
     }
 
+    addBankPoint(bank){
+        this.banks[this.bankInc] = bank;
+        this.bankInc++;
+    }
 
     addToShops(shop, entity){
         this.physicsWorld.addNewMob(entity);
         this.shops[this.physicsWorld.lastEntityId - 1] = shop ;
     }
 
+    ///     TEMP
+    isInRangeOfBank(player){
+        let range = 100;
 
+        let mBank;
+        Object.keys(this.banks).forEach(bank =>{
+            let tBank = this.banks[bank];
+            let dist = distance(tBank.pos, player.pos);
+            if(dist < range){
+                //todo check for workbench type;
+                mBank = tBank;
+            }
+        })
+        if(mBank) return true;
+    }
 
     ///     TEMP
     isInRangeOfCrafting(category, player){
@@ -229,7 +247,7 @@ class Zone{
         client.player = newPlayer;
 
         this.zoneSender.notifyClientPlayer(client, newPlayer);
-        this.zoneSender.initMessage(client, this.physicsWorld.entities, this.itemWorld.floorItems, this.shops, this.wBenches);
+        this.zoneSender.initMessage(client, this.physicsWorld.entities, this.itemWorld.floorItems, this.shops, this.wBenches, this.banks);
     }
 
     update() {

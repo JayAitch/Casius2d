@@ -307,6 +307,14 @@ class WorkBench extends GameObject{
     }
 }
 
+class Bank extends GameObject{
+    constructor(collisionManager, config) {
+        super(config.pos,config.zone);
+        this.width = 32; // temp
+        this.height = 32; // temp
+    }
+}
+
 
 
 class ShopKeeper extends GameObject{
@@ -532,4 +540,4 @@ class ServerPlayer extends DamageableCharacter{
     }
 }
 
-module.exports = {ServerPlayer, NonPassibleTerrain, ZonePortal, BasicMob, BasicResource, ShopKeeper, WorkBench}
+module.exports = {ServerPlayer, NonPassibleTerrain, ZonePortal, BasicMob, BasicResource, ShopKeeper, WorkBench, Bank}
