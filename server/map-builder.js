@@ -76,7 +76,19 @@ function getWorldObjects(id){
 }
 
 
-
+function AABBtoBounds(obj){
+    let x = obj.pos.x,
+        y = obj.pos.y,
+        width = obj.width,
+        height = obj.height
+    ptl = {x:x - (width/2), y:y - (height/2)};
+    ptr = {x:x + (width/2), y:y - (height/2)};
+    pbr = {x:x + (width/2), y:y + (height/2)};
+    pbl = {x:x - (width/2), y:y + (height/2)};
+    let points = [ptl,ptr,pbr,pbl];
+    console.log(points);
+    return points;
+}
 
 
 function getProperty(properties, prop){
@@ -97,6 +109,8 @@ function build(factory, zone, physicsWorld){
 }
 
 function createFromJSON(objects, factory, zone, phyWorld){
+
+    let navMesh = [];
     objects.forEach((object)=>{
 
         let x = object.pos.x + object.width /2;//temp
@@ -172,11 +186,16 @@ function createFromJSON(objects, factory, zone, phyWorld){
                 }
 
                 let shopEntity = factory.new(shEntityConfig);
-                zone.addToShops(shopInv, shopEntity)
+                zone.addToShops(shopInv, shopEntity);
+                break;
+            case "MOB-ZONE":
+                let bounds = AABBtoBounds(config);
+                navMesh.push(bounds);
+                break;
         }
 
     })
-
+    zone.navMesh = navMesh;
 }
 
 

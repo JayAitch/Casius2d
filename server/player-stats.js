@@ -6,7 +6,6 @@ for(let i = 0; i < maxLevel; i++){
     levels[i] = experienceForLevel(i);
 }
 
-console.log(levels);
 
 
 

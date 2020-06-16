@@ -194,7 +194,7 @@ class BasicMob extends  DamageableCharacter {
 
     constructor(collisionManager, config) {
         let layers = {base: "pig"};
-        let pos = {x: 150, y: 150};
+        let pos = {x: 100, y: 360};
         let stats = config.stats;
         super(pos, config.stats, config.zone);
         this.width = 32; // temp
@@ -206,7 +206,7 @@ class BasicMob extends  DamageableCharacter {
         this.movementComponent = new characterComponents.MovementComponent(this.pos, config.stats.speed);
         this.animationComponent = new characterComponents.AnimationComponent(layers, this.movementComponent);
         let attackingComp = new characterComponents.AttackingComponent(collisionManager, this.pos, this.animationComponent, stats, config.zone, [1]);
-        this.components.push(new characterComponents.AIComponent(this.pos, this.velocity, this.movementComponent, attackingComp));
+        this.components.push(new characterComponents.AIComponent(this.pos, this.velocity, this.movementComponent, attackingComp, config.navMesh));
         this.components.push(this.movementComponent);
         this.components.push(this.animationComponent);
     }
@@ -319,7 +319,6 @@ class ShopKeeper extends GameObject{
         this.movementComponent = new characterComponents.MovementComponent(this.pos, stats);
         this.animationComponent = new characterComponents.AnimationComponent(animLayers, this.movementComponent);
         this.tick = 0;
-        console.log(this);
         this.createCollider(collisionManager);
     }
 
@@ -338,7 +337,7 @@ class ShopKeeper extends GameObject{
             pos: this.pos,
             layer:2,
             //  interacts:[0,1,3,4],
-            interacts:[0],
+            interacts:[3],
             callback: (other)=>{
                 return this.collisionCallback(other);
             },

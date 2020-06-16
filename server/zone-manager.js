@@ -3,6 +3,8 @@ const systems = require('./systems.js');
 const gameObjects = require('./game-object-factory.js');
 const mapBuilder = require('./map-builder.js')
 const dropManager = require('./drop-manager.js');
+const NavMesh = require('navmesh'); /////TODO: make this a const somewhere
+
 systems.startUpdate();
 
 
@@ -55,15 +57,18 @@ class Zone{
         this.wBenchInc = 0;
         this.wBenches = {};
         this.shops = {};
+
         this.factory = new gameObjects.Factory(this.physicsWorld.collisionManager, this.itemWorld);
         mapBuilder.build(this.factory, this,  this.physicsWorld); // more concrete management of nodes, will remove physics world from this
-
-        this.testCreateMobLots(5);
+        this.testCreateMobLots(1);
         systems.addToUpdate(this);
   //      this.testCreateShopKeeper();
     }
 
-
+    set navMesh(val){
+        console.log(val);
+        this.navigation = new NavMesh(val);
+    }
 
     addWorkBench(wBench){
         this.wBenches[this.wBenchInc] = wBench;
@@ -138,7 +143,8 @@ class Zone{
             let config = {
                 deathCallback: callBack,
                 stats:{health: 100, maxHealth:100, defence:0, attack:2, speed:3 },
-                zone: this.zoneID
+                zone: this.zoneID,
+                navMesh: this.navigation
             }
 
             let entityConfig = {

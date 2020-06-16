@@ -1,3 +1,4 @@
+const AIComp = require('./ai-component.js')
 directions = {"NORTH":"up", "WEST":"left", "SOUTH":"down", "EAST":"right" };
 global.states  = {"THRUST":"thrust", "WALK":"walk","CAST":"cast", "STOP":"stop"};
 
@@ -11,7 +12,7 @@ class AnimationComponent{
         this.deltaTime = 0;
         this.previouseVelo = moveComp.velocity;
         this.forcedState = false;
-        this.direction = {x:-1,y:0};
+        this.direction = {x:1,y:0};
     }
 
     remove(){
@@ -166,86 +167,6 @@ class ColliderComponent{
 
 
 
-class AIComponent{
-    constructor(pos, velocity, movementComp, attackComp){
-        this.tick = 0;
-        this.pos = pos;
-        this.velocity = velocity;
-        this.firstAction = 10;
-        this.movementComp = movementComp;
-        this.attackComp = attackComp
-    }
-    remove(){delete this;}
-
-    update(entity){
-        this.tick++;
-        switch (this.tick % this.firstAction) {
-            case 0:
-                this.changeDirection();
-                let velocity = {
-                    x: this.direction.x * 10,
-                    y: this.direction.y * 10
-                }
-                this.movementComp.stop();
-                this.movementComp.addMovement(velocity);
-                this.aiAttack();
-                break
-            case 50:
-                this.changeDirection();
-                this.movementComp.stop();
-                //this.attackComp.attack();
-
-                break;
-            default:
-        }
-
-
-    }
-    remove(){
-        this.isDelete = true;
-        delete this;
-    }
-
-    aiAttack(){
-        let attackMessage = {
-            type: messageTypes.DAMAGE,
-            damage: this.attackComp.stats.attack  || 0,
-            rewardCB: function(){}
-        }
-        console.log(this.attackComp.stats.attack)
-        this.attackComp.attack(attackMessage);
-    }
-
-    changeDirection(){
-        // if(this.flip){
-        //     this.flip =!this.flip;
-        //     this.direction = {x:0,y:1};
-        // }
-        // else{
-        //     this.flip =!this.flip;
-        //     this.direction = {x:0,y:-1};
-        // }
-        let int = randomInteger(0,3);
-        this.firstAction = randomInteger(10,50);
-        switch (int) {
-            case 0:
-                this.direction = {x:0,y:1};
-                break;
-            case 1:
-                this.direction = {x:0,y:-1};
-                break;
-            case 2:
-                this.direction = {x:1,y:0};
-                break;
-            case 3:
-                this.direction = {x:-1,y:0};
-                break;
-        }
-    }
-}
-
-
-
 // not currently used
 class MovementComponent{
     constructor(pos,speed) {
@@ -275,14 +196,13 @@ class MovementComponent{
         let previouseVelocity = this.velocity;
         let x = Math.sign(addedVelocity.x) + Math.sign(previouseVelocity.x);
         let y = Math.sign(addedVelocity.y) + Math.sign(previouseVelocity.y);
-
         if(Math.abs(x) > 0 && Math.abs(y) > 0){
             let xSign = Math.sign(x);
             let ySign = Math.sign(y);
             let mX = x;
             let mY = y;
-            x = Math.pow(0.8,(mX * mX) + (mY * mY)) * xSign;
-            y = Math.pow(0.8,(mX * mX) + (mY *mY)) * ySign;
+            x = Math.pow(0.5,(mX * mX) + (mY * mY)) * xSign * 2;
+            y = Math.pow(0.5,(mX * mX) + (mY *mY)) * ySign * 2;
         }
 
         this.velocity = {x: x * this.moveSpeed, y:  y * this.moveSpeed};
@@ -298,4 +218,4 @@ class MovementComponent{
     }
 }
 
-module.exports = {MovementComponent,ColliderComponent, AttackingComponent,AnimationComponent,AIComponent};
+module.exports = {MovementComponent,ColliderComponent, AttackingComponent,AnimationComponent, AIComponent:AIComp.AIComponent};
