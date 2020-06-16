@@ -113,6 +113,49 @@ class InventoryManager{
         return result;
     }
 
+
+     getMultipleItems(qItem, amount){
+        let slots = []
+        let itemSearchInc = 0;
+        let foundCount = 0;
+        let found = false;
+        this.inventory.forEach( item =>{
+            if(!found){
+                // TODO also check +
+                if(item.base.id === qItem.base.id) {
+                    slots.push(itemSearchInc);
+                    foundCount++;
+                    if(foundCount === amount){
+                        found = true;
+                    }
+
+                }
+                itemSearchInc++;
+            }
+
+        });
+        console.log({result:found,slots:slots, count:foundCount});
+        return {result:found,slots:slots, count:foundCount}
+    }
+
+    pickupItems(items){
+
+        // let invItem = {
+        //     base: items[item.id],
+        //     plus: item.plus,
+        //     quantity: item.quantity
+        // }
+        // TODO: add to paperdoll first
+        if(items && items.length){
+            items.forEach(item =>{
+                console.log(item)
+                let addedItem = this.mInv.addItem(item);
+                this.clientUpdate();
+            })
+        }
+    }
+
+
     pickupItem(item){
 
         // let invItem = {
@@ -141,8 +184,9 @@ class InventoryManager{
         this.ppD.addItem(key, item);
         return removedItem;
     }
+
     removeItems(slotarr){
-        console.log(slotarr.length)
+        console.log(slotarr.length);
         if(slotarr != undefined && !slotarr.length) {
             this.mInv.removeItem(slotarr);
             return;
@@ -151,10 +195,16 @@ class InventoryManager{
         slotarr.sort(function(a, b){return a - b});
         slotarr.reverse();
         console.log(slotarr);
+        let itemsRemoved = [];
         slotarr.forEach(slot=>{
-            this.mInv.removeItem(slot);
+            let item =this.mInv.removeItem(slot);
+            itemsRemoved.push(item);
         })
+        this.clientUpdate();
+        return itemsRemoved;
     }
+
+
     unequiptItem(key){
         let removedItem = this.ppD.removeItem(key);
         if(removedItem){
@@ -165,10 +215,10 @@ class InventoryManager{
         return removedItem;
     }
 
-    dropItem(slot){
-        let item = this.mInv.removeItem(slot);
-        return item;//this needs adding to item world
-    }
+    // dropItem(slot){
+    //     let item = this.mInv.removeItem(slot);
+    //     return item;//this needs adding to item world
+    // }
 
 
 
@@ -187,8 +237,70 @@ class InventoryManager{
         return this.mInv.getItem(slot);
     }
 
+    removeItemsAmount(slot, amount){
+        let removedItems;
+        if(amount){
+            if(amount === "ALL"){
+                let count = 48
+                // remove from invent
+                let item = this.mInv.getItem(slot)
+                let result = this.getMultipleItems(item, count)
+                removedItems = this.removeItems(result.slots);
+            }else{
+                let item = this.mInv.getItem(slot)
+                let result = this.getMultipleItems(item, amount);
+                removedItems = this.removeItems(result.slots);
+            }
+        }else{
+            let dropItem = this.mInv.getItem(slot)
+            if(dropItem) {
+                let izone = ZONES[this.ownerLocation.zone];
+                let item = this.mInv.removeItem(slot);
+                izone.itemWorld.addItem(pos, item);
+                removedItems = item;
+            }
+        }
+        this.clientUpdate();
+        return removedItems;
+    }
 
-    actOnInventorySlot(action, slot, zone, pos, bank) {
+
+    dropItem(pos, slot, amount){
+        if(amount){
+            if(amount === "ALL"){
+                let count = 48
+                // remove from invent
+                let item = this.mInv.getItem(slot)
+                let result = this.getMultipleItems(item, count);
+                this.dropItemLots(result.count,pos, item);
+                this.removeItems(result.slots);
+            }else{
+                let item = this.mInv.getItem(slot)
+                let result = this.getMultipleItems(item, amount);
+                this.dropItemLots( result.count,pos, item);
+                this.removeItems(result.slots);
+            }
+        }else{
+            let dropItem = this.mInv.getItem(slot)
+            if(dropItem) {
+                let izone = ZONES[this.ownerLocation.zone];
+                let item = this.mInv.removeItem(slot);
+                izone.itemWorld.addItem(pos, item);
+
+            }
+        }
+        this.clientUpdate();
+    }
+
+    dropItemLots(amount, pos, item){
+        let izone = ZONES[this.ownerLocation.zone];
+        for(let i = 0; i < amount; i++){
+            izone.itemWorld.addItem(pos, item);
+            this.clientUpdate();
+        }
+    }
+
+    actOnInventorySlot(action, slot, zone, pos, bank, options) {
         switch (action) {
             case slotActions.EQUIP:
                 let clickedItem = this.mInv.getItem(slot);
@@ -201,26 +313,13 @@ class InventoryManager{
                 }
                 break;
             case slotActions.DROP:
-                let dropItem = this.mInv.getItem(slot)
-                if(dropItem) {
-                    let item = this.mInv.removeItem(slot);
-                    zone.itemWorld.addItem(pos, item);
-                    this.clientUpdate();
-                }
+                this.dropItem(pos,slot, options.amount);
+                this.clientUpdate();
                 break;
             case slotActions.BANK:
-                // TEMP
-                let zone = ZONES[this.ownerLocation.zone];
-                let client = zone.zoneSender.room.clientLookup[this.ownerID];
-                let inRange = zone.isInRangeOfBank(client.player);
-                if(inRange){
-                    let bankItem = this.mInv.getItem(slot);
-                    if(bankItem) {
-                        let item = this.mInv.removeItem(slot);
-                        bank.addItem(item);
-                        this.clientUpdate();
-                    }
-                }
+
+                let removedItems = this.removeItemsAmount(slot, options.amount);
+                bank.addItems(removedItems);
                 break;
         }
     }

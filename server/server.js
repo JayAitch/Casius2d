@@ -221,7 +221,7 @@ io.on('connect', function(client) {
         client.on('clickShopSlot',function(data) {
             let action = data.action // todo
             let zone = ZONES[client.playerLocation.zone]
-            zone.buyItem(client, data.key, data.slot);
+            zone.buyItem(client, data.key, data.slot, data.options);// todo add this to shop
         });
 
 
@@ -250,14 +250,15 @@ io.on('connect', function(client) {
         client.on('clickInventorySlot',function(data) {
 
             let slot = data.slot;
+            console.log(data);
             let action = slotActions[data.action];
             let zone = ZONES[client.playerLocation.zone];
             if(data.action === "SELL") {
-                zone.sellItem(client, data.id, slot);
+                zone.sellItem(client, data.id, slot, data.options);
             }
             else{
                 let playerPos = client.playerLocation.pos;
-                client.character.invent.actOnInventorySlot(action, slot, zone, playerPos, client.character.bank);
+                client.character.invent.actOnInventorySlot(action, slot, zone, playerPos, client.character.bank, data.options);
             }
 
            // client.emit("myInventory", client.character.invent.message);
@@ -270,7 +271,7 @@ io.on('connect', function(client) {
             if(inRange){
                 let slot = data.slot;
                 let action = slotActions[data.action];
-                client.character.bank.actOnBankSlot(action, slot, client.character.invent);
+                client.character.bank.actOnBankSlot(action, slot, client.character.invent, data.options);
             }
         });
 

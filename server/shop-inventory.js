@@ -111,7 +111,7 @@ class ShopInventory{
         this.reStockRate = deltaTime(500);
     }
 
-    buy(slot, inv) {
+    buy(slot, inv, options) {
         let stock = this.stock[slot];
         if (stock && stock.amount > 0) {
             if (inv.gold >= stock.item.base.value) {
@@ -123,10 +123,14 @@ class ShopInventory{
             }
         }
     }
-    sell(slot,inv){
+    sell(slot,inv, options){
         let item = inv.getItem(slot);
-        inv.gold += item.base.value;
-        inv.removeItems(slot);
+        if(item && item.base){
+
+            inv.gold += item.base.value;
+            inv.removeItems([slot]);
+        }
+
         this.addItemToStock(item);
     }
 

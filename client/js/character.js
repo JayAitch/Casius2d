@@ -452,7 +452,7 @@ class Bank{
 
 class WorkBench{
    constructor(pos, type, scene, recipes) {
-       this.sprite = scene.add.image(pos.x, pos.y, "basecharacter");//temp
+       this.sprite = scene.add.image(pos.x, pos.y, type);//temp
        this.type = type;
        this.recipes = recipes
        this.scene = scene;
@@ -487,9 +487,9 @@ class InteractDisplay{
 
     showInteract(pos){
         // leaving here because we could be abusing th tween engine too much
-      //  if(!this.countingDown){
-       //     clearTimeout(this.time);
-         //   this.countdownVisibility();
+       if(!this.countingDown){
+           clearTimeout(this.time);
+           this.countdownVisibility();
 
             let fftext = this.scene.add.text(pos.x, pos.y - 50, this.text); // todo change to key image
             fftext.setDepth(UILayer + 999);
@@ -514,6 +514,6 @@ class InteractDisplay{
                 yoyo: false
             });
         }
-   // }
+   }
 
 }

@@ -30,12 +30,12 @@ const textStyles = {
         fontSize: "16px",
     },
     "menu-header": {
-        fill: '#777',
+        fill: '#222',
         fontFamily: "arial",
         fontSize: "24px",
     },
     "menu-body": {
-        fill: '#777',
+        fill: '#333',
         fontFamily: "arial",
         fontSize: "14px",
     },
@@ -45,22 +45,22 @@ const textStyles = {
         fontSize: "14px",
     },
     "list-item":{
-        fill: '#777',
+        fill: '#555',
         fontFamily: "arial",
         fontSize: "14px",
     },
     "tab-title":{
-        fill: '#777',
+        fill: '#333',
         fontFamily: "arial",
         fontSize: "14px",
     },
     "dialog-head":{
-        fill: '#fff',
+        fill: '#111',
         fontFamily: "arial",
         fontSize: "24px",
     },
     "dialog-body":{
-        fill: '#999',
+        fill: '#333',
         fontFamily: "arial",
         fontSize: "14px",
     },

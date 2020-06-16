@@ -16,21 +16,25 @@ SPAWNS= {0:{x:150,y:150},1:{x:400,y:400}, 2:{x:600,y:400}} //temp
 
 nodeLookup = {
     "rock_iron":{
+        "image-key":"iron-rock",
         "drop": "rock_iron_1",
         "reward": {"type": skillLevels.MINING, "amount":15}
 
     },
     "rock_gold":{
         "drop": "rock_gold_1",
+        "image-key":"gold-rock",
         "reward": {"type": skillLevels.MINING, "amount":55}
 
     },
     "rock_copper":{
+        "image-key":"copper-rock",
         "drop": "rock_copper_1",
         "reward": {"type": skillLevels.MINING, "amount":25}
 
     },
     "wood_magic":{
+        "image-key":"magic-tree",
         "drop": "wood_magic_1",
         "reward": {"type": skillLevels.WOODCUTTING, "amount":15}
     }
@@ -147,7 +151,7 @@ function createFromJSON(objects, factory, zone, phyWorld){
             case "NODE":
                 let lookup = nodeLookup[object.node_id];
 
-                config.layers = {base: "rock"};
+                config.layers = {base: lookup["image-key"]};
                 config.stats = { health: 100, maxHealth:100, defence:5};
                 config.drop = lookup.drop;
                 config.zone = zone.zoneID;

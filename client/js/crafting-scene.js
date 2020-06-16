@@ -376,7 +376,7 @@ class CraftingScene extends Phaser.Scene {
             background: this.rexUI.add.roundRectangle(0, 0, 100, 100, 20,  COLOR_PRIMARY, 0.3),
 
             title: this.rexUI.add.label({
-                background: this.rexUI.add.roundRectangle(0, 0, 100, 40, 20,COLOR_DARK),
+                background: this.rexUI.add.roundRectangle(0, 0, 100, 40, 20,COLOR_DARK, 0.5),
                 text: this.add.text(0, 0, item.name, textStyles["dialog-head"]),
                 space: {
                     left: 15,

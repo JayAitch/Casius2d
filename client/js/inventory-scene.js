@@ -166,7 +166,7 @@ class InventoryMenu extends Phaser.Scene {
 
                     {
                         name:"ALL",
-                        command:{key:"DROP", option:{amount:1}}
+                        command:{key:"DROP", option:{amount:"ALL"}}
                     }
                 ]
             },
@@ -213,16 +213,17 @@ class InventoryMenu extends Phaser.Scene {
 
                         {
                             name:"ALL",
-                            command:{key:"BANK", option:{amount:1}}
+                            command:{key:"BANK", option:{amount:"ALL"}}
                         }
                         ]
                 })
             }
 
-            let callback = (action)=>{
-                let data ={
+            let callback = (action, options)=>{
+                let data = {
                     slot:cellIndex, action:action
                 }
+                if(options) data.options = options;
                 //     temp
                 if(action === "SELL") {
                     let sScene = this.scene.get("shop");

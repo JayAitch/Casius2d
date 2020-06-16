@@ -159,8 +159,8 @@ global.workBenches = {
             [skillLevels.MINING]: recipes[skillLevels.MINING],
         }
     },
-    "carpenterTable": {
-        type:"CARPENTER",
+    "choppingStump": {
+        type:"CHOPPING",
         recipes: {
             [skillLevels.WOODCUTTING]: recipes[skillLevels.WOODCUTTING]
         }

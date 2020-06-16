@@ -504,7 +504,7 @@
 {
 "name":"bench_type",
 "type":"string",
-"value":"carpenterTable"
+"value":"choppingStump"
 }],
 "rotation":0,
 "type":"WORKBENCH",

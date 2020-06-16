@@ -165,7 +165,7 @@ class BankMenu extends Phaser.Scene {
 
                     {
                         name:"ALL",
-                        command:{key:"WITHDRAW", option:{amount:1}}
+                        command:{key:"WITHDRAW", option:{amount:"ALL"}}
                     }
                 ]
             }
@@ -188,11 +188,9 @@ class BankMenu extends Phaser.Scene {
         this.itemGrid.on('cell.click',  (cellContainer, cellIndex)=> {
             let actualActions = JSON.parse(JSON.stringify(actionItems));
 
-
-
-            let callback = (action)=>{
+            let callback = (action, options)=>{
                 let data ={
-                    slot:cellIndex, action:action
+                    slot:cellIndex, action:action, options:options
                 }
                 this.sender.clickBankSlot(data);
             }

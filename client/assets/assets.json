@@ -26,7 +26,13 @@
       "nails":"assets/item_icons/crafting/nails.png",
       "petal":"assets/item_icons/crafting/petal.png",
       "plank":"assets/item_icons/crafting/plank.png",
-      "silk":"assets/item_icons/crafting/silk.png"
+      "silk":"assets/item_icons/crafting/silk.png",
+      "ANVIL":"assets/map_extras/anvil.png",
+      "CHOPPING":"assets/map_extras/chopping_stump.png",
+      "TAILOR":"assets/map_extras/tailer.png",
+      "iron-rock":"assets/map_extras/iron_rock.png",
+      "copper-rock":"assets/map_extras/copper_rock.png",
+      "gold-rock":"assets/map_extras/gold_rock.png"
     },
     "tilemapTiledJSON": {
         "map": "assets/tilemaps/testmap.json",

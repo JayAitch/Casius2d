@@ -126,11 +126,12 @@ class Zone{
     }
 
 
-    buyItem(client, shopid, slot){
+    buyItem(client, shopid, slot, options){
         //todo: check range
         let shopInv = this.shops[shopid];
+        // todo implement options
         if(shopInv);
-        shopInv.buy(slot, client.character.invent);
+        shopInv.buy(slot, client.character.invent, options);
     }
     //
     // shopTrade(client, id){
